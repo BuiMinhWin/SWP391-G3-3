@@ -30,8 +30,16 @@ public class OrderService {
 
         return orderRepository.save(order);
     }
-    public List<Order> getAccounts(){
+
+    public List<Order> getOrder(){
         return orderRepository.findAll();
+    }
+    public Order getOrders(String orderId){
+        return orderRepository.findById(orderId).orElseThrow(()
+                -> new RuntimeException("Order not found"));
+    }
+    public void deleteOrder(String orderId){
+        orderRepository.deleteById(orderId);
     }
 
 }
