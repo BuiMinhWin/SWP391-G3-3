@@ -1,6 +1,7 @@
 package com.group3.order.controller;
 
 import com.group3.order.dto.request.OrderCreation;
+import com.group3.order.dto.request.OrderUpdate;
 import com.group3.order.entity.Order;
 import com.group3.order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,11 @@ public class OrderController {
     String deleteOrder(@PathVariable String orderId){
         orderService.deleteOrder(orderId);
         return "Order has been deleted";
+    }
+    @PutMapping("/{orderId}")
+    Order updateAccount(@PathVariable String orderId, @RequestBody OrderUpdate request){
+        return orderService.updateOrder(orderId, request);
+
     }
     @GetMapping("/{orderId}")
     Order getOrder(@PathVariable("orderId") String orderId){
