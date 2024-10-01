@@ -22,7 +22,7 @@ const DeliveryComponent = () => {
   useEffect(() => {
     const fetchOverviewData = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/overview'); // 
+        const response = await fetch('http://localhost:8080/api/overview'); 
         const data = await response.json();
         setOverviewData(data);
       } catch (error) {
@@ -32,7 +32,7 @@ const DeliveryComponent = () => {
 
     const fetchDeliveries = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/deliveries'); // 
+        const response = await fetch('http://localhost:8080/api/deliveries'); 
         const data = await response.json();
         setDeliveries(data);
         setSelectedDelivery(data[0]); 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { createEmployee, getEmployee, updateEmployee } from '../services/EmployeeService'
+import { createAccount, getAccount, updateAccount } from '../services/EmployeeService'
 import { useNavigate, useParams } from 'react-router-dom' 
 
 const EmployeeComponent = () => {
@@ -10,6 +10,7 @@ const EmployeeComponent = () => {
   const [roleId, setRoleId] = useState('')
   const [userName, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [phone, setPhone] = useState('');
   const [errors, setErrors] = useState({ 
     firstName: '', 
     lastName: '', 
@@ -17,13 +18,14 @@ const EmployeeComponent = () => {
     roleId: '',
     userName: '',
     password: '',
+    phone 
   })
   
-  const {id} = useParams();
+  const {accountId} = useParams();
 
   useEffect(() => {
-    if(id){
-      getEmployee(id).then((response) => {
+    if(accountId){
+      getAccount(accountId).then((response) => {
         setFirstName(response.data.firstName);
         setLastName(response.data.lastName);
         setEmail(response.data.email);
@@ -32,7 +34,7 @@ const EmployeeComponent = () => {
         console.error(error);
       })
     }
-  },[id])
+  },[accountId])
  
   const navigator = useNavigate();
 
@@ -60,24 +62,24 @@ const EmployeeComponent = () => {
 
   }
 
-  function saveOrUpdateEmployee(e) {
+  function saveOrUpdateAccount(e) {
     e.preventDefault();
 
     if (validateForm()) {  
-      const employee = { firstName, lastName, email, roleId, userName, password };
-      console.log(employee);
-      if(id){
-        updateEmployee(id, employee).then ((response)=>{
+      const account = { firstName, lastName, userName, password, email, phone,roleId,avatar:"",createAt:new Date().toISOString };
+      console.log(account);
+      if(accountId){
+        updateAccount(accountId, account).then ((response)=>{
           console.log(response.data)
-          navigator('/employees');
+          navigator('/accounts');
 
         }).catch(error =>{
           console.error(error)
         })
       }else{
-        createEmployee(employee).then((response) => {
+        createAccount(account).then((response) => {
           console.log(response.data);
-          navigator('/employees');
+          navigator('/accounts');
         }).catch(error=>{
           console.error(error);
         })
@@ -137,7 +139,7 @@ const EmployeeComponent = () => {
   }
 
   function pageTitle() {
-    if (id) {
+    if (accountId) {
       return <h2 className='text-center'> Update Employee </h2>
     } else {
       return <h2 className='text-center'> Add Employee </h2>
@@ -234,7 +236,18 @@ const EmployeeComponent = () => {
                 {errors.password && <div className='invalid-feedback'>{errors.password}</div>}
               </div>
 
-              <button className='btn btn-success' onClick={saveOrUpdateEmployee}>
+              <div className='form-group mb-2'>
+                <label>Phone Number</label>
+                <input 
+                  type="tel" 
+                  value={phone} 
+                  onChange={(e) => setPhone(e.target.value)} 
+                  required 
+                  placeholder="Phone Number"
+                />
+            </div>
+
+              <button className='btn btn-success' onClick={saveOrUpdateAccount}>
                 Submit
               </button>
             </form>

@@ -26,9 +26,9 @@ function App() {
             <Route path='/login' element={<LoginComponent handleLogin={handleLogin} />} />
             <Route path="/register" element={<RegisterComponent />} />
             <Route path='/' element={isAuthenticated ? <ListEmployeeComponent /> : <Navigate to='/login' />} />
-            <Route path='/employees' element={isAuthenticated ? <ListEmployeeComponent /> : <Navigate to='/login' />} />
-            <Route path='/add-employee' element={isAuthenticated ? <EmployeeComponent /> : <Navigate to='/login' />} />
-            <Route path='/edit-employee/:id' element={isAuthenticated ? <EmployeeComponent /> : <Navigate to='/login' />} />
+            <Route path='/accounts' element={isAuthenticated ? <ListEmployeeComponent /> : <Navigate to='/login' />} />
+            <Route path='/add-account' element={isAuthenticated ? <EmployeeComponent /> : <Navigate to='/login' />} />
+            <Route path='/edit-account/:accountId' element={isAuthenticated ? <EmployeeComponent /> : <Navigate to='/login' />} />
           </Routes>
         </div>
         <FooterComponent />

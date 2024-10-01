@@ -1,75 +1,92 @@
-  import React, {useEffect, useState} from 'react'
-  import { deleteEmployee, listEmployees } from '../services/EmployeeService'
-  import { useNavigate } from 'react-router-dom'
-  const ListEmployeeComponent = () => {
+import React, { useEffect, useState } from 'react';
+import {deleteAccount , listAccount } from '../services/EmployeeService';
+import { useNavigate } from 'react-router-dom';
 
-    const [employees, setEmployees] = useState([])
+const ListEmployeeComponent = () => {
+  const [accounts, setAccounts] = useState([]);
+  const navigate = useNavigate()  ;
 
-    const navigator = useNavigate();
+  useEffect(() => {
+    getAllAccounts();
+  }, []);
 
-    useEffect(()=> {
-      getAllEmployees();
-
-    },[])
-    function getAllEmployees(){
-      listEmployees().then((respone)=>{
-        setEmployees(respone.data);
-      }).catch(error =>{
-          console.error(error);
-          
-      });
-    }
-
-    function addNewEmployee(){
-      navigator('/add-employee')
-    }
-    function updateEmployee(id){
-      navigator(`/edit-employee/${id}`);
-    }
-
-    function removeEmployee(id){
-      console.log(id);
-      deleteEmployee(id).then((response)=>{
-        getAllEmployees();
-
-      }).catch(error => {
-        console.error(error);
+  const getAllAccounts = () => {
+    listAccount()
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          setAccounts(response.data);
+        } else {
+          console.error("API response is not an array", response.data);
+          setAccounts([]);
+        }
       })
-    }
-    return (
-    
-      <div className="container">
+      .catch((error) => {
+        console.error("Error fetching employees: ", error);
+      });
+  };
 
-        <h2 className="text-center">List of Employees</h2>
-        <button className='btn btn-primary mb-2 ' onClick={addNewEmployee}>Add Employee </button>
-        <table className='table table-striped table-bordered'>
-          <thead>
+  const addNewAccount = () => {
+    navigate('/add-account');
+  };
+
+  const updateAccount = (accountId) => {
+    navigate(`/edit-account/${accountId}`);
+  };
+
+  const removeAccount = (accountId) => {  
+    deleteAccount (accountId)
+      .then(() => {
+        getAllAccounts();
+      })
+      .catch((error) => {
+        console.error("Error deleting employee: ", error);
+      });
+  };
+
+  return (
+    <div className="container">
+      <h2 className="text-center">List of Accounts</h2>
+      <button className="btn btn-primary mb-2" onClick={addNewAccount}>Add Account</button>
+
+      <table className="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Account Id</th>
+            <th>RoleID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>CreateAt</th>
+            <th>Avatar</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {accounts.length > 0 ? (
+            accounts.map(account => (
+              <tr key={account.accountId}>
+                <td>{account.accountId}</td>
+                <td>{account.roleId}</td>
+                <td>{account.firstName}</td>
+                <td>{account.lastName}</td>
+                <td>{account.email}</td>
+                <td>{account.createAt}</td>
+                <td><img src={account.avatar} alt="Avatar" width="50" height="50" /></td>
+                <td>
+                  <button className="btn btn-info" onClick={() => updateAccount(account.accountId)}>Update</button>
+                  <button className="btn btn-danger" onClick={() => removeAccount(account.accountId)}>Delete</button>
+                </td>
+              </tr>
+            ))
+          ) : (
             <tr>
-              <th>Employee Id</th>
-              <th>Employee First Name</th>
-              <th>Employee Last Name </th>
-              <th>Employee Email</th>
-              <th>Actions</th>
+              <td colSpan="8" className="text-center">No Employees Found</td>
             </tr>
-          </thead>    
-          <tbody>
-            {
-              employees.map(employee => 
-                <tr key={employee.id}>
-                  <td>{employee.id}</td>
-                  <td>{employee.firstName}</td>
-                  <td>{employee.lastName}</td>
-                  <td>{employee.email}</td>
-                  <td>
-                    <button className='btn btn-info' onClick = {()=>updateEmployee(employee.id)}>Update</button>
-                    <button className='btn btn-danger' onClick = {()=>removeEmployee(employee.id)}>Delete</button>
-                  </td>
-                </tr>)
-            }
-          </tbody>
-        </table>
-      </div>
-    )
-  }
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
-  export default ListEmployeeComponent
+export default ListEmployeeComponent;

@@ -3,29 +3,42 @@ import { useNavigate } from 'react-router-dom';
 import '../App.css'; 
 
 const LoginComponent = ({ handleLogin }) => {
-  const [username, setUsername] = useState('');
+  const [userName, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const loginData = { username, password };
-
+  
+    const loginData = { userName, password };
+  
     try {
-      const response = await fetch('http://localhost:8080/api/employees/login', {
+      const response = await fetch('http://localhost:8080/api/accounts/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(loginData),
       });
-
+  
       if (response.ok) {
-        const result = await response.text();
-        alert(result); 
-        handleLogin(true);
-        navigate('/employees');
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const result = await response.json();
+  
+          if (result.roleId === 'admin') {
+            alert('Welcome Admin!');
+            handleLogin(true);
+            navigate('/accounts'); 
+          } 
+          if (result.roleId ==="Delivering Staff"){
+            alert("Welcome");
+            handleLogin(true);
+            navigate("/delivery");
+          }
+        } else {
+          alert('Unexpected response format');
+        }
       } else {
         alert('Login failed');
       }
@@ -49,10 +62,10 @@ const LoginComponent = ({ handleLogin }) => {
           </div>
           <form onSubmit={handleSubmit}>
             <div>
-              <label>Login</label>
+              <label>Username</label>
               <input 
                 type="text" 
-                value={username} 
+                value={userName } 
                 onChange={(e) => setUsername(e.target.value)} 
                 required 
                 placeholder="Email or phone number"
