@@ -2,13 +2,12 @@ package com.example.demo.controller;
 
 
 
-import com.example.demo.dto.request.AccountCreation;
-import com.example.demo.dto.request.AccountUpdate;
-import com.example.demo.entity.Account;
+import com.example.demo.dto.request.AccountDTO;
 import com.example.demo.service.iml.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -17,34 +16,39 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
+
     @PostMapping("/register")
-    Account createAccount(@RequestBody AccountCreation request){
-        return accountService.createAccount(request);
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO accountDTO) {
+        AccountDTO savedAccount = accountService.createAccount(accountDTO);
+        return new ResponseEntity<>(savedAccount, HttpStatus.CREATED);
     }
 
+    // Build Get Account by ID REST API
+    @GetMapping("{accountId}")
+    public ResponseEntity<AccountDTO> getAccountById(@PathVariable("accountId") String accountId) {
+        AccountDTO accountDTO = accountService.getAccountById(accountId);
+        return ResponseEntity.ok(accountDTO);
+    }
+
+    // Build Get All Accounts REST API
     @GetMapping
-    List<Account> getAccounts(){
-        return accountService.getAccounts();
+    public ResponseEntity<List<AccountDTO>> getAllAccounts() {
+        List<AccountDTO> accounts = accountService.getAllAccounts();
+        return ResponseEntity.ok(accounts);
     }
 
-    @GetMapping("/{accountId}")
-    Account getAccount(@PathVariable("accountId") String accountId){
-        return accountService.getAccount(accountId);
+    // Build Update Account REST API
+    @PutMapping("{accountId}")
+    public ResponseEntity<AccountDTO> updateAccount(@PathVariable("accountId") String accountId, @RequestBody AccountDTO updatedAccountDTO) {
+        AccountDTO accountDTO = accountService.updateAccount(accountId, updatedAccountDTO);
+        return ResponseEntity.ok(accountDTO);
     }
 
-    @PutMapping("/{accountId}")
-    Account updateAccount(@PathVariable String accountId, @RequestBody AccountUpdate request){
-        return accountService.updateAccount(accountId, request);
-
-    }
-
-    @DeleteMapping("/{accountId}")
-    String deleteAccount(@PathVariable String accountId){
+    // Build Delete Account REST API
+    @DeleteMapping("{accountId}")
+    public ResponseEntity<String> deleteAccount(@PathVariable("accountId") String accountId) {
         accountService.deleteAccount(accountId);
-        return "Account has been deleted";
+        return ResponseEntity.ok("Account deleted successfully");
     }
-
-
-
 
 }

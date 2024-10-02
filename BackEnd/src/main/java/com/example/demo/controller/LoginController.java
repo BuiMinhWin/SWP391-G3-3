@@ -13,8 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/api/accounts")
 public class LoginController {
 
     @Autowired
@@ -31,7 +33,7 @@ public class LoginController {
         }
     }
 
-    @GetMapping("/manager/dashboard")
+    @GetMapping("/Manager/dashboard")
     public String managerDashboard(@AuthenticationPrincipal Account user, Model model) {
         model.addAttribute("username", user.getUserName());
         return "managerDashboard";  // Trả về managerDashboard.html khi đăng nhập thành công

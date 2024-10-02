@@ -5,8 +5,6 @@ public class LoginDTO {
     private String password;
     private String email;
 
-    public LoginDTO() {
-    }
 
     public String getEmail() {
         return email;

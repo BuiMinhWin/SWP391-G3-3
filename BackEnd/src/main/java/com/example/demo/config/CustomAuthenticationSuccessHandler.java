@@ -1,6 +1,5 @@
 package com.example.demo.config;
 
-import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,16 +22,16 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         for (GrantedAuthority authority : authorities) {
             if (authority.getAuthority().equals("ROLE_MANAGER")) {
-                redirectUrl = "/manager/dashboard";
+                redirectUrl = "/Manager/dashboard";
                 break;
             } else if (authority.getAuthority().equals("ROLE_SALES")) {
-                redirectUrl = "/sales/dashboard";
+                redirectUrl = "/Sales/dashboard";
                 break;
             } else if (authority.getAuthority().equals("ROLE_DELIVERY")) {
-                redirectUrl = "/delivery/dashboard";
+                redirectUrl = "Delivery/dashboard";
                 break;
             } else if (authority.getAuthority().equals("ROLE_CUSTOMER")) {
-                redirectUrl = "/customer/dashboard";
+                redirectUrl = "Customer/dashboard";
                 break;
             }
         }

@@ -2,71 +2,80 @@ package com.example.demo.service.iml;
 
 import com.example.demo.Login.LoginDTO;
 import com.example.demo.Login.LoginMessage;
-import com.example.demo.dto.request.AccountCreation;
-import com.example.demo.dto.request.AccountUpdate;
+import com.example.demo.dto.request.AccountDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.IdGenerator;
+import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.example.demo.exception.ResourceNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class AccountService {
 
 
-    private final AccountRepository accountRepository;
-
     @Autowired
-    public AccountService(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
-    }
+    private AccountRepository accountRepository;
 
-
-    public Account createAccount(AccountCreation request){
-        Account account = new Account();
-
+    public AccountDTO createAccount(AccountDTO accountDTO) {
+        Account account = AccountMapper.mapToAccount(accountDTO);
         account.setAccountId(IdGenerator.generateCustomUserId());
-        account.setRoleId(request.getRoleId());
-        account.setPassword(request.getPassword());
-        account.setUserName(request.getUserName());
-        account.setPhone(request.getPhone());
-        account.setEmail(request.getEmail());
-        account.setAvatar(request.getAvatar());
-        account.setFirstName(request.getFirstName());
-        account.setLastName(request.getLastName());
-        account.setCreateAt(request.getCreateAt());
-
-        return accountRepository.save(account);
+        if (accountDTO.getRoleId() == null || accountDTO.getRoleId().isEmpty()) {
+            account.setRoleId("Customer");
+        }
+        if (accountDTO.getCreateAt() == null) {
+            account.setCreateAt(LocalDateTime.now());
+        }
+        if (accountDTO.getAvatar() == null || accountDTO.getAvatar().isEmpty()) {
+            account.setAvatar("");
+        }
+        Account savedAccount = accountRepository.save(account);
+        return AccountMapper.maptoAccountDTO(savedAccount);
     }
 
-    public Account updateAccount(String userId, AccountUpdate request){
-        Account account = getAccount(userId);
-
-        account.setPassword(request.getPassword());
-        account.setUserName(request.getUserName());
-        account.setPhone(request.getPhone());
-        account.setEmail(request.getEmail());
-        account.setAvatar(request.getAvatar());
-        account.setFirstName(request.getFirstName());
-        account.setLastName(request.getLastName());
-
-        return accountRepository.save(account);
+    public AccountDTO getAccountById(String accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
+        return AccountMapper.maptoAccountDTO(account);
     }
 
-    public List<Account> getAccounts(){
-        return accountRepository.findAll();
+    public List<AccountDTO> getAllAccounts() {
+        List<Account> accounts = accountRepository.findAll();
+        return accounts.stream().map(AccountMapper::maptoAccountDTO)
+                .collect(Collectors.toList());
     }
 
-    public Account getAccount(String accountId){
-        return accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+    public AccountDTO updateAccount(String accountId, AccountDTO updatedAccountDTO) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
 
+        account.setFirstName(updatedAccountDTO.getFirstName());
+        account.setLastName(updatedAccountDTO.getLastName());
+        account.setEmail(updatedAccountDTO.getEmail());
+        account.setRoleId(updatedAccountDTO.getRoleId());
+        account.setUserName(updatedAccountDTO.getUserName());
+        account.setPassword(updatedAccountDTO.getPassword());
+
+        Account updatedAccount = accountRepository.save(account);
+        return AccountMapper.maptoAccountDTO(updatedAccount);
     }
 
-    public void deleteAccount(String accountId){
+    public void deleteAccount(String accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
         accountRepository.deleteById(accountId);
+    }
+
+    public AccountDTO getAccountByUserName(String userName, String password) {
+        Optional<Account> accountOptional = accountRepository.findOneByUserNameAndPassword(userName,password);
+        return accountOptional.map(AccountMapper::maptoAccountDTO).orElse(null);
     }
 
     public LoginMessage loginUser(LoginDTO loginDTO) {
@@ -82,13 +91,13 @@ public class AccountService {
                 if (accountOptional.isPresent()) {
                     return new LoginMessage("Login Success", true, account.getRoleId());
                 } else {
-                    return new LoginMessage("Login Failed", false, account.getRoleId());
+                    return new LoginMessage("Login Failed",false, account.getRoleId());
                 }
             } else {
-                return new LoginMessage("Password Not Match", false, account.getRoleId());
+                return new LoginMessage("Password Not Match",false, account.getRoleId());
             }
         } else {
-            return new LoginMessage("User Name or Email not exists", false, account.getRoleId());
+            return new LoginMessage("User Name or Email not exists",false, account.getRoleId());
         }
     }
 

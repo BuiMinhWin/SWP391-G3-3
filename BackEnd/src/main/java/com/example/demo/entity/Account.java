@@ -1,109 +1,51 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-
+@Table(name = "account")
 public class Account {
+
     @Id
-
+    @Column(name = "account_id", columnDefinition = "CHAR(36)")
     private String accountId;
-    private String roleId;
-    private String password;
-    private String userName;
-    private String phone;
-    private String email;
-    private String avatar;
+
+    @Column(name = "first_name", nullable = false)
     private String firstName;
+
+    @Column(name = "last_name", nullable = false)
     private String lastName;
-    private Date createAt;
 
-    public Account() {
-    }
+    @Column(name = "user_name", nullable = false, unique = true)
+    private String userName;
 
+    @Column(name = "password", nullable = false)
+    private String password;
 
-    public String getAccountId() {
-        return accountId;
-    }
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
+    @Column(name = "phone", length = 15)
+    private String phone;
 
-    public String getAvatar() {
-        return avatar;
-    }
+    @Column(name = "role_id", nullable = false)
+    private String roleId;
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+    @Column(name = "avatar")
+    private String avatar;
 
-    public Date getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(Date createAt) {
-        this.createAt = createAt;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+    @CreationTimestamp
+    @Column(name = "create_at", updatable = false)
+    private LocalDateTime createAt;
 }
