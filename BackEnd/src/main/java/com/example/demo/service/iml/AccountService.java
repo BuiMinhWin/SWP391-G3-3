@@ -5,6 +5,7 @@ import com.example.demo.Login.LoginMessage;
 import com.example.demo.dto.request.AccountDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.IdGenerator;
+import com.example.demo.exception.DuplicateEmailException;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,10 @@ public class AccountService {
     private AccountRepository accountRepository;
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
+        if (accountRepository.existsByEmail(accountDTO.getEmail())) {
+            throw new DuplicateEmailException("This email address '" + accountDTO.getEmail() + "' is already in use." );
+        }
+
         Account account = AccountMapper.mapToAccount(accountDTO);
         account.setAccountId(IdGenerator.generateCustomUserId());
         if (accountDTO.getRoleId() == null || accountDTO.getRoleId().isEmpty()) {
