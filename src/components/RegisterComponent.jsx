@@ -11,8 +11,10 @@ const RegisterComponent = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [avatar, setAvatar] = useState('');
   const navigate = useNavigate();
 
+ 
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -22,7 +24,7 @@ const RegisterComponent = () => {
       return;
     }
   
-    const account = { firstName, lastName, userName, password, email, phone,roleId: 'Customer',avatar:"",createAt:new Date().toISOString };
+    const account = { firstName, lastName, userName, password, email, phone, roleId: 'Customer', avatar:avatarUrl, createAt:new Date().toISOString };
 
     createAccount(account)
       .then((response) => {
@@ -109,6 +111,20 @@ const RegisterComponent = () => {
                 required 
                 placeholder="Phone Number"
               />
+            </div>
+            <div>
+              <label>Avatar</label>
+              <input 
+                type="file" 
+                multiple
+                accept="image/*"
+                onChange={(e) => setAvatar(e.target.files)} 
+              />
+              {avatar && [...avatar].map((ava, index) => (
+                <div key={index}>
+                  <img src={URL.createObjectURL(ava)} width="200px" alt={`Avatar ${index}`} />
+                </div>
+              ))}
             </div>
             <button type="submit">Sign Up</button>
             <button type="button" className="google-login">Sign Up with Google</button>

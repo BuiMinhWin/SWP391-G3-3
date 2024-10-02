@@ -31,7 +31,7 @@ function App() {
             <Route path='/edit-account/:accountId' element={isAuthenticated ? <EmployeeComponent /> : <Navigate to='/login' />} />
           </Routes>
         </div>
-        <FooterComponent />
+        {/* <FooterComponent /> */}
       </BrowserRouter>
     </div>
   );
