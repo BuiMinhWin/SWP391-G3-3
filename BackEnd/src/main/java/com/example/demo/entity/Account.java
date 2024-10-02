@@ -11,7 +11,6 @@ import java.util.Date;
 
 public class Account {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
 
     private String accountId;
     private String roleId;
