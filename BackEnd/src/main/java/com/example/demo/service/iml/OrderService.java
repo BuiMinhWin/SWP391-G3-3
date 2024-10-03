@@ -1,6 +1,11 @@
 package com.example.demo.service.iml;
 
-public class OrderService {
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@AllArgsConstructor
+
+public class OrderService {
 
 }
