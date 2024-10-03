@@ -21,8 +21,9 @@ public class Order {
     @Column(name = "order_id", columnDefinition = "CHAR(36)")
     private String orderId;
 
-    @Column(name = "account_id", nullable = false)
-    private String accountId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
     @Column(name = "order_date", nullable = false)
     private LocalDateTime orderDate;

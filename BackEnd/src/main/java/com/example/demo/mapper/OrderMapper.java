@@ -1,14 +1,17 @@
 package com.example.demo.mapper;
 
 import com.example.demo.dto.request.OrderDTO;
+import com.example.demo.entity.Account;
 import com.example.demo.entity.Order;
+import org.springframework.stereotype.Component;
 
+@Component
 public class OrderMapper {
 
-    public static OrderDTO mapToOrderDTO(Order order) {
+    public OrderDTO mapToOrderDTO(Order order) {
         return new OrderDTO(
                 order.getOrderId(),
-                order.getAccountId(),
+                order.getAccount().getAccountId(),
                 order.getOrderDate(),
                 order.getShippedDate(),
                 order.getOrigin(),
@@ -21,10 +24,10 @@ public class OrderMapper {
         );
     }
 
-    public static Order mapToOrder(OrderDTO orderDTO) {
+    public Order mapToOrder(OrderDTO orderDTO, Account account) {
         Order order = new Order();
         order.setOrderId(orderDTO.getOrderId());
-        order.setAccountId(orderDTO.getAccountId());
+        order.setAccount(account);
         order.setOrderDate(orderDTO.getOrderDate());
         order.setShippedDate(orderDTO.getShippedDate());
         order.setOrigin(orderDTO.getOrigin());
