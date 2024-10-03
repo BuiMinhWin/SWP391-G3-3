@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO {
+
     private String orderId;
     private String accountId;
     private LocalDateTime orderDate;

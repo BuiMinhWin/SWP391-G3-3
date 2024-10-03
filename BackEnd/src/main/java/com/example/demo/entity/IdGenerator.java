@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class IdGenerator {
 
-    public static String generateCustomUserId() {
+    public static String generateId() {
         Random random = new Random();
 
         char letter1 = (char) (random.nextInt(26) + 'A');
