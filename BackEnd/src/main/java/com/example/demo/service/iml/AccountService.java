@@ -31,7 +31,7 @@ public class AccountService {
         }
 
         Account account = AccountMapper.mapToAccount(accountDTO);
-        account.setAccountId(IdGenerator.generateCustomUserId());
+        account.setAccountId(IdGenerator.generateId());
         if (accountDTO.getRoleId() == null || accountDTO.getRoleId().isEmpty()) {
             account.setRoleId("Customer");
         }
