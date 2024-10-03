@@ -15,6 +15,8 @@ import lombok.Setter;
 @Table(name = "`document`")
 public class Document {
 
+    @Id
+
     @Column(name = "document_id", nullable = false)
     private String documentId;
 

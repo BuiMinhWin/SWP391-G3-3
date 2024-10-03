@@ -14,6 +14,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "`service`")
 public class Service {
+    @Id
 
     @Column(name = "service_id", nullable = false)
     private String serviceId;
