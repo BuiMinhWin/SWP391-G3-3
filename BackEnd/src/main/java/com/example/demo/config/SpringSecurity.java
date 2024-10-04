@@ -19,7 +19,11 @@ public class SpringSecurity {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AccountService accountService) throws Exception {
         http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/", "/api/accounts/login", "/api/accounts", "/api/accounts/**", "/api/accounts/register","/api/orders/create", "/error", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                        .requestMatchers("/", "/api/accounts/login", "/api/accounts", "/api/accounts/**"
+                                , "/api/accounts/register","/api/orders/create"
+                                ,"/api/feedbacks/create"
+                                , "/error", "/swagger-ui/**", "/v3/api-docs/**"
+                                , "/swagger-resources/**", "/webjars/**").permitAll()
                         .requestMatchers("/Manager/**").hasRole("MANAGER")
                         .requestMatchers("/Sales/**").hasRole("SALES")
                         .requestMatchers("/Delivery/**").hasRole("DELIVERY")

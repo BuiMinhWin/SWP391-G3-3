@@ -22,7 +22,7 @@ public class FeedbackService {
     @Autowired
     private OrderRepository orderRepository;
 
-    public FeedbackDTO createFeedback(FeedbackDTO feedbackDTO, String orderId) {
+    public FeedbackDTO createFeedback(FeedbackDTO feedbackDTO) {
 
         Order order = orderRepository.findById(feedbackDTO.getOrderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Feedback not found with id " + feedbackDTO.getOrderId()));
