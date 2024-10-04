@@ -17,12 +17,12 @@ import java.time.LocalDateTime;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID) // UUID cho orderId
     @Column(name = "order_id", columnDefinition = "CHAR(36)")
     private String orderId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading cho Account
+    @JoinColumn(name = "account_id", nullable = false) // Khóa ngoại
     private Account account;
 
     @Column(name = "order_date", nullable = false)
