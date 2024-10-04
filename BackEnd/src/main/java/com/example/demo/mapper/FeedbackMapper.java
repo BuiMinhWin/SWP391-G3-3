@@ -2,13 +2,14 @@ package com.example.demo.mapper;
 
 import com.example.demo.dto.request.FeedbackDTO;
 import com.example.demo.entity.Feedback;
+import com.example.demo.entity.Order;
 
 public class FeedbackMapper {
 
     public static FeedbackDTO maptoFeedbackDTO(Feedback feedback) {
         return new FeedbackDTO(
                 feedback.getFeedbackId(),
-                feedback.getOrderId(),
+                feedback.getOrder().getOrderId(),
                 feedback.getRating(),
                 feedback.getComment(),
                 feedback.getCreatedAt(),
@@ -16,10 +17,10 @@ public class FeedbackMapper {
         );
     }
 
-    public static Feedback mapToFeedback(FeedbackDTO feedbackDTO) {
+    public static Feedback mapToFeedback(FeedbackDTO feedbackDTO, Order order) {
         Feedback feedback = new Feedback();
         feedback.setFeedbackId(feedbackDTO.getFeedbackId());
-        feedback.setOrderId(feedbackDTO.getOrderId());
+        feedback.setOrder(order);
         feedback.setRating(feedbackDTO.getRating());
         feedback.setComment(feedbackDTO.getComment());
         feedback.setCreatedAt(feedbackDTO.getCreatedAt());

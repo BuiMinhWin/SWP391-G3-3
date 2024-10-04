@@ -22,8 +22,9 @@ public class Feedback {
     @Column(name = "feedback_id", columnDefinition = "CHAR(36)")
     private String feedbackId;
 
-    @Column(name = "order_id", nullable = false)
-    private String orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     @Column(name = "rating")
     private int rating;
