@@ -1,8 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.request.AccountDTO;
 import com.example.demo.dto.request.OrderDTO;
-import com.example.demo.service.iml.AccountService;
 import com.example.demo.service.iml.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
