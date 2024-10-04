@@ -53,6 +53,64 @@ public class OrderService {
         return orderMapper.mapToOrderDTO(savedOrder);
     }
 
+    public OrderDTO cancelOrder(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
+
+        if (order.getStatus() != 0) {
+            order.setStatus(0);
+            order.setOrderDate(LocalDateTime.now());
+            Order savedOrder = orderRepository.save(order);
+            return orderMapper.mapToOrderDTO(savedOrder);
+        } else {
+            throw new IllegalStateException("Order is already canceled.");
+        }
+    }
+
+    public OrderDTO updateOrderWhenCanceled(String orderId, OrderDTO orderDTO) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
+
+        if (order.getStatus() == 0) {
+
+            if (orderDTO.getOrderDate() != null) {
+                order.setOrderDate(orderDTO.getOrderDate());
+            }
+
+            if (orderDTO.getShippedDate() != null) {
+                order.setShippedDate(orderDTO.getShippedDate());
+            }
+
+            if (orderDTO.getOrigin() != null) {
+                order.setOrigin(orderDTO.getOrigin());
+            }
+
+            if (orderDTO.getDestination() != null) {
+                order.setDestination(orderDTO.getDestination());
+            }
+
+            if (orderDTO.getFreight() != null) {
+                order.setFreight(orderDTO.getFreight());
+            }
+
+            if (orderDTO.getTotalPrice() != 0) {
+                order.setTotalPrice(orderDTO.getTotalPrice());
+            }
+
+            if (orderDTO.getAccountId() != null) {
+                Account account = accountRepository.findById(orderDTO.getAccountId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + orderDTO.getAccountId()));
+                order.setAccount(account);
+            }
+            order.setStatus(1);
+            Order updatedOrder = orderRepository.save(order);
+
+            return orderMapper.mapToOrderDTO(updatedOrder);
+        } else {
+            throw new IllegalStateException("Order can only be updated if it is canceled.");
+        }
+    }
+
 
 
 }
