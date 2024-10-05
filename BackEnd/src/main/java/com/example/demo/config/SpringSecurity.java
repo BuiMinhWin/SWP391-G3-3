@@ -21,7 +21,7 @@ public class SpringSecurity {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/", "/api/accounts/login", "/api/accounts", "/api/accounts/**"
                                 , "/api/accounts/register","/api/orders/create","/api/orders/cancel/**","/api/orders/update/**"
-                                ,"/api/feedbacks/create"
+                                ,"/api/feedbacks/create", "/api/ordersDetail/create"
                                 , "/error", "/swagger-ui/**", "/v3/api-docs/**"
                                 , "/swagger-resources/**", "/webjars/**").permitAll()
                         .requestMatchers("/Manager/**").hasRole("MANAGER")

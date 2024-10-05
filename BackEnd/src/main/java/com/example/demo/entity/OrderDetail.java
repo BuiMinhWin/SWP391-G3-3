@@ -22,8 +22,9 @@ public class OrderDetail {
     @Column(name = "order_detail_id", columnDefinition = "CHAR(36)")
     private String orderDetailId;
 
-    @Column(name = "order_id", nullable = false)
-    private String orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     @Column(name = "quantity")
     private int quantity;
