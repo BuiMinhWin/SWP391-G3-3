@@ -94,12 +94,10 @@ public class AccountService {
         if (account != null) {
             String inputPassword = loginDTO.getPassword();
             String encodedPassword = account.getPassword();
-
-            // Kiểm tra mật khẩu
+            
             if (inputPassword.equals(encodedPassword)) {
                 Optional<Account> accountOptional = accountRepository.findOneByUserNameAndPassword(account.getUserName(), encodedPassword);
 
-                // Nếu đăng nhập thành công
                 if (accountOptional.isPresent()) {
                     return ResponseEntity.ok(new LoginMessage("Login Success", true, account.getRoleId()));
                 } else {
@@ -107,12 +105,10 @@ public class AccountService {
                             .body(new LoginMessage("Login Failed", false, account.getRoleId()));
                 }
             } else {
-                // Mật khẩu không khớp
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(new LoginMessage("Password Not Match", false, account.getRoleId()));
             }
         } else {
-            // Người dùng hoặc email không tồn tại
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new LoginMessage("User Name or Email not exists", false, null));
         }
