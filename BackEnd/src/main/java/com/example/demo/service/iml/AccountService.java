@@ -10,12 +10,14 @@ import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.demo.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
 
 @Service
 @AllArgsConstructor
@@ -83,7 +85,8 @@ public class AccountService {
         return accountOptional.map(AccountMapper::maptoAccountDTO).orElse(null);
     }
 
-    public LoginMessage loginUser(LoginDTO loginDTO) {
+
+    public ResponseEntity<LoginMessage> loginUser(LoginDTO loginDTO) {
         Account account = accountRepository.findByUserName(loginDTO.getUserName());
         if (account == null) {
             account = accountRepository.findByEmail(loginDTO.getEmail());
@@ -91,19 +94,29 @@ public class AccountService {
         if (account != null) {
             String inputPassword = loginDTO.getPassword();
             String encodedPassword = account.getPassword();
+
+            // Kiểm tra mật khẩu
             if (inputPassword.equals(encodedPassword)) {
                 Optional<Account> accountOptional = accountRepository.findOneByUserNameAndPassword(account.getUserName(), encodedPassword);
+
+                // Nếu đăng nhập thành công
                 if (accountOptional.isPresent()) {
-                    return new LoginMessage("Login Success", true, account.getRoleId());
+                    return ResponseEntity.ok(new LoginMessage("Login Success", true, account.getRoleId()));
                 } else {
-                    return new LoginMessage("Login Failed",false, account.getRoleId());
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(new LoginMessage("Login Failed", false, account.getRoleId()));
                 }
             } else {
-                return new LoginMessage("Password Not Match",false, account.getRoleId());
+                // Mật khẩu không khớp
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new LoginMessage("Password Not Match", false, account.getRoleId()));
             }
         } else {
-            return new LoginMessage("User Name or Email not exists",false, account.getRoleId());
+            // Người dùng hoặc email không tồn tại
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new LoginMessage("User Name or Email not exists", false, null));
         }
     }
+
 
 }

@@ -17,13 +17,8 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginMessage> login(@RequestBody LoginDTO loginDTO) {
-        LoginMessage loginMessage = accountService.loginUser(loginDTO);
-
-        if (loginMessage.getStatus()) {
-            return new ResponseEntity<>(loginMessage, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(loginMessage, HttpStatus.UNAUTHORIZED);
-        }
+        return accountService.loginUser(loginDTO);
     }
+
 
 }
