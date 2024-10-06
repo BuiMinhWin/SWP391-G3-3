@@ -27,7 +27,7 @@ public class OrderMapper {
     public Order mapToOrder(OrderDTO orderDTO, Account account) {
         Order order = new Order();
         order.setOrderId(orderDTO.getOrderId());
-        order.setAccount(account); // Đảm bảo bạn gán đối tượng Account
+        order.setAccount(account);
         order.setOrderDate(orderDTO.getOrderDate());
         order.setShippedDate(orderDTO.getShippedDate());
         order.setOrigin(orderDTO.getOrigin());
