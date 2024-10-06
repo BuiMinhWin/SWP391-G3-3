@@ -3,7 +3,7 @@ package com.example.demo.Login;
 public class LoginMessage {
     String message;
     Boolean status;
-    String role;
+    String roleId;
 
     public String getMessage() {
         return message;
@@ -18,17 +18,17 @@ public class LoginMessage {
         this.status = status;
     }
 
-    public LoginMessage(String message, Boolean status, String role) {
+    public LoginMessage(String message, Boolean status, String roleId) {
         this.message = message;
         this.status = status;
-        this.role = role;
+        this.roleId = roleId;
     }
 
-    public String getRole() {
-        return role;
+    public String getRoleId() {
+        return roleId;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
     }
 }
