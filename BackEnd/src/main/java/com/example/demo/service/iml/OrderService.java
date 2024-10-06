@@ -6,6 +6,7 @@ import com.example.demo.dto.request.OrderDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.IdGenerator;
 import com.example.demo.entity.Order;
+import com.example.demo.mapper.AccountMapper;
 import com.example.demo.mapper.OrderMapper;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OrderRepository;
@@ -15,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -36,7 +39,8 @@ public class OrderService {
         System.out.println("Account found: " + account);
 
         Order order = orderMapper.mapToOrder(orderDTO, account);
-        order.setOrderId(IdGenerator.generateId());
+        order.setDocumentId(IdGenerator.generateId());
+        order.setServiceId(IdGenerator.generateId());
 
         if (orderDTO.getOrderDate() == null) {
             order.setOrderDate(LocalDateTime.now());
@@ -110,7 +114,18 @@ public class OrderService {
             throw new IllegalStateException("Order can only be updated if it is canceled.");
         }
     }
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(orderMapper::mapToOrderDTO)
+                .collect(Collectors.toList());
+    }
 
+    public OrderDTO getOrderById(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
+        return orderMapper.mapToOrderDTO(order);
+    }
 
 
 }
