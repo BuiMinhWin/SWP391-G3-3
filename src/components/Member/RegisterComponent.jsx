@@ -8,7 +8,7 @@ const RegisterComponent = () => {
   const [lastName, setLastName] = useState('');
   const [userName, setUserName] = useState(''); 
   const [password, setPassword] = useState('');
-  // const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [avatar, setAvatar] = useState('');
@@ -79,7 +79,7 @@ const RegisterComponent = () => {
                 placeholder="Enter password"
               />
             </div>
-            {/* <div className="input-group">
+           <div className="input-group">
               <label>Confirm Password</label>
               <input 
                 type="password" 
@@ -88,7 +88,7 @@ const RegisterComponent = () => {
                 required 
                 placeholder="Confirm password"
               />
-            </div> */}
+            </div> 
             <div className="input-group">
               <label>Email</label>
               <input 

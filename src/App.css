@@ -16,14 +16,7 @@ html, body {
   text-align: center;
   padding: 20px;
 }
-.main-content {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-/* Header styles */
+
 .header {
   background-color: #2b3a4d;
   color: white;
