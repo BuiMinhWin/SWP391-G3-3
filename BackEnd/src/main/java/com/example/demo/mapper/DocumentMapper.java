@@ -3,21 +3,25 @@ package com.example.demo.mapper;
 import com.example.demo.dto.request.DocumentDTO;
 import com.example.demo.entity.Document;
 import com.example.demo.entity.Order;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DocumentMapper {
 
-    public static DocumentDTO maptoDocumentDTO(Document document) {
+    public DocumentDTO mapToDocumentDTO(Document document) {
         return new DocumentDTO(
-                document.getOrder().getDocumentId(),
+                document.getDocumentId(),
+                document.getOrder().getOrderId(),
                 document.getDocumentType(),
                 document.getDescription()
         );
     }
 
-    public static Document mapToDocument(DocumentDTO documentDTO, Order order) {
+    public Document mapToDocument(DocumentDTO documentDTO, Order order) {
         Document document = new Document();
+        document.setDocumentId(documentDTO.getDocumentId());
         document.setOrder(order);
-        document.setDocumentType(documentDTO.getDocument_type());
+        document.setDocumentType(documentDTO.getDocumentType());
         document.setDescription(documentDTO.getDescription());
         return document;
     }

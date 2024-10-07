@@ -15,12 +15,12 @@ import lombok.Setter;
 public class Document {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "document_id", columnDefinition = "CHAR(36)")
     private String documentId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "document_id", referencedColumnName = "order_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     @Column(name = "document_type")

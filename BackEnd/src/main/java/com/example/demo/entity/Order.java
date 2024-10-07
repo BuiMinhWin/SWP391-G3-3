@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -43,11 +44,8 @@ public class Order {
     @Column(name = "total_price")
     private float totalPrice;
 
-    @Column(name = "service_id")
-    private String serviceId;
-
-    @Column(name = "document_id")
-    private String documentId;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Document> documents;
 
     @Column(name = "status")
     private int status;

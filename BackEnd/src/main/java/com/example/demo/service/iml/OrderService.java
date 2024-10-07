@@ -39,8 +39,6 @@ public class OrderService {
         System.out.println("Account found: " + account);
 
         Order order = orderMapper.mapToOrder(orderDTO, account);
-        order.setDocumentId(IdGenerator.generateId());
-        order.setServiceId(IdGenerator.generateId());
 
         if (orderDTO.getOrderDate() == null) {
             order.setOrderDate(LocalDateTime.now());

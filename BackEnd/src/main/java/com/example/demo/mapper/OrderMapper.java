@@ -18,8 +18,6 @@ public class OrderMapper {
                 order.getDestination(),
                 order.getFreight(),
                 order.getTotalPrice(),
-                order.getServiceId(),
-                order.getDocumentId(),
                 order.getStatus()
         );
     }
@@ -34,8 +32,6 @@ public class OrderMapper {
         order.setDestination(orderDTO.getDestination());
         order.setFreight(orderDTO.getFreight());
         order.setTotalPrice(orderDTO.getTotalPrice());
-        order.setServiceId(orderDTO.getServiceId());
-        order.setDocumentId(orderDTO.getDocumentId());
         order.setStatus(orderDTO.getStatus());
         return order;
     }

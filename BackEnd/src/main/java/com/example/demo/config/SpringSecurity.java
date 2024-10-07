@@ -27,6 +27,7 @@ public class SpringSecurity {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/", "/api/accounts/login", "/api/accounts", "/api/accounts/**", "/api/accounts/register"
                                 ,"/api/orders/create","/api/orders/cancel/**","/api/orders/update/**","/api/orders","/api/orders/**"
+                                ,"/api/documents/create","/api/documents/**","/api/documents","/api/documents/order/**"
                                 ,"/api/feedbacks/create", "/api/ordersDetail/create"
                                 , "/error", "/swagger-ui/**", "/v3/api-docs/**"
                                 , "/swagger-resources/**", "/webjars/**").permitAll()

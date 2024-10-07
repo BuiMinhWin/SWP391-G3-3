@@ -21,7 +21,5 @@ public class OrderDTO {
     private String destination;
     private String freight;
     private float totalPrice;
-    private String serviceId;
-    private String documentId;
     private int status;
 }
