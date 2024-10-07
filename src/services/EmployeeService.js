@@ -1,13 +1,13 @@
 import axios from "axios";
 
-const REST_API_BASE_URL = "http://222.255.238.187:8080/api/accounts";
+const REST_API_BASE_URL = "http://koideliverysystem.id.vn:8080/api/accounts";
 
 export const listAccount = () => {
   return axios.get(REST_API_BASE_URL);
 };
 
 export const createAccount = (account) => {
-  return axios.post(REST_API_BASE_URL, account);
+  return axios.post(REST_API_BASE_URL + '/register', account);
 };
 
 export const getAccount = (accountId) => {
