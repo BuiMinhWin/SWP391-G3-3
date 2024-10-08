@@ -47,6 +47,14 @@ public class AccountService {
         return AccountMapper.maptoAccountDTO(savedAccount);
     }
 
+    public Account findByEmail(String email) {
+        return accountRepository.findByEmail(email);
+    }
+
+    public void save(Account account) {
+        accountRepository.save(account);
+    }
+
     public AccountDTO getAccountById(String accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
@@ -113,7 +121,5 @@ public class AccountService {
                     .body(new LoginMessage("User Name or Email not exists", false, null));
         }
     }
-
-
 
 }

@@ -17,10 +17,6 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SpringSecurity {
 
-    @Autowired
-    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AccountService accountService) throws Exception {
         http
@@ -42,7 +38,6 @@ public class SpringSecurity {
                         .loginPage("/login")
                         .loginProcessingUrl("/doLogin")
                         .failureUrl("/login?error=true")
-                        .successHandler(customAuthenticationSuccessHandler)
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/").permitAll()
