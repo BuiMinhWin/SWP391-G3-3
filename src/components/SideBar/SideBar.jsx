@@ -34,7 +34,8 @@ const SideBar = () => {
       anchor="left"
     >
       <Divider />
-      <List>
+      <List       sx={{ width: '100%', maxWidth: 360, bgcolor: 'inherit' }}
+      component="nav" >
         {["Thống kê", "Đơn hàng", "Trang cá nhân"].map((text, index) => (
           <ListItem
             key={text}
@@ -53,17 +54,21 @@ const SideBar = () => {
                   }
                 : undefined
             }
+            sx={{ display:'flex'}}
           >
-            <ListItemButton>
+            <ListItemButton  >
               <ListItemIcon
                 sx={{
                   color: "white",
+                  '& . Mui-ListItemIcon-root': {
+                    marginTop: '21px'
+                  }
                 }}
               >
                 {index === 0 ? (
-                  <InsertChartOutlinedIcon />
+                  <InsertChartOutlinedIcon  />
                 ) : index === 1 ? (
-                  <LocalShippingOutlinedIcon />
+                  <LocalShippingOutlinedIcon  />
                 ) : index === 2 ? (
                   <PermIdentityOutlinedIcon />
                 ) : undefined}
