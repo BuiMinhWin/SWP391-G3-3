@@ -33,7 +33,7 @@ public class APIConfig {
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("public")
-                .pathsToMatch("/api/**")
+                .pathsToMatch("/api/accounts/**")
                 .build();
     }
 }
