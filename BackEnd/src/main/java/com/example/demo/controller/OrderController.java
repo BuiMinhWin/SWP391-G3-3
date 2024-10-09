@@ -42,4 +42,9 @@ public class OrderController {
         OrderDTO order = orderService.getOrderById(orderId);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
+    @PutMapping("/updateStatus/{orderId}")
+    public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable String orderId, @RequestParam int newStatus) {
+        OrderDTO updatedOrder = orderService.updateOrderStatus(orderId, newStatus);
+        return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
+    }
 }

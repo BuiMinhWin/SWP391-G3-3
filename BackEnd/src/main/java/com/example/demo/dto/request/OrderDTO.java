@@ -20,6 +20,18 @@ public class OrderDTO {
     private String origin;
     private String destination;
     private String freight;
+
+    private String receiverName;
+    private String senderName;
+    private String receiverAddress;
+    private String senderAddress;
+    private String receiverPhone;
+    private String senderPhone;
+    private int postalCode;
+    private String receiverNote;
+    private String senderNote;
+    private String orderNote;
+
     private float totalPrice;
     private int status;
 }

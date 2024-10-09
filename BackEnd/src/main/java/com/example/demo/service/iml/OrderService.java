@@ -125,5 +125,35 @@ public class OrderService {
         return orderMapper.mapToOrderDTO(order);
     }
 
+    public OrderDTO updateOrderStatus(String orderId, int newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
+
+        order.setStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
+
+        switch (newStatus) {
+            case 0:
+                System.out.println("Order status updated to Canceled.");
+                break;
+            case 1:
+                System.out.println("Order status updated to Processing.");
+                break;
+            case 2:
+                System.out.println("Order status updated to Shipped.");
+                break;
+            case 3:
+                System.out.println("Order status updated to Delivered.");
+                break;
+            default:
+                System.out.println("Order status updated to an unrecognized status.");
+                break;
+        }
+
+        return orderMapper.mapToOrderDTO(updatedOrder);
+    }
+
+
+
 
 }
