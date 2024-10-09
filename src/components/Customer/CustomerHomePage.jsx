@@ -4,6 +4,7 @@ import './CustomerHomePage.css';
 import FAQs from "../FAQs/FAQs";
 import logo from '../../assets/Logo.png';
 import blog from '../../assets/Blog.jpg';
+import avatar from '../../assets/Avatar.jpg';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -32,6 +33,11 @@ const Homepage = () => {
     }
   }, [activeTab]);
 
+  const [isDropdownOpen, setDropdownOpen] = useState(false); // Quản lý trạng thái mở dropdown
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!isDropdownOpen);
+  }
 
   return (
     <div className="homepage-container">
@@ -51,13 +57,22 @@ const Homepage = () => {
               <a href="#">Chương trình khuyến mãi</a>
             </div>
           </div>
+
+          
           <a href="#" className="nav-link">Giới Thiệu</a>
         </div>
         <div className="navbar-right">
-          <a href="#" className="nav-link support-link"><i className="fas fa-question-circle"></i>Hỗ Trợ</a>
-          <button className="register-btn" onClick={() => navigate('/register')}>Đăng Ký</button>
-          <button className="login-btn" onClick={() => navigate('/login')}>Đăng Nhập</button>  
-        </div>
+      <a href="#" className="nav-link support-link">
+        <i className="fas fa-question-circle"></i> Hỗ Trợ
+      </a>
+      <div className="dropdown">
+          <img src={avatar} alt="Avatar" className="avatar" />
+            <div className="dropdown-content">
+              <a href="#">Tài khoản của tôi</a>
+              <a href="#">Đăng xuất</a>
+            </div>  
+      </div>
+    </div>
       </nav>
 
       {/* Welcome section */}
