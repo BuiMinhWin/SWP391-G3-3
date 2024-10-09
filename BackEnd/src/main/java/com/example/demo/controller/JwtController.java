@@ -20,14 +20,10 @@ public class JwtController {
     private AccountService accountService;
 
     @GetMapping("/getAccessToken")
-    public String getAccessToken(HttpSession session) {
-        // Lấy access token từ session hoặc từ Swagger UI
+    public String getAccessToken(String token) {
 
-        String accessToken = (String) session.getAttribute("swaggerAccessToken");
-        session.setAttribute("swaggerAccessToken", accessToken);
-        System.out.println("Access Token stored in session: " + session.getAttribute("swaggerAccessToken"));
-        if (accessToken != null) {
-            return "Access Token: " + accessToken;
+        if (token != null) {
+            return "Access Token: " + token;
         } else {
             return "Access Token not found. Please login again.";
         }
