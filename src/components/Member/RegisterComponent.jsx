@@ -15,6 +15,7 @@ const RegisterComponent = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
+    console.log(account)
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -23,7 +24,7 @@ const RegisterComponent = () => {
     }
 
     const account = { firstName, lastName, userName, password, email, phone, roleId: 'Customer', avatar, createAt: new Date().toISOString };
-
+    console.log (account);
     createAccount(account)
       .then((response) => {
         console.log('Account created:', response.data);
