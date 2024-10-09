@@ -22,16 +22,13 @@ const LoginComponent = ({ handleLogin }) => {
       console.log("Role ID:", result.roleId);
 
       if (result.roleId === 'Manager') {
-        navigate('/accounts');
+        navigate('/manager');
       } else if (result.roleId === 'Delivery') {
         navigate('/delivery');
       } else if (result.roleId === 'Customer') {
         navigate('/customer');
-      } else if (result.roleId === 'Manager') {
-        navigate('/manager');
-      }
-      else if (result.roleId === 'Sales') {
-        navigate('/salestaff');
+      }else if (result.roleId === 'Sales') {
+        navigate('/sales');
       }
     } catch (error) {
       console.error('Login Error:', error);
@@ -49,8 +46,8 @@ const LoginComponent = ({ handleLogin }) => {
       return;
     }
   
-    fetch('http://koideliverysystem.id.vn:8080/api/oauth2/authorization/google', {
-      method: 'POST',
+    fetch('http://koideliverysystem.id.vn:8080/api/loginGG/user-info', {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },

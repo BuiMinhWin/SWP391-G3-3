@@ -3,9 +3,7 @@ import { Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './DeliveryStaff.css';
-import { useNavigate } from 'react-router-dom';
-import { listOrder,getOrderDetail } from '../../services/DeliveryService';
+import './Manager.css';
 
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
@@ -17,19 +15,15 @@ const DeliveryComponent = () => {
     ongoingShipments: 0,
     delivered: 0,
   });
-  const [orders, setOrders] = useState([]);
-  const navigate = useNavigate();
 
+  const [deliveries, setDeliveries] = useState([]);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [profitsData, setProfitsData] = useState({ weekly: 0, monthly: 0, yearly: 0 });
-  const [hoveredOrder, setHoveredOrder] = useState(null); 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [orderDetail, setOrderDetail] = useState(null);
 
   useEffect(() => {
     const fetchOverviewData = async () => {
       try {
-        const response = await fetch('http://koideliverysystem.id.vn:8080/api/orders'); 
+        const response = await fetch('http://localhost:8080/api/overview'); 
         const data = await response.json();
         setOverviewData(data);
       } catch (error) {
@@ -39,9 +33,9 @@ const DeliveryComponent = () => {
 
     const fetchDeliveries = async () => {
       try {
-        const response = await fetch('http://koideliverysystem.id.vn:8080/api/orders'); 
+        const response = await fetch('http://localhost:8080/api/delivery'); 
         const data = await response.json();
-        
+        setDeliveries(data);
         setSelectedDelivery(data[0]); 
       } catch (error) {
         console.error('Error fetching deliveries:', error);
@@ -50,36 +44,13 @@ const DeliveryComponent = () => {
 
     fetchOverviewData();
     fetchDeliveries();
-    getAllOrders();
   }, []);
 
-  const getAllOrders = () => {
-    listOrder()
-      .then((response) => {
-        if (Array.isArray(response.data)) {
-          setOrders(response.data);
-        } else {
-          console.error("API response is not an array", response.data);
-          setOrders([]);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching : ", error);
-      });
-  };
-  
-  const handleMouseEnter = (order) => {
-    setHoveredOrder(order); 
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredOrder(null); 
-  };
   const fetchOrderDetails = async (orderId) => {
     try {
-      const response = await fetch('http://localhost:8080/api/orders/${orderId}'); 
+      const response = await fetch(`http://localhost:8080/api/orders/${orderId}`); 
       const data = await response.json();
-    
+     
       updateChartData(data);
     } catch (error) {
       console.error('Error fetching order details:', error);
@@ -124,34 +95,10 @@ const DeliveryComponent = () => {
     ],
   };
 
-  const handleSearch = async (event) => {
-    const query = event.target.value;
-    setSearchQuery(query);
-  
-    if (query) {
-      try {
-        
-        const response = await getOrderDetail(query);
-        
-        if (response.data) {
-          setOrderDetail(response.data);  
-        } else {
-          setOrderDetail(null);  
-        }
-      } catch (error) {
-        console.error("Error fetching order details:", error);
-        setOrderDetail(null);  
-      }
-    } else {
-      setOrderDetail(null);  
-    }
-  };
-  
-
   return (
     <div className="container-fluid">
       <div className="row">
-        <aside className="sidebar col-2 p-3 border-end">
+         <aside className="sidebar col-2 p-3 border-end">
           <div className="profile-container text-center mb-4">
             <div className="SideKoi d-flex align-items-center justify-content-between">
               <img src="/Logo-Koi/Order.png" alt="Profile " className="profile-img rounded-circle me-3" />
@@ -168,10 +115,13 @@ const DeliveryComponent = () => {
           <a href="#"><i className="bi bi-speedometer2 me-2"></i> Dashboard</a>
         </li>
         <li>
-          <a href="/orders"><i className="bi bi-bag me-2"></i> Orders</a>
+          <a href="#"><i className="bi bi-chat-dots me-2"></i> Messages</a>
         </li>
         <li>
-          <a href="#"><i className="bi bi-chat-dots me-2"></i> Messages</a>
+          <a  href="/accounts"><i className="bi bi-people me-2"></i> Customers</a>
+        </li>
+        <li>
+          <a href="#"><i className="bi bi-person-badge me-2"></i> Employees</a>
         </li>
         <li>
           <a href="#"><i className="bi bi-life-preserver me-2"></i> Help & Support</a>
@@ -189,14 +139,7 @@ const DeliveryComponent = () => {
             <h1>Dashboard</h1>
             <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
             <div className="d-flex align-items-center search-container" style={{ flex: 1 }}>
-            <input
-                type="text"
-                className="form-control me-2"
-                placeholder="Search by Order ID..."
-                value={searchQuery}
-                onChange={handleSearch}
-                style={{ width:    '100%' }}
-              />
+              <input type="text" className="form-control me-2" placeholder="Search..." style={{ width: '100%' }} />
             </div>
             <div className="d-flex align-items-center">
               <select className="form-select me-2">
@@ -209,7 +152,7 @@ const DeliveryComponent = () => {
                   <img src="/Delivery/User.png" alt="Profile" className="profile-img rounded-circle" style={{ width: '40px', height: '40px' }} />
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <Dropdown.Item href="/profile">View Profile</Dropdown.Item>
+                  <Dropdown.Item href="#">View Profile</Dropdown.Item>
                   <Dropdown.Item href="#">Update Profile</Dropdown.Item>
                   <Dropdown.Item href="#">Logout</Dropdown.Item>
                 </Dropdown.Menu>
@@ -220,106 +163,43 @@ const DeliveryComponent = () => {
 
           <section className="overview">
             <div className="card total-shipments">
-              <h3>Total Orders</h3>
+              <h3>Total Shipments</h3>
               <p>{overviewData.totalShipments}</p>
-              
+              <span>+13.4% vs Last Week</span>
             </div>
             <div className="card total-orders">
-              <h3>Delivering</h3>
+              <h3>Total Orders</h3>
               <p>{overviewData.totalOrders}</p>
-              
+              <span>-23.4% vs Last Week</span>
             </div>
             <div className="card total-shipments">
-              <h3>Delivered</h3>
+              <h3>Total Shipments</h3>
               <p>{overviewData.ongoingShipments}</p>
-              
+              <span>+13.4% vs Last Week</span>
             </div>
             <div className="card delivered">
-              <h3>Fail</h3>
+              <h3>Delivered</h3>
               <p>{overviewData.delivered}</p>
-              
+              <span>-13.4% vs Last Week</span>
             </div>
           </section>
 
-          {orderDetail && orderDetail.length > 0 && (
-          <section className="filtered-order mt-4">
-            <h2>Order Details for ID: {orderDetail[0].orderId}</h2>
-            
-            <table className="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Order Detail ID</th>
-                  <th>Koi Name</th>
-                  <th>Koi Type</th>
-                  <th>Quantity</th>
-                  <th>Weight</th>
-                  <th>Discount</th>
-                  <th>Status</th>
-                  <th>Created At</th>
-                  
-                </tr>
-              </thead>
-              <tbody>
-                {orderDetail.map((detail) => (
-                  <tr key={detail.orderDetailId}>
-                    <td>{detail.orderDetailId}</td>
-                    <td>{detail.koiName}</td>
-                    <td>{detail.koiType}</td>
-                    <td>{detail.quantity}</td>
-                    <td>{detail.weight}</td>
-                    <td>{detail.discount}</td>
-                    <td>{detail.status === 1 ? 'Active' : 'Inactive'}</td>
-                    <td>{new Date(detail.createdAt).toLocaleString()}</td>
-                    
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-)}
-
           <section className="ongoing-delivery mt-4 d-flex border-top pt-3">
-          <div className="delivery-list col-7">
+            <div className="delivery-list col-7">
               <h2>Ongoing Delivery</h2>
-              <table className="table table-striped table-bordered">
-                <thead>
-                  <tr>
-                    <th>OrderId</th>
-                    <th>TotalPrice</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.length > 0 ? (
-                    orders.map((order) => (
-                      <tr
-                        key={order.orderId}
-                        onMouseEnter={() => handleMouseEnter(order)} 
-                        onMouseLeave={handleMouseLeave} 
-                      >
-                        <td>{order.orderId}</td>
-                        <td>{order.totalPrice}</td>
-                        <td>{order.status}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="3" className="text-center">No Orders Found</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-
-              {hoveredOrder && (
-                <div className="hovered-order-details mt-3 p-3 bg-light border rounded">
-                <h4>Order Details</h4>
-                <p><strong>Destination:</strong> {hoveredOrder.destination}</p>
-                <p><strong>Freight:</strong> {hoveredOrder.freight}</p>
-                <p><strong>OrderDate:</strong> {hoveredOrder.orderDate}</p>
-                <p><strong>ShipDate:</strong> {hoveredOrder.shippedDate}</p>
-                <p><strong>Origin:</strong> {hoveredOrder.origin}</p>
-              </div>
-              )}
+              {deliveries.map((delivery) => (
+                <div
+                  key={delivery.id}
+                  className="delivery-item d-flex justify-content-between align-items-center border-bottom p-2"
+                  onClick={() => handleDeliveryClick(delivery)}
+                >
+                  <div>
+                    <p>Shipment number: <strong>{delivery.shipmentNumber}</strong></p>
+                    <p>{delivery.route}</p>
+                  </div>
+                  <i className="bi bi-truck" style={{ fontSize: '2rem' }}></i>
+                </div>
+              ))}
             </div>
             <div className="delivery-map col-5">
               <img src="/Delivery/map.png" alt="Map" className="img-fluid" />
