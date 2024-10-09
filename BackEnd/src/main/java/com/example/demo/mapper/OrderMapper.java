@@ -17,6 +17,16 @@ public class OrderMapper {
                 order.getOrigin(),
                 order.getDestination(),
                 order.getFreight(),
+                order.getReceiverName(),
+                order.getSenderName(),
+                order.getReceiverAddress(),
+                order.getSenderAddress(),
+                order.getReceiverPhone(),
+                order.getSenderPhone(),
+                order.getPostalCode(),
+                order.getReceiverNote(),
+                order.getSenderNote(),
+                order.getOrderNote(),
                 order.getTotalPrice(),
                 order.getStatus()
         );
@@ -31,9 +41,18 @@ public class OrderMapper {
         order.setOrigin(orderDTO.getOrigin());
         order.setDestination(orderDTO.getDestination());
         order.setFreight(orderDTO.getFreight());
+        order.setReceiverName(orderDTO.getReceiverName());
+        order.setSenderName(orderDTO.getSenderName());
+        order.setReceiverAddress(orderDTO.getReceiverAddress());
+        order.setSenderAddress(orderDTO.getSenderAddress());
+        order.setReceiverPhone(orderDTO.getReceiverPhone());
+        order.setSenderPhone(orderDTO.getSenderPhone());
+        order.setPostalCode(orderDTO.getPostalCode());
+        order.setReceiverNote(orderDTO.getReceiverNote());
+        order.setSenderNote(orderDTO.getSenderNote());
+        order.setOrderNote(orderDTO.getOrderNote());
         order.setTotalPrice(orderDTO.getTotalPrice());
         order.setStatus(orderDTO.getStatus());
         return order;
     }
-
 }
