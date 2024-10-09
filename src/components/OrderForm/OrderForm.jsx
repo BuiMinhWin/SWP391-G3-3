@@ -2,21 +2,17 @@ import React from "react";
 import { Box, Grid, InputAdornment, Paper, Typography } from "@mui/material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import SideBar from "../SideBar/SideBar";
-import TextField from "../FromUI/Textfield";
-import Select from "../FromUI/Select/index";
+import TextFieldWrapper from "../FromUI/Textfield";
+import SelectWrapper from "../FromUI/Select";
 import countries from "../../data/countries.json";
-import Checkbox from "../FromUI/Checkbox";
 import ButtonWrapper from "../FromUI/Button";
 import koi_type from "../../data/koiTypes.json";
 import koi_name from "../../data/koiVarieties.json";
-// import FileInput from "../FromUI/File";
-
 import { createOrder } from "../../services/CustomerService";
+import SideBar from "../SideBar/SideBar";
+import HeaderBar from "../Header/Header/Nguyen";
 
-// const FILE_SIZE = 1024 * 1024 * 5; // 5MB
-// const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/gif", "image/png"];
-
+// Initial Form State
 const INITIAL_FORM_STATE = {
   origin: "",
   cityS: "",
@@ -28,8 +24,8 @@ const INITIAL_FORM_STATE = {
   senderAddress: "",
   receiverPhone: "",
   senderPhone: "",
-  postalCodeS: 0,
-  postalCodeR: 0,
+  postalCodeS: "", // Use string for postal codes
+  postalCodeR: "", // Use string for postal codes
   receiverNote: "",
   senderNote: "",
   description: "",
@@ -37,19 +33,17 @@ const INITIAL_FORM_STATE = {
   koi_image: null,
   koi_name: "",
   koi_type: "",
-  quantity: 0,
-  weight: 0.0,
+  quantity: 1, // Set initial quantity to 1
+  weight: 0.1, // Set initial weight to 0.1
   freight: false,
-  // files: null,
 };
 
+// Validation Schema with Yup
 const FORM_VALIDATION = Yup.object().shape({
   origin: Yup.string().required("Vui lòng nhập địa điểm xuất phát"),
   destination: Yup.string().required("Vui lòng nhập địa điểm đến"),
   receiverName: Yup.string().required("Vui lòng nhập tên người nhận"),
   senderName: Yup.string().required("Vui lòng nhập tên người gửi"),
-  receiverAddress: Yup.string().required("Vui lòng nhập địa chỉ người nhận"),
-  senderAddress: Yup.string().required("Vui lòng nhập địa chỉ người gửi"),
   receiverPhone: Yup.string()
     .matches(/^[0-9]+$/, "Số điện thoại phải là số")
     .required("Vui lòng nhập số điện thoại người nhận"),
@@ -64,13 +58,10 @@ const FORM_VALIDATION = Yup.object().shape({
     .required("Vui lòng nhập mã bưu điện"),
   receiverNote: Yup.string().nullable(),
   senderNote: Yup.string().nullable(),
-  description: Yup.string().nullable(),
+  description: Yup.string().nullable(), // Optional field for additional notes
   discount: Yup.number()
     .min(0, "Giảm giá không được nhỏ hơn 0")
     .required("Vui lòng nhập giảm giá"),
-  // koi_image: Yup.mixed()
-  //   .nullable()
-  //   .required("Vui lòng tải lên hình ảnh cá Koi"),
   cityS: Yup.string().required("Vui lòng chọn thành phố"),
   cityR: Yup.string().required("Vui lòng chọn thành phố"),
   koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"),
@@ -90,27 +81,23 @@ const OrderForm = () => {
       initialValues={INITIAL_FORM_STATE}
       validationSchema={FORM_VALIDATION}
       onSubmit={async (values, { setSubmitting, setErrors }) => {
-        console.log("Form values before submission:", values); // First check
+        console.log("Form values before submission:", values); // Debugging log
 
         try {
-          // Log right before preparing the data
-          console.log("Preparing orderData:", values);
-
           const orderData = {
             origin: values.origin,
-            cityS: `${values.cityS} - ${values.origin}`,
-            cityR: `${values.cityR} - ${values.destination}`,
+            cityS: values.cityS,
+            cityR: values.cityR,
             destination: values.destination,
             receiverName: values.receiverName,
             senderName: values.senderName,
-            senderAddress: values.senderAddress,
             receiverPhone: values.receiverPhone,
             senderPhone: values.senderPhone,
             postalCodeS: values.postalCodeS,
             postalCodeR: values.postalCodeR,
             receiverNote: values.receiverNote,
             senderNote: values.senderNote,
-            orderNote: values.description,
+            orderNote: values.description, // Corresponds to description in form state
             discount: Number(values.discount),
             koi_image: values.koi_image,
             koi_name: values.koi_name,
@@ -119,10 +106,10 @@ const OrderForm = () => {
             weight: parseFloat(values.weight),
           };
 
-          console.log("Order data ready for submission:", orderData); // Second check
+          console.log("Order data ready for submission:", orderData); // Debugging log
 
           const response = await createOrder(orderData);
-          console.log("Order created successfully:", response.data); // Third check
+          console.log("Order created successfully:", response.data); // Success log
         } catch (error) {
           console.error("Error creating order:", error);
           setErrors({ submit: error.message });
@@ -130,180 +117,188 @@ const OrderForm = () => {
           setSubmitting(false);
         }
       }}
+      validateOnMount={true} // Ensure validation is checked on mount
     >
-      {({ handleSubmit }) => (
-        <Form onSubmit={handleSubmit}>
-          <Box
-            sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
-          >
-            <Box
-              sx={{
-                height: "64px",
-                bgcolor: "primary.main",
-                display: "flex",
-                alignItems: "center",
-                p: 2,
-              }}
-            >
-              <h1 style={{ color: "white" }}>Top Nav Bar</h1>
-            </Box>
+      {({ handleSubmit, isValid, errors }) => {
+        console.log("Validation errors:", errors); // Log validation errors
 
-            {/* Sidebar + Content Container */}
-            <Box sx={{ display: "flex", flex: 1 }}>
-              <Box sx={{ width: "250px", bgcolor: "secondary.main", p: 2 }}>
-                <h2 style={{ color: "white" }}>Sidebar</h2>
+        return (
+          <Form onSubmit={handleSubmit}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", height: "100vh" }} component={"body"}
+            >
+              <Box
+                sx={{
+                  height: "64px",
+                  bgcolor: "primary.main",
+                  display: "flex",
+                  alignItems: "center",
+                  p: 2,
+                }}
+              >
+                <HeaderBar/>
               </Box>
 
-              {/* Content */}
-              <Box sx={{ flex: 1, p: 3, bgcolor: "#eeeeee" }}>
-                {/* Paper 1: Receiver Information */}
-                <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
-                    Địa chỉ lấy hàng *
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                      <TextField name="senderName" label="Tên người gửi" />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField name="senderPhone" label="Điện thoại" />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Select
-                        name="cityS"
-                        label="Thành phố"
-                        options={countries}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField name="postalCodeS" label="Postal Code" />
-                      {/* <Checkbox name="freight" legend="InVN" label="Freight" /> */}
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField name="origin" label="Địa chỉ người gửi" />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        name="senderNote"
-                        label="Hướng dẫn giao hàng"
-                      />
-                    </Grid>
-                  </Grid>
-                </Paper>
+              {/* Sidebar + Content Container */}
+              <Box sx={{ display: "flex", flex: 1 }}>
+                <Box>
+                  <SideBar />
+                </Box>
 
-                {/* Paper 2: Sender Information */}
-                <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
-                    Địa chỉ người nhận
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                      <TextField name="receiverName" label="Tên người nhận" />
+                {/* Content */}
+                <Box sx={{ flex: 1, p: 3, bgcolor: "#eeeeee" }}>
+                  {/* Paper 1: Receiver Information */}
+                  <Paper elevation={4} sx={{ padding: "20px" }}>
+                    <Typography variant="h6" gutterBottom>
+                      Địa chỉ lấy hàng *
+                    </Typography>
+                    <Grid container spacing={3}>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderName"
+                          label="Tên người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderPhone"
+                          label="Điện thoại"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <SelectWrapper
+                          name="cityS"
+                          label="Thành phố"
+                          options={countries}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="postalCodeS"
+                          label="Postal Code"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="origin"
+                          label="Địa chỉ người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderNote"
+                          label="Hướng dẫn giao hàng"
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6}>
-                      <TextField name="receiverPhone" label="Điện thoại" />
-                    </Grid>
+                  </Paper>
 
-                    <Grid item xs={6}>
-                      <Select
-                        name="cityR"
-                        label="Thành phố"
-                        options={countries}
-                      />
+                  {/* Paper 2: Receiver Information */}
+                  <Paper elevation={4} sx={{ padding: "20px" }}>
+                    <Typography variant="h6" gutterBottom>
+                      Địa chỉ người nhận
+                    </Typography>
+                    <Grid container spacing={3}>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="receiverName"
+                          label="Tên người nhận"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="receiverPhone"
+                          label="Điện thoại"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <SelectWrapper
+                          name="cityR"
+                          label="Thành phố"
+                          options={countries}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="postalCodeR"
+                          label="Postal Code"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="destination"
+                          label="Địa chỉ người nhận"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="receiverNote"
+                          label="Hướng dẫn giao hàng"
+                        />
+                      </Grid>
                     </Grid>
+                  </Paper>
 
-                    <Grid item xs={6}>
-                      <TextField name="postalCodeR" label="Postal Code" />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        name="destination"
-                        label="Địa chỉ người nhận"
-                      />
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <TextField
-                        name="receiverNote"
-                        label="Hướng dẫn giao hàng"
-                      ></TextField>
-                    </Grid>
-                  </Grid>
-                </Paper>
-                <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
-                    Thông tin bưu gửi
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                      <Select
-                        name="koi_type"
-                        label="Koi Type"
-                        options={koi_type}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Select
-                        name="koi_name"
-                        label="Koi Variant"
-                        options={koi_name}
-                      />
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <TextField
-                        name="weight"
-                        label="Cân nặng trung bình"
-                        slotProps={{
-                          input: {
-                            startAdornment: (
-                              <InputAdornment
-                                position="start"
-                                sx={{
-                                  display: "flex",
-                                  flex: "center",
-                                }}
-                              >
-                                kg
-                              </InputAdornment>
+                  {/* Paper 3: Order Information */}
+                  <Paper elevation={4} sx={{ padding: "20px" }}>
+                    <Typography variant="h6" gutterBottom>
+                      Thông tin bưu gửi
+                    </Typography>
+                    <Grid container spacing={3}>
+                      <Grid item xs={6}>
+                        <SelectWrapper
+                          name="koi_type"
+                          label="Koi Type"
+                          options={koi_type}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <SelectWrapper
+                          name="koi_name"
+                          label="Koi Variant"
+                          options={koi_name}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="weight"
+                          label="Cân nặng trung bình"
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">kg</InputAdornment>
                             ),
-                          },
-                        }}
-                      />
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper name="quantity" label="Số lượng" />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper name="description" label="Ghi chú" />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="discount"
+                          label="Giảm giá"
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">%</InputAdornment>
+                            ),
+                          }}
+                        />
+                      </Grid>
                     </Grid>
+                  </Paper>
 
-                    <Grid item xs={6}>
-                      <TextField
-                        name="quantity"
-                        label="Quantities"
-                        type="number"
-                        slotProps={{
-                          inputLabel: {
-                            shrink: true,
-                          },
-                        }}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      <TextField
-                        name="orderNote"
-                        label="Lưu ý của người gửi: "
-                        multiline
-                        rows={4}
-                      ></TextField>
-                    </Grid>
-                  </Grid>
-                </Paper>
-                {/* Submit Button */}
-                <Box mt={3}>
-                  <ButtonWrapper>Submit Order</ButtonWrapper>
+                  <ButtonWrapper disabled={!isValid}>
+                    Submit Order
+                  </ButtonWrapper>
                 </Box>
               </Box>
             </Box>
-          </Box>
-        </Form>
-      )}
+          </Form>
+        );
+      }}
     </Formik>
   );
 };
