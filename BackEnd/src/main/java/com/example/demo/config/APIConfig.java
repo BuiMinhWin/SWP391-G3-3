@@ -21,8 +21,7 @@ import org.springframework.context.annotation.Configuration;
                         authorizationUrl = "https://accounts.google.com/o/oauth2/auth",
                         tokenUrl = "https://oauth2.googleapis.com/token",
                         scopes = {
-                                @OAuthScope(name = "profile", description = "Access to your Google profile"),
-                                @OAuthScope(name = "email", description = "Access to your email")
+                                @OAuthScope(name = "profile", description = "Access to your Google profile")
                         }
                 )
         )
@@ -33,7 +32,7 @@ public class APIConfig {
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("public")
-                .pathsToMatch("/api/accounts/**")
+                .pathsToMatch("/api/**")
                 .build();
     }
 }
