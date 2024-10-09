@@ -30,6 +30,10 @@ public class OrderDTO {
     private String receiverNote;
     private String senderNote;
     private String orderNote;
-    private float totalPrice;
+    private int totalPrice;
     private int status;
+
+    public OrderDTO(int totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 }

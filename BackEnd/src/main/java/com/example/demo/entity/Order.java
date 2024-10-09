@@ -42,7 +42,7 @@ public class Order {
     private String freight;
 
     @Column(name = "total_price")
-    private float totalPrice;
+    private int totalPrice;
 
     @Column(name = "receiver_name")
     private String receiverName;

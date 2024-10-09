@@ -180,4 +180,10 @@ public class OrderService {
 
         return orderMapper.mapToOrderDTO(updatedOrder);
     }
+    public OrderDTO getOrderByIdV2(String orderId) {
+        return orderRepository.findById(orderId)
+                .map(order -> new OrderDTO(order.getTotalPrice()))
+                .orElse(null);
+    }
+
 }
