@@ -1,20 +1,28 @@
-import React from "react";
-import { TextField } from "@mui/material";
-import { useField } from "formik";
+import React from 'react';
+import { useField } from 'formik';
+import { TextField } from '@mui/material'; // Correct component for a form text field
 
-const TextfieldWrapper = ({ name, ...otherProps }) => {
-  const [field, mata] = useField(name);
+const TextfieldWrapper = ({
+  name,
+  ...otherProps
+}) => {
+  const [field, meta] = useField(name); // Fixed 'mata' to 'meta'
+
   const configTextfield = {
     ...field,
     ...otherProps,
     fullWidth: true,
-    variant: "outlined",
+    variant: 'outlined'
   };
-  if (mata && mata.touch && mata.error) {
+
+  if (meta && meta.touched && meta.error) {
     configTextfield.error = true;
-    configTextfield.helperText = mata.error;
+    configTextfield.helperText = meta.error;
   }
-  return <TextField {...configTextfield} />;
+
+  return (
+    <TextField {...configTextfield} /> // Correct component usage
+  );
 };
 
 export default TextfieldWrapper;
