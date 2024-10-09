@@ -24,7 +24,7 @@ public class SpringSecurity {
                                 , "/api/feedbacks/create", "/api/ordersDetail/create", "/api/loginGG/user-info"
                                 ,"/api/orders/create","/api/orders/cancel/**","/api/orders/update/**","/api/orders","/api/orders/**","/api/orders/updateStatus/**"
                                 ,"/api/documents/create","/api/documents/**","/api/documents","/api/documents/order/**"
-                                ,"/api/feedbacks/create", "/api/ordersDetail/create"
+                                ,"/api/feedbacks/create", "/api/ordersDetail/create", "/api/ordersDetail/order/**"
                                 , "/error", "/swagger-ui/**", "/v3/api-docs/**"
                                 , "/swagger-resources/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated()

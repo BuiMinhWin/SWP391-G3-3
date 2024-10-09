@@ -8,6 +8,8 @@ import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import java.time.LocalDateTime;
 
@@ -40,5 +42,16 @@ public class OrderDetailService {
         OrderDetail savedOrderDetail = orderDetailRepository.save(orderDetail);
 
         return OrderDetailMapper.mapToOrderDetailDTO(savedOrderDetail);
+    }
+
+    public List<OrderDetailDTO> getOrderDetailsByOrderId(String orderId) {
+        List<OrderDetail> orderDetails = orderDetailRepository.findByOrder_OrderId(orderId);
+        if (orderDetails.isEmpty()) {
+            throw new ResourceNotFoundException("No OrderDetails found for order with id " + orderId);
+        }
+
+        return orderDetails.stream()
+                .map(OrderDetailMapper::mapToOrderDetailDTO)
+                .collect(Collectors.toList());
     }
 }
