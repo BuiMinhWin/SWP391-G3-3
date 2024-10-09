@@ -47,8 +47,12 @@ public class AccountService {
         return AccountMapper.maptoAccountDTO(savedAccount);
     }
 
-    public Account findByEmail(String email) {
-        return accountRepository.findByEmail(email);
+    public AccountDTO findAccountByEmail(String email) {
+        Account account = accountRepository.findByEmail(email);
+        if (account != null) {
+            return AccountMapper.maptoAccountDTO(account);
+        }
+        return null;
     }
 
     public void save(Account account) {
@@ -121,5 +125,7 @@ public class AccountService {
                     .body(new LoginMessage("User Name or Email not exists", false, null));
         }
     }
+
+
 
 }

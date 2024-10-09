@@ -20,7 +20,6 @@ public class OrderDTO {
     private String origin;
     private String destination;
     private String freight;
-
     private String receiverName;
     private String senderName;
     private String receiverAddress;
