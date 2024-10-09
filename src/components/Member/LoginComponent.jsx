@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import './Login.css';
-import { loginAccount, googleLogin } from '../../services/EmployeeService';  
-import { jwtDecode } from "jwt-decode";
+import { loginAccount, googleLogin } from '../../services/EmployeeService';
+
+
 
 const LoginComponent = ({ handleLogin }) => {
   const [userName, setUsername] = useState('');
@@ -12,7 +13,7 @@ const LoginComponent = ({ handleLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const loginData = { userName, password }; 
+    const loginData = { userName, password };
 
     try {
       const response = await loginAccount(loginData);
@@ -42,57 +43,55 @@ const LoginComponent = ({ handleLogin }) => {
 
   const handleGoogleLoginSuccess = (response) => {
     console.log("Google login success:", response);
-  
-    const credential = response.credential;
+
+    const credential = response?.credential;
+
     if (!credential) {
       console.error('No credential found in the response.');
       alert('Google login failed. No credential found.');
       return;
     }
- 
-    googleLogin(credential)
+
+    // const decodedToken = jwt_decode(credential);
+    // console.log("Decoded Token:", decodedToken); // Decoded Google token
+
+    googleLogin({ credential })
       .then((res) => {
         const data = res.data;
-        console.log('Server response:', data); 
-  
-       
+        console.log('Server response:', data);
+
         if (data.success) {
           alert('Google login successful');
-          handleLogin(true); 
-  
+          handleLogin(true);
+
           const roleId = data.roleId;
-          
           switch (roleId) {
             case 'Manager':
-              navigate('/accounts'); 
+              navigate('/accounts');
               break;
             case 'Delivery':
-              navigate('/delivery'); 
+              navigate('/delivery');
               break;
             case 'Customer':
-              navigate('/customer'); 
+              navigate('/customer');
               break;
-              case 'Sales':
-              navigate('/customer'); 
+            case 'Sales':
+              navigate('/sales');
               break;
             default:
               console.warn('Unknown roleId:', roleId);
               alert('Login successful, but unrecognized role.');
               break;
           }
-  
-        
         } else if (data.newAccount) {
           alert('New account has been created successfully');
-          handleLogin(true); 
-  
+          handleLogin(true);
+
           const roleId = data.roleId;
           if (roleId === 'Customer') {
             navigate('/customer');
           }
-  
         } else {
-          
           alert('Login failed. Please check your details.');
         }
       })
@@ -101,9 +100,9 @@ const LoginComponent = ({ handleLogin }) => {
         alert('An error occurred during Google login');
       });
   };
-  
-  const handleGoogleLoginFailure = (response) => {
-    console.error('Google login failure:', response);
+
+  const handleGoogleLoginFailure = () => {
+    console.error('Google login failure');
     alert('Google login failed, please try again.');
   };
 
@@ -153,13 +152,9 @@ const LoginComponent = ({ handleLogin }) => {
 
             <GoogleLogin
               onSuccess={credentialResponse => {
-                const decoded = jwtDecode(credentialResponse?.credential);
-                console.log(decoded);
                 handleGoogleLoginSuccess(credentialResponse);
               }}
-              onError={() => {
-                handleGoogleLoginFailure();
-              }}
+              onError={handleGoogleLoginFailure}
             />
 
             <div className="sign-up">

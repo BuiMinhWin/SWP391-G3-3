@@ -23,7 +23,7 @@ const RegisterComponent = () => {
     }
 
     const account = { firstName, lastName, userName, password, email, phone, roleId: 'Customer', avatar, createAt: new Date().toISOString };
-
+    console.log (account);
     createAccount(account)
       .then((response) => {
         console.log('Account created:', response.data);
