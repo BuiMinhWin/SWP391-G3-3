@@ -47,7 +47,7 @@ public class OrderMapper {
         order.setSenderAddress(orderDTO.getSenderAddress());
         order.setReceiverPhone(orderDTO.getReceiverPhone());
         order.setSenderPhone(orderDTO.getSenderPhone());
-        order.setPostalCode(orderDTO.getPostalCode());
+        order.setPostalCode(orderDTO.getPostalCode() != null ? orderDTO.getPostalCode() : 0);
         order.setReceiverNote(orderDTO.getReceiverNote());
         order.setSenderNote(orderDTO.getSenderNote());
         order.setOrderNote(orderDTO.getOrderNote());

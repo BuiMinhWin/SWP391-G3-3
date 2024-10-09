@@ -63,7 +63,7 @@ public class Order {
     private String senderPhone;
 
     @Column(name = "postal_code")
-    private int postalCode;
+    private Integer postalCode;
 
     @Column(name = "receiver_note")
     private String receiverNote;

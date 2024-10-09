@@ -26,11 +26,10 @@ public class OrderDTO {
     private String senderAddress;
     private String receiverPhone;
     private String senderPhone;
-    private int postalCode;
+    private Integer postalCode;
     private String receiverNote;
     private String senderNote;
     private String orderNote;
-
     private float totalPrice;
     private int status;
 }
