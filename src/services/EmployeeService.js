@@ -34,12 +34,15 @@ export const loginAccount = (loginData) => {
 };
 
 
-export const googleLogin = async (data) => {
-  return axios.post('http://koideliverysystem.id.vn:8080/api/accounts/google-login', data, {
-      headers: {
-          'Content-Type': 'application/json',
-      }
-  });
+export const googleLogin = (token) => {
+  return axios.post(
+    'http://koideliverysystem.id.vn:8080/api/accounts/google-login', 
+    { token },
+    {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,  
+    }
+  );
 };
 
 

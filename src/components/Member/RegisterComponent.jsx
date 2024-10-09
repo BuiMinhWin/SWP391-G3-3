@@ -15,6 +15,7 @@ const RegisterComponent = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
+    console.log(account)
     e.preventDefault();
 
     if (password !== confirmPassword) {
