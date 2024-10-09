@@ -1,43 +1,78 @@
-import { Box, Grid, Paper, Typography} from "@mui/material";
+import React from "react";
+import { Box, Grid, Paper, Typography } from "@mui/material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import SideBar from "../SideBar/SideBar";
 import TextField from "../FromUI/Textfield";
 import Select from "../FromUI/Select/index";
-import contries from "../../data/countries.json";
-import Checkbox from "../FromUI/Checkbox"
-import Button from "../FromUI/Button"
+import countries from "../../data/countries.json"; 
+import Checkbox from "../FromUI/Checkbox";
+import ButtonWrapper from "../FromUI/Button"; // Updated Button import
+import { createOrder } from "../../services/CustomerService";
 
 const INITIAL_FORM_STATE = {
   fullName: "",
   phone: "",
   postalCode: "",
   province: "",
-  pickupAdress: "",
-  pickupAdressInstruction: "",
+  pickupAddress: "",
+  pickupAddressInstruction: "",
   receiverFullName: "",
   receiverPhone: "",
   receiverPostalCode: "",
   receiverProvince: "",
-  receiverPickupAdress: "",
-  receiverpickupAdressInstruction: "",
-  feight: false
+  receiverPickupAddress: "",
+  receiverPickupAddressInstruction: "",
+  freight: false,
 };
 
 const FORM_VALIDATION = Yup.object().shape({
   fullName: Yup.string().required("Vui lòng không để trống"),
   phone: Yup.string().required("Vui lòng không để trống"),
   postalCode: Yup.string().required("Vui lòng không để trống"),
-  freight: Yup.boolean().oneOf([true], "Must be selected").required("Must select"),
+  freight: Yup.boolean()
+    .oneOf([true], "Must be selected")
+    .required("Must select"),
 });
 
 const OrderForm = () => {
   return (
     <Formik
-      initialValues={{ ...INITIAL_FORM_STATE }}
+      initialValues={INITIAL_FORM_STATE}
       validationSchema={FORM_VALIDATION}
-      onSubmit={(values) => {
-        console.log(values);
+      onSubmit={async (values, { setSubmitting, setErrors }) => {
+        try {
+          // Define the structure for the new order
+          const orderData = {
+            customer: {
+              fullName: values.fullName,
+              phone: values.phone,
+              postalCode: values.postalCode,
+              province: values.province,
+              pickupAddress: values.pickupAddress,
+              pickupAddressInstruction: values.pickupAddressInstruction,
+            },
+            receiver: {
+              fullName: values.receiverFullName,
+              phone: values.receiverPhone,
+              postalCode: values.receiverPostalCode,
+              province: values.receiverProvince,
+              pickupAddress: values.receiverPickupAddress,
+              pickupAddressInstruction: values.receiverPickupAddressInstruction,
+            },
+            freight: values.freight,
+          };
+
+          // Call the createOrder API function
+          const response = await createOrder(orderData);
+          console.log("Order created successfully:", response.data);
+          // Optionally reset the form or show a success message
+        } catch (error) {
+          console.error("Error creating order:", error);
+          // Handle errors, e.g., setErrors({ submit: error.message });
+        } finally {
+          setSubmitting(false);
+        }
       }}
     >
       {({ handleSubmit }) => (
@@ -81,18 +116,18 @@ const OrderForm = () => {
                       <Select
                         name="postalCode"
                         label="Postal Code"
-                        options={contries}
+                        options={countries}
                       />
                     </Grid>
                     <Grid item xs={6}>
-                      <Checkbox name="freight" legend = "InVN" label="feight" />
+                      <Checkbox name="freight" legend="InVN" label="Freight" />
                     </Grid>
                     <Grid item xs={6}>
-                      <TextField name="pickupAdress" label="Pickup Address" />
+                      <TextField name="pickupAddress" label="Pickup Address" />
                     </Grid>
                     <Grid item xs={6}>
                       <TextField
-                        name="pickupAdressInstruction"
+                        name="pickupAddressInstruction"
                         label="Pickup Address Instruction"
                       />
                     </Grid>
@@ -128,13 +163,13 @@ const OrderForm = () => {
                     </Grid>
                     <Grid item xs={6}>
                       <TextField
-                        name="receiverPickupAdress"
+                        name="receiverPickupAddress"
                         label="Receiver Pickup Address"
                       />
                     </Grid>
                     <Grid item xs={6}>
                       <TextField
-                        name="receiverpickupAdressInstruction"
+                        name="receiverPickupAddressInstruction"
                         label="Receiver Pickup Address Instruction"
                       />
                     </Grid>
@@ -143,7 +178,7 @@ const OrderForm = () => {
 
                 {/* Submit Button */}
                 <Box mt={3}>
-                    <Button>Submit Form</Button>
+                  <ButtonWrapper>Submit Order</ButtonWrapper>
                 </Box>
               </Box>
             </Box>
