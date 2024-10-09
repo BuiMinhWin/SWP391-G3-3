@@ -18,8 +18,7 @@ function index() {
         <Route path='/delivery' element={<DeliveryComponent/>} /> 
         <Route path='/customer' element={<CustomerHomePage/>} /> 
         <Route path='/manager' element={<ManagerComponent/>} /> 
-
-             
+        
     </Routes>
 
    
