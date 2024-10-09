@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';  
+import { GoogleLogin } from '@react-oauth/google';
 import './Login.css';
-import { loginAccount } from '../../services/EmployeeService';  
-// import HeaderComponent from '../Header/HeaderComponent';
+import { loginAccount, googleLogin } from '../../services/EmployeeService';  
+import { jwtDecode } from "jwt-decode";
 
 const LoginComponent = ({ handleLogin }) => {
   const [userName, setUsername] = useState('');
@@ -12,7 +12,7 @@ const LoginComponent = ({ handleLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const loginData = { userName, password };
+    const loginData = { userName, password }; 
 
     try {
       const response = await loginAccount(loginData);
@@ -22,17 +22,16 @@ const LoginComponent = ({ handleLogin }) => {
       console.log("Role ID:", result.roleId);
 
       if (result.roleId === 'Manager') {
-        alert('Welcome Admin!');
-        handleLogin(true);
         navigate('/accounts');
       } else if (result.roleId === 'Delivery') {
-        alert('Welcome');
-        handleLogin(true);
         navigate('/delivery');
       } else if (result.roleId === 'Customer') {
-        alert('Welcome');
-        handleLogin(true);
         navigate('/customer');
+      } else if (result.roleId === 'Manager') {
+        navigate('/manager');
+      }
+      else if (result.roleId === 'Sales') {
+        navigate('/salestaff');
       }
     } catch (error) {
       console.error('Login Error:', error);
@@ -42,31 +41,58 @@ const LoginComponent = ({ handleLogin }) => {
 
   const handleGoogleLoginSuccess = (response) => {
     console.log("Google login success:", response);
- 
+  
     const credential = response.credential;
     if (!credential) {
       console.error('No credential found in the response.');
       alert('Google login failed. No credential found.');
       return;
     }
+ 
+    googleLogin(credential)
+      .then((res) => {
+        const data = res.data;
+        console.log('Server response:', data); 
   
-    fetch('http://koideliverysystem.id.vn:8080/api/oauth2/authorization/google', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token: credential }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('Server response:', data);
-        
+       
         if (data.success) {
           alert('Google login successful');
           handleLogin(true); 
-          navigate('/accounts');
+  
+          const roleId = data.roleId;
+          
+          switch (roleId) {
+            case 'Manager':
+              navigate('/accounts'); 
+              break;
+            case 'Delivery':
+              navigate('/delivery'); 
+              break;
+            case 'Customer':
+              navigate('/customer'); 
+              break;
+              case 'Sales':
+              navigate('/customer'); 
+              break;
+            default:
+              console.warn('Unknown roleId:', roleId);
+              alert('Login successful, but unrecognized role.');
+              break;
+          }
+  
+        
+        } else if (data.newAccount) {
+          alert('New account has been created successfully');
+          handleLogin(true); 
+  
+          const roleId = data.roleId;
+          if (roleId === 'Customer') {
+            navigate('/customer');
+          }
+  
         } else {
-          alert('Login failed. Please check your credentials.');
+          
+          alert('Login failed. Please check your details.');
         }
       })
       .catch((err) => {
@@ -74,7 +100,6 @@ const LoginComponent = ({ handleLogin }) => {
         alert('An error occurred during Google login');
       });
   };
-  
   
   const handleGoogleLoginFailure = (response) => {
     console.error('Google login failure:', response);
@@ -126,8 +151,14 @@ const LoginComponent = ({ handleLogin }) => {
             </form>
 
             <GoogleLogin
-              onSuccess={handleGoogleLoginSuccess}
-              onError={handleGoogleLoginFailure}
+              onSuccess={credentialResponse => {
+                const decoded = jwtDecode(credentialResponse?.credential);
+                console.log(decoded);
+                handleGoogleLoginSuccess(credentialResponse);
+              }}
+              onError={() => {
+                handleGoogleLoginFailure();
+              }}
             />
 
             <div className="sign-up">

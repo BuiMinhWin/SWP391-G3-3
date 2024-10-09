@@ -5,6 +5,10 @@ import LoginComponent from '../components/Member/LoginComponent'
 import RegisterComponent from '../components/Member/RegisterComponent'
 import UserPage from '../pages/UserPage/UserPage'
 import OrderForm from '../components/OrderForm/OrderForm'
+import SaleStaffComponent from '../components/SaleStaff/SaleStaffComponent'
+import DeliveryComponent from '../components/DeliveryStaff/DeliveryComponent'
+import CustomerHomePage from '../components/Customer/CustomerHomePage'
+import ManagerComponent from '../components/Manager/EmployeeComponent'
 
 function index() {
   return (
@@ -14,11 +18,12 @@ function index() {
         <Route path='/register' element={<RegisterComponent/>} />
         <Route path='/user' element={<UserPage/>}/>
         <Route path='/form' element={<OrderForm/>}/>
+        <Route path='/salestaff' element={<SaleStaffComponent/>} />
+        <Route path='/delivery' element={<DeliveryComponent/>} /> 
+        <Route path='/customer' element={<CustomerHomePage/>} /> 
+        <Route path='/manager' element={<ManagerComponent/>} /> 
 
-        {/* <Route path='/' element={
-        <Navigate to='/home' relative={true} /> */}
-    {/* } /> */}
-        
+             
     </Routes>
 
    
