@@ -44,7 +44,7 @@ const Homepage = () => {
           <div className="dropdown">
             <a href="#" className="nav-link">Dịch Vụ</a>
             <div className="dropdown-content">
-              <a href="#">Tạo Đơn</a>
+              <a href="/form">Tạo Đơn</a>
               <a href="#">Ước Tính Chi Phí</a>
               <a href="#">Theo dõi đơn hàng</a>
               <a href="#">Quy định vận chuyển</a>
@@ -64,7 +64,7 @@ const Homepage = () => {
       <header className="homepage-header">
         <h1 className='title-1'>VẬN CHUYỂN CÁ KOI</h1>
         <h1 className='title-2'>GẦN GŨI - TIN CẬY - HIỆU QUẢ</h1>
-        <button className="order-btn">TẠO ĐƠN TẠI ĐÂY</button>  
+        <button className="order-btn" onClick={() => navigate('/form')}>TẠO ĐƠN TẠI ĐÂY</button>  
       </header>
 
       {/* Main content */}
