@@ -3,6 +3,10 @@ import { Route, Routes } from 'react-router-dom'
 import Homepage from '../pages/HomePage/HomePage'
 import LoginComponent from '../components/Member/LoginComponent'
 import RegisterComponent from '../components/Member/RegisterComponent'
+import SaleStaffComponent from '../components/SaleStaff/SaleStaffComponent'
+import DeliveryComponent from '../components/DeliveryStaff/DeliveryComponent'
+import CustomerHomePage from '../components/Customer/CustomerHomePage'
+import ManagerComponent from '../components/Manager/EmployeeComponent'
 
 function index() {
   return (
@@ -10,11 +14,12 @@ function index() {
         <Route path='/' element={<Homepage/>} />
         <Route path='/login' element={<LoginComponent/>} />
         <Route path='/register' element={<RegisterComponent/>} />
+        <Route path='/salestaff' element={<SaleStaffComponent/>} />
+        <Route path='/delivery' element={<DeliveryComponent/>} /> 
+        <Route path='/customer' element={<CustomerHomePage/>} /> 
+        <Route path='/manager' element={<ManagerComponent/>} /> 
 
-        {/* <Route path='/' element={
-        <Navigate to='/home' relative={true} /> */}
-    {/* } /> */}
-        
+             
     </Routes>
 
    
