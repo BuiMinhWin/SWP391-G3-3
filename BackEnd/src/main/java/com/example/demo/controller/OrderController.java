@@ -22,12 +22,12 @@ public class OrderController {
         OrderDTO savedOrder = orderService.createOrder(orderDTO);
         return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
     }
-    @PutMapping("/cancel/{orderId}")
+    @PatchMapping("/cancel/{orderId}")
     public ResponseEntity<OrderDTO> cancelOrder(@PathVariable String orderId) {
         OrderDTO canceledOrder = orderService.cancelOrder(orderId);
         return new ResponseEntity<>(canceledOrder, HttpStatus.OK);
     }
-    @PutMapping("/update/{orderId}")
+    @PatchMapping("/update/{orderId}")
     public ResponseEntity<OrderDTO> updateOrderWhenCanceled(@PathVariable String orderId, @RequestBody OrderDTO orderDTO) {
         OrderDTO updatedOrder = orderService.updateOrderWhenCanceled(orderId, orderDTO);
         return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
@@ -43,7 +43,7 @@ public class OrderController {
         OrderDTO order = orderService.getOrderById(orderId);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
-    @PutMapping("/updateStatus/{orderId}")
+    @PatchMapping("/updateStatus/{orderId}")
     public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable String orderId, @RequestBody UpdateStatusDTO updateStatusDTO) {
         OrderDTO updatedOrder = orderService.updateOrderStatus(orderId, updateStatusDTO.getNewStatus());
         return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
