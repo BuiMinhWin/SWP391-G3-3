@@ -20,6 +20,11 @@ const LoginComponent = ({ handleLogin }) => {
 
       const result = response.data;
       console.log("Role ID:", result.roleId);
+      console.log("Account ID:", result.accountId);
+
+      localStorage.setItem('userToken', result.token);
+      localStorage.setItem('userRole', result.roleId);
+      localStorage.setItem('accountId', result.accountId);
 
       if (result.roleId === 'Manager') {
         navigate('/manager');

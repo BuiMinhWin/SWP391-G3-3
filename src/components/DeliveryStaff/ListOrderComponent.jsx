@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react'
-import { listOrder } from '../../services/DeliveryService';
+import React, { useEffect, useState } from 'react';
+import { listOrder, updateStatus } from '../../services/DeliveryService';
 import { useNavigate } from 'react-router-dom';
 
 const ListOrderComponent = () => {
   const [orders, setOrders] = useState([]);
-  const navigate = useNavigate()  ;
+  const [editedStatuses, setEditedStatuses] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     getAllOrders();
@@ -21,13 +22,38 @@ const ListOrderComponent = () => {
         }
       })
       .catch((error) => {
-        console.error("Error fetching employees: ", error);
+        console.error("Error fetching orders: ", error);
+
       });
   };
-  const updateOrder = (orderId) => {
-    navigate(`/edit-order/${orderId}`);
+
+  const handleStatusChange = (orderId, newStatus) => {
+    // console.log("Before update:", editedStatuses);
+  
+    const updatedStatuses = {
+      ...editedStatuses,  
+      [orderId]: newStatus,  
+    };
+  
+    // console.log("After update:", updatedStatuses);
+  
+    setEditedStatuses(updatedStatuses); 
   };
 
+  const updateOrderStatus = (orderId) => {
+    const status = editedStatuses[orderId] ?? order.status;
+    if (status) {
+      console.log('New status to update:', status);
+      updateStatus(orderId, status)  
+        .then((response) => {
+          console.log('Status updated successfully:', response);
+          getAllOrders();  
+        })
+        .catch((error) => {
+          console.error('Error updating status:', error);
+        });
+    }
+  };
 
   return (
     <div className="container">
@@ -44,11 +70,12 @@ const ListOrderComponent = () => {
             <th>TotalPrice</th>
             <th>Origin</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {orders.length > 0 ? (
-           orders.map(order => (
+            orders.map(order => (
               <tr key={order.orderId}>
                 <td>{order.orderId}</td>
                 <td>{order.destination}</td>
@@ -57,22 +84,32 @@ const ListOrderComponent = () => {
                 <td>{order.shippedDate}</td>
                 <td>{order.totalPrice}</td>
                 <td>{order.origin}</td>
-                <td>{order.status}</td>
                 <td>
-                  <button className="btn btn-info" onClick={() => updateOrder(order.orderId)}>Update</button>
-                  
+                  <input
+                    type="text"
+                    value={editedStatuses[order.orderId] ?? order.status}
+                    onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
+                  />
+                </td>
+                <td>
+                  <button
+                    className="btn btn-info"
+                    onClick={() => updateOrderStatus(order.orderId)}
+                  >
+                    Update Status
+                  </button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="text-center">No Orders Found</td>
+              <td colSpan="9" className="text-center">No Orders Found</td>
             </tr>
           )}
         </tbody>
       </table>
     </div>
   );
-}
+};
 
-export default ListOrderComponent
+export default ListOrderComponent;
