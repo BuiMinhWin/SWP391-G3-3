@@ -15,12 +15,16 @@ import lombok.Setter;
 @Table(name = "`service`")
 public class Service {
     @Id
-
-    @Column(name = "service_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "service_id", columnDefinition = "CHAR(36)")
     private String serviceId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
+
     @Column(name = "service_name")
-    private int serviceName;
+    private String serviceName;
 
     @Column(name = "price")
     private double price;
