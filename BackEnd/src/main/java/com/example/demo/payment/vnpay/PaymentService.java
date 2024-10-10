@@ -29,7 +29,7 @@ public class PaymentService {
                         .message("Order not found")
                         .build();
             }
-            log.info("Total price for orderId {}: {}", orderId, orderDTO.getTotalPrice());
+            log.info("Total price for orderId {}: {} vnd", orderId, orderDTO.getTotalPrice());
 
             BigDecimal amount = BigDecimal.valueOf(orderDTO.getTotalPrice()).multiply(new BigDecimal(100));
 
