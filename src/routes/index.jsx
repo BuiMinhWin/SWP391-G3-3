@@ -29,6 +29,7 @@ function index() {
         {/* <Route path='/profile' element={<ProfileComponent/>} /> để sau  */}
         <Route path='/customer' element={<CustomerHomePage/>} /> 
         <Route path='/manager' element={<ManagerComponent/>} /> 
+        <Route path='/user-page' element={<UserPage/>}/>
 
              
     </Routes>

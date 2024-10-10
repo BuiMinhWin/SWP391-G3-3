@@ -17,9 +17,14 @@ const LoginComponent = ({ handleLogin }) => {
     try {
       const response = await loginAccount(loginData);
       console.log("API Response:", response);
+      
 
       const result = response.data;
       console.log("Role ID:", result.roleId);
+      localStorage.setItem('accountId', result.accountId);
+      console.log("Account ID: ", localStorage.getItem('accountId'));
+      localStorage.setItem('userRole', result.roleId);
+      
 
       if (result.roleId === 'Manager') {
         navigate('/manager');
