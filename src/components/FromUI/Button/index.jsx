@@ -7,6 +7,7 @@ const ButtonWrapper = ({
   ...otherProps
 }) => {
   const { submitForm } = useFormikContext();
+  console.log('Formik Context:', useFormikContext());
 
   const handleSubmit = () => {
     submitForm();
