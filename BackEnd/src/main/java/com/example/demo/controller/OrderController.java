@@ -48,4 +48,5 @@ public class OrderController {
         OrderDTO updatedOrder = orderService.updateOrderStatus(orderId, updateStatusDTO.getNewStatus());
         return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
     }
+
 }

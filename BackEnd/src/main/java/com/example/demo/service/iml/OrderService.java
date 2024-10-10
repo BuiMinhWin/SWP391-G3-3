@@ -157,6 +157,12 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
+        // Automatically set status to 1 (Processing) if newStatus is not provided or specific
+        if (newStatus < 0 || newStatus > 3) {
+            newStatus = 1; // Default to Processing
+            logger.info("Invalid status provided. Status automatically set to Processing (1).");
+        }
+
         order.setStatus(newStatus);
         Order updatedOrder = orderRepository.save(order);
 
@@ -180,6 +186,7 @@ public class OrderService {
 
         return orderMapper.mapToOrderDTO(updatedOrder);
     }
+
     public OrderDTO getOrderByIdV2(String orderId) {
         return orderRepository.findById(orderId)
                 .map(order -> new OrderDTO(order.getTotalPrice()))
