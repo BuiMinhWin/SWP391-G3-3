@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.request.OrderDTO;
+import com.example.demo.dto.request.UpdateStatusDTO;
 import com.example.demo.service.iml.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,8 +44,8 @@ public class OrderController {
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
     @PutMapping("/updateStatus/{orderId}")
-    public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable String orderId, @RequestParam int newStatus) {
-        OrderDTO updatedOrder = orderService.updateOrderStatus(orderId, newStatus);
+    public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable String orderId, @RequestBody UpdateStatusDTO updateStatusDTO) {
+        OrderDTO updatedOrder = orderService.updateOrderStatus(orderId, updateStatusDTO.getNewStatus());
         return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
     }
 }
