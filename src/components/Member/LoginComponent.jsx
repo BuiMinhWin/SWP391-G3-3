@@ -28,7 +28,7 @@ const LoginComponent = ({ handleLogin }) => {
       } else if (result.roleId === 'Customer') {
         navigate('/customer');
       }else if (result.roleId === 'Sales') {
-        navigate('/sales');
+        navigate('/salestaff');
       }
     } catch (error) {
       console.error('Login Error:', error);
