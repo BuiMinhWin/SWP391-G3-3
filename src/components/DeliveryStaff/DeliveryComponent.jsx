@@ -215,7 +215,7 @@ console.log("Stored Account ID:", accountId);
                   <img src="/Delivery/User.png" alt="Profile" className="profile-img rounded-circle" style={{ width: '40px', height: '40px' }} />
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <Dropdown.Item href="/profile">View Profile</Dropdown.Item>
+                  <Dropdown.Item href="user-page">View Profile</Dropdown.Item>
                   <Dropdown.Item href="#">Update Profile</Dropdown.Item>
                   <Dropdown.Item href="#">Logout</Dropdown.Item>
                 </Dropdown.Menu>
