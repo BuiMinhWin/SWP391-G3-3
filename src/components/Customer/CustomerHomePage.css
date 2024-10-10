@@ -36,8 +36,10 @@
 }
 
 .navbar-right {
+
   display: flex;
   align-items: center;
+
 }
 
 .logo {

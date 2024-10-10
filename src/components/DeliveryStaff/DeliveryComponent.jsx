@@ -27,6 +27,12 @@ const DeliveryComponent = () => {
   const [orderDetail, setOrderDetail] = useState(null);
 
   useEffect(() => {
+  // const token = localStorage.getItem('userToken');
+  const roleId = localStorage.getItem('userRole'); 
+  // console.log('Token:', token);
+  console.log('Role ID:', roleId);
+  const accountId = localStorage.getItem('accountId');
+console.log("Stored Account ID:", accountId);
     const fetchOverviewData = async () => {
       try {
         const response = await fetch('http://koideliverysystem.id.vn:8080/api/orders'); 
