@@ -22,7 +22,7 @@ function index() {
         <Route path='/delivery' element={<DeliveryComponent/>} /> 
         <Route path='/customer' element={<CustomerHomePage/>} /> 
         <Route path='/manager' element={<ManagerComponent/>} /> 
-        <Route path='user-page' element={<UserPage/>}/>
+        <Route path='/user-page' element={<UserPage/>}/>
 
              
     </Routes>

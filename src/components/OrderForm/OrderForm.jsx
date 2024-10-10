@@ -83,8 +83,12 @@ const OrderForm = () => {
       onSubmit={async (values, { setSubmitting, setErrors }) => {
         console.log("Form values before submission:", values); // Debugging log
 
+        const accountId = localStorage.getItem('accountId');
+        console.log("Account ID:", accountId);
+
         try {
           const orderData = {
+            accountId,
             origin: values.origin,
             cityS: values.cityS,
             cityR: values.cityR,
