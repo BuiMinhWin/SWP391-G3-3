@@ -10,6 +10,8 @@ import DeliveryComponent from '../components/DeliveryStaff/DeliveryComponent'
 import CustomerHomePage from '../components/Customer/CustomerHomePage'
 import ManagerComponent from '../components/Manager/EmployeeComponent'
 import ListOrderComponent from '../components/DeliveryStaff/ListOrderComponent'
+import EmployeeComponent from '../components/Manager/EmployeeComponent'
+
 
 function index() {
   return (
@@ -25,9 +27,9 @@ function index() {
         <Route path='/customer' element={<CustomerHomePage/>} /> 
         <Route path='/manager' element={<ManagerComponent/>} /> 
         <Route path='/add-account' element={ <EmployeeComponent />} />
-        <Route path='/edit-account/:accountId' element={ <EmployeeComponent /> } />
+        <Route path='/edit-account/:accountId' element={ <EmployeeComponent/> } />
         <Route path='/user-page' element={<UserPage/>}/>
-
+        
       
     </Routes>
   );

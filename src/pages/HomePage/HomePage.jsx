@@ -30,6 +30,10 @@ const Homepage = () => {
       setTrackingCode(''); // Xóa mã đơn hàng
       setTrackingResult(''); // Xóa kết quả tra cứu
     }
+    const roleId = localStorage.getItem('roleId'); 
+    console.log('Role ID:', roleId);
+    const accountId = localStorage.getItem('accountId');
+    console.log("Stored Account ID:", accountId);
   }, [activeTab]);
 
 

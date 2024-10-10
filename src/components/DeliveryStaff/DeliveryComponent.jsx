@@ -6,11 +6,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './DeliveryStaff.css';
 import { useNavigate } from 'react-router-dom';
 import { listOrder,getOrderDetail } from '../../services/DeliveryService';
-
+import { logout } from '../Member/auth'; 
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
 
 const DeliveryComponent = () => {
+  const handleLogout = () => {
+    logout(); 
+    navigate('/'); 
+  };
   const [overviewData, setOverviewData] = useState({
     totalShipments: 0,
     totalOrders: 0,
@@ -28,11 +32,11 @@ const DeliveryComponent = () => {
 
   useEffect(() => {
   // const token = localStorage.getItem('userToken');
-  const roleId = localStorage.getItem('userRole'); 
   // console.log('Token:', token);
+  const roleId = localStorage.getItem('roleId'); 
   console.log('Role ID:', roleId);
   const accountId = localStorage.getItem('accountId');
-console.log("Stored Account ID:", accountId);
+  console.log("Stored Account ID:", accountId);
     const fetchOverviewData = async () => {
       try {
         const response = await fetch('http://koideliverysystem.id.vn:8080/api/orders'); 
@@ -217,7 +221,7 @@ console.log("Stored Account ID:", accountId);
                 <Dropdown.Menu>
                   <Dropdown.Item href="user-page">View Profile</Dropdown.Item>
                   <Dropdown.Item href="#">Update Profile</Dropdown.Item>
-                  <Dropdown.Item href="#">Logout</Dropdown.Item>
+                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </div>
