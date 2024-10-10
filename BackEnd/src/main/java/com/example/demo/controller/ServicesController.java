@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.dto.request.ServiceDTO;
-import com.example.demo.service.iml.ServiceService;
+import com.example.demo.dto.request.ServicesDTO;
+import com.example.demo.service.iml.ServicesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/services")
-public class ServiceController {
+public class ServicesController {
 
     @Autowired
-    private ServiceService serviceService;
+    private ServicesService servicesService;
 
     @PostMapping("/create")
-    public ResponseEntity<ServiceDTO> createService(@RequestBody ServiceDTO serviceDTO) {
-        ServiceDTO savedService = serviceService.createService(serviceDTO);
-        return new ResponseEntity<>(savedService, HttpStatus.CREATED);
+    public ResponseEntity<ServicesDTO> createService(@RequestBody ServicesDTO servicesDTO) {
+        ServicesDTO savedServices = servicesService.createService(servicesDTO);
+        return new ResponseEntity<>(savedServices, HttpStatus.CREATED);
     }
 }

@@ -12,19 +12,19 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "`service`")
-public class Service {
+@Table(name = "`services`")
+public class Services {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "service_id", columnDefinition = "CHAR(36)")
-    private String serviceId;
+    @Column(name = "services_id", columnDefinition = "CHAR(36)")
+    private String servicesId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(name = "service_name")
-    private String serviceName;
+    @Column(name = "services_name")
+    private String servicesName;
 
     @Column(name = "price")
     private double price;

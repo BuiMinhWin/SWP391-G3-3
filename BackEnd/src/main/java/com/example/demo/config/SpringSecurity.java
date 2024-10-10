@@ -33,7 +33,6 @@ public class SpringSecurity {
                 )
                 .csrf(csrf -> csrf.disable())  // Vô hiệu hóa CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));  // Cấu hình CORS
-  // Cấu hình xác thực JWT từ Google
 
         return http.build();
     }

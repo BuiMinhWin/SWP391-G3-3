@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServiceDTO {
+public class ServicesDTO {
 
     private String serviceId;
     private String orderId;
