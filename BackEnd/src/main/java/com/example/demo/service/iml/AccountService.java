@@ -75,12 +75,34 @@ public class AccountService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
 
-        account.setFirstName(updatedAccountDTO.getFirstName());
-        account.setLastName(updatedAccountDTO.getLastName());
-        account.setEmail(updatedAccountDTO.getEmail());
-        account.setRoleId(updatedAccountDTO.getRoleId());
-        account.setUserName(updatedAccountDTO.getUserName());
-        account.setPassword(updatedAccountDTO.getPassword());
+        // Update only the fields that are not null in updatedAccountDTO
+        if (updatedAccountDTO.getFirstName() != null) {
+            account.setFirstName(updatedAccountDTO.getFirstName());
+        }
+        if (updatedAccountDTO.getLastName() != null) {
+            account.setLastName(updatedAccountDTO.getLastName());
+        }
+        if (updatedAccountDTO.getEmail() != null) {
+            // Check for duplicate email only if email is being updated
+            if (!account.getEmail().equals(updatedAccountDTO.getEmail()) &&
+                    accountRepository.existsByEmail(updatedAccountDTO.getEmail())) {
+                throw new DuplicateEmailException("This email address '" + updatedAccountDTO.getEmail() + "' is already in use.");
+            }
+            account.setEmail(updatedAccountDTO.getEmail());
+        }
+        if (updatedAccountDTO.getRoleId() != null) {
+            account.setRoleId(updatedAccountDTO.getRoleId());
+        }
+        if (updatedAccountDTO.getUserName() != null) {
+            account.setUserName(updatedAccountDTO.getUserName());
+        }
+        if (updatedAccountDTO.getPassword() != null) {
+            account.setPassword(updatedAccountDTO.getPassword());
+        }
+        if (updatedAccountDTO.getAvatar() != null) {
+            account.setAvatar(updatedAccountDTO.getAvatar());
+        }
+        // Add more fields as necessary
 
         Account updatedAccount = accountRepository.save(account);
         return AccountMapper.maptoAccountDTO(updatedAccount);

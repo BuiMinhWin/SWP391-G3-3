@@ -37,12 +37,13 @@ public class AccountController {
         return ResponseEntity.ok(accounts);
     }
 
-    // Build Update Account REST API
-    @PutMapping("{accountId}")
+    // Build Partial Update Account REST API
+    @PatchMapping("{accountId}")
     public ResponseEntity<AccountDTO> updateAccount(@PathVariable("accountId") String accountId, @RequestBody AccountDTO updatedAccountDTO) {
         AccountDTO accountDTO = accountService.updateAccount(accountId, updatedAccountDTO);
         return ResponseEntity.ok(accountDTO);
     }
+
 
     // Build Delete Account REST API
     @DeleteMapping("{accountId}")
