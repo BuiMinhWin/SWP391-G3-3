@@ -3,10 +3,13 @@ package com.example.demo.mapper;
 import com.example.demo.dto.request.OrderDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Order;
+import com.example.demo.util.DistanceCalculator;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OrderMapper {
+
+    private static final int RATE_PER_KM = 15000;
 
     public OrderDTO mapToOrderDTO(Order order) {
         return new OrderDTO(
@@ -28,7 +31,11 @@ public class OrderMapper {
                 order.getSenderNote(),
                 order.getOrderNote(),
                 order.getTotalPrice(),
-                order.getStatus()
+                order.getStatus(),
+                order.getOriginLatitude(),
+                order.getOriginLongitude(),
+                order.getDestinationLatitude(),
+                order.getDestinationLongitude()
         );
     }
 
@@ -51,8 +58,23 @@ public class OrderMapper {
         order.setReceiverNote(orderDTO.getReceiverNote());
         order.setSenderNote(orderDTO.getSenderNote());
         order.setOrderNote(orderDTO.getOrderNote());
-        order.setTotalPrice(orderDTO.getTotalPrice());
+
+        double distance = DistanceCalculator.calculateDistance(
+                orderDTO.getOriginLatitude(),
+                orderDTO.getOriginLongitude(),
+                orderDTO.getDestinationLatitude(),
+                orderDTO.getDestinationLongitude()
+        );
+        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(distance, RATE_PER_KM);
+        order.setTotalPrice(calculatedTotalPrice);
+
         order.setStatus(orderDTO.getStatus());
+
+        order.setOriginLatitude(orderDTO.getOriginLatitude());
+        order.setOriginLongitude(orderDTO.getOriginLongitude());
+        order.setDestinationLatitude(orderDTO.getDestinationLatitude());
+        order.setDestinationLongitude(orderDTO.getDestinationLongitude());
+
         return order;
     }
 }
