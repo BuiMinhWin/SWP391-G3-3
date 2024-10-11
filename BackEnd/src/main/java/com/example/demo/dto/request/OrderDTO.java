@@ -33,6 +33,11 @@ public class OrderDTO {
     private int totalPrice;
     private int status;
 
+    private double originLatitude;
+    private double originLongitude;
+    private double destinationLatitude;
+    private double destinationLongitude;
+
     public OrderDTO(int totalPrice) {
         this.totalPrice = totalPrice;
     }
