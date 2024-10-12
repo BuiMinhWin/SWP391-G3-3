@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/accounts")
-@CrossOrigin(origins = {"http://localhost:3000", "http://koideliverysystem.id.vn"}, allowCredentials = "true")
 public class LoginController {
 
     @Autowired
