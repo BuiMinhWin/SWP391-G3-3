@@ -68,7 +68,7 @@ const Homepage = () => {
       <div className="dropdown">
           <img src={avatar} alt="Avatar" className="avatar" />
             <div className="dropdown-content">
-              <a href="#">Tài khoản của tôi</a>
+              <a href="user-page">Tài khoản của tôi</a>
               <a href="#">Đăng xuất</a>
             </div>  
       </div>

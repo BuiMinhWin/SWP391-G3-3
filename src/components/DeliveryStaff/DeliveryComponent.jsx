@@ -1,35 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import { Line, Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
+import { Dropdown } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './DeliveryStaff.css';
+import { useNavigate } from 'react-router-dom';
+import { listOrder,getOrderDetail } from '../../services/DeliveryService';
+import { logout } from '../Member/auth'; 
 
-import { Line, Pie } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Dropdown } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./DeliveryStaff.css";
-import { useNavigate } from "react-router-dom";
-import { listOrder, getOrderDetail } from "../../services/DeliveryService";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend);
 
 const DeliveryComponent = () => {
+  const handleLogout = () => {
+    logout(); 
+    navigate('/'); 
+  };
   const [overviewData, setOverviewData] = useState({
     totalShipments: 0,
     totalOrders: 0,
@@ -50,12 +35,12 @@ const DeliveryComponent = () => {
   const [orderDetail, setOrderDetail] = useState(null);
 
   useEffect(() => {
-    // const token = localStorage.getItem('userToken');
-    const roleId = localStorage.getItem("userRole");
-    // console.log('Token:', token);
-    console.log("Role ID:", roleId);
-    const accountId = localStorage.getItem("accountId");
-    console.log("Stored Account ID:", accountId);
+  // const token = localStorage.getItem('userToken');
+  // console.log('Token:', token);
+  const roleId = localStorage.getItem('roleId'); 
+  console.log('Role ID:', roleId);
+  const accountId = localStorage.getItem('accountId');
+  console.log("Stored Account ID:", accountId);
     const fetchOverviewData = async () => {
       try {
         const response = await fetch(
@@ -232,49 +217,37 @@ const DeliveryComponent = () => {
           <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
             <h1>Dashboard</h1>
             <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-              <div
-                className="d-flex align-items-center search-container"
-                style={{ flex: 1 }}
-              >
-                <input
-                  type="text"
-                  className="form-control me-2"
-                  placeholder="Search by Order ID..."
-                  value={searchQuery}
-                  onChange={handleSearch}
-                  style={{ width: "100%" }}
-                />
-              </div>
-              <div className="d-flex align-items-center">
-                <select className="form-select me-2">
-                  <option>ENG</option>
-                  <option>FR</option>
-                  <option>ES</option>
-                </select>
-                <Dropdown>
-                  <Dropdown.Toggle
-                    variant="secondary"
-                    id="dropdown-basic"
-                    className="profile-dropdown"
-                  >
-                    <img
-                      src="/Delivery/User.png"
-                      alt="Profile"
-                      className="profile-img rounded-circle"
-                      style={{ width: "40px", height: "40px" }}
-                    />
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item href="/user-page">
-                      View Profile
-                    </Dropdown.Item>
-                    <Dropdown.Item href="#">Update Profile</Dropdown.Item>
-                    <Dropdown.Item href="#">Logout</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
-            </header>
+            <div className="d-flex align-items-center search-container" style={{ flex: 1 }}>
+            <input
+                type="text"
+                className="form-control me-2"
+                placeholder="Search by Order ID..."
+                value={searchQuery}
+                onChange={handleSearch}
+                style={{ width:    '100%' }}
+              />
+            </div>
+            <div className="d-flex align-items-center">
+              <select className="form-select me-2">
+                <option>ENG</option>
+                <option>FR</option>
+                <option>ES</option>
+              </select>
+              <Dropdown>
+                <Dropdown.Toggle variant="secondary" id="dropdown-basic" className="profile-dropdown">
+                  <img src="/Delivery/User.png" alt="Profile" className="profile-img rounded-circle" style={{ width: '40px', height: '40px' }} />
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item href="user-page">View Profile</Dropdown.Item>
+                  <Dropdown.Item href="#">Update Profile</Dropdown.Item>
+                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
           </header>
+          </header>
+
+
 
           <section className="overview">
             <div className="card total-shipments">

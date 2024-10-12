@@ -41,10 +41,10 @@ const ListOrderComponent = () => {
   };
 
   const updateOrderStatus = (orderId) => {
-    const status = editedStatuses[orderId] ?? order.status;
-    if (status) {
-      console.log('New status to update:', status);
-      updateStatus(orderId, status)  
+    const newStatus = editedStatuses[orderId] ?? order.status;
+    if (newStatus) {
+      console.log('New status to update:', newStatus);
+      updateStatus(orderId, newStatus)  
         .then((response) => {
           console.log('Status updated successfully:', response);
           getAllOrders();  

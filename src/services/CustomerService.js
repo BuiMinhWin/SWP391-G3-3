@@ -6,10 +6,10 @@ const REST_API_BASE_URL2 = "http://koideliverysystem.id.vn:8080/api/accounts";
 export const createOrder = async (orderData) => {
   try {
     const response = await axios.post(`${REST_API_BASE_URL}/create`, orderData);
-    return response.data; // Return the data from the response
+    return response.data; 
   } catch (error) {
     console.error("Error creating order:", error.response || error.message);
-    throw error; // Propagate error to be handled by the caller
+    throw error; 
   }
 };
 
@@ -23,7 +23,6 @@ export const getAccountById = async (accountId) => {
   }
 };
 
-// Update account details
 export const updateAccount = async (accountId, accountData) => {
   try {
     const response = await axios.patch(
