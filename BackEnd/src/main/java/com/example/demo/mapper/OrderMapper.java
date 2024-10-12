@@ -32,10 +32,11 @@ public class OrderMapper {
                 order.getOrderNote(),
                 order.getTotalPrice(),
                 order.getStatus(),
-                order.getOriginLatitude(),
-                order.getOriginLongitude(),
-                order.getDestinationLatitude(),
-                order.getDestinationLongitude()
+//                order.getOriginLatitude(),
+//                order.getOriginLongitude(),
+//                order.getDestinationLatitude(),
+//                order.getDestinationLongitude()
+                order.getDistance()
         );
     }
 
@@ -59,21 +60,22 @@ public class OrderMapper {
         order.setSenderNote(orderDTO.getSenderNote());
         order.setOrderNote(orderDTO.getOrderNote());
 
-        double distance = DistanceCalculator.calculateDistance(
-                orderDTO.getOriginLatitude(),
-                orderDTO.getOriginLongitude(),
-                orderDTO.getDestinationLatitude(),
-                orderDTO.getDestinationLongitude()
-        );
-        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(distance, RATE_PER_KM);
+//        double distance = DistanceCalculator.calculateDistance(
+//                orderDTO.getOriginLatitude(),
+//                orderDTO.getOriginLongitude(),
+//                orderDTO.getDestinationLatitude(),
+//                orderDTO.getDestinationLongitude()
+//        );
+        order.setDistance(orderDTO.getDistance());
+        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(orderDTO.getDistance(), RATE_PER_KM);
         order.setTotalPrice(calculatedTotalPrice);
 
         order.setStatus(orderDTO.getStatus());
 
-        order.setOriginLatitude(orderDTO.getOriginLatitude());
-        order.setOriginLongitude(orderDTO.getOriginLongitude());
-        order.setDestinationLatitude(orderDTO.getDestinationLatitude());
-        order.setDestinationLongitude(orderDTO.getDestinationLongitude());
+//        order.setOriginLatitude(orderDTO.getOriginLatitude());
+//        order.setOriginLongitude(orderDTO.getOriginLongitude());
+//        order.setDestinationLatitude(orderDTO.getDestinationLatitude());
+//        order.setDestinationLongitude(orderDTO.getDestinationLongitude());
 
         return order;
     }

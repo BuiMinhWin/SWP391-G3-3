@@ -80,15 +80,18 @@ public class Order {
     @Column(name = "status")
     private int status;
 
-    @Column(name = "origin_latitude")
-    private double originLatitude;
+//    @Column(name = "origin_latitude")
+//    private double originLatitude;
+//
+//    @Column(name = "origin_longitude")
+//    private double originLongitude;
+//
+//    @Column(name = "destination_latitude")
+//    private double destinationLatitude;
+//
+//    @Column(name = "destination_longitude")
+//    private double destinationLongitude;
 
-    @Column(name = "origin_longitude")
-    private double originLongitude;
-
-    @Column(name = "destination_latitude")
-    private double destinationLatitude;
-
-    @Column(name = "destination_longitude")
-    private double destinationLongitude;
+    @Column(name = "distance")
+    private double distance;
 }
