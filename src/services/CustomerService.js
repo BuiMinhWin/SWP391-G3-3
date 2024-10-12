@@ -26,7 +26,10 @@ export const getAccountById = async (accountId) => {
 // Update account details
 export const updateAccount = async (accountId, accountData) => {
   try {
-    const response = await axios.put(`${REST_API_BASE_URL2}/${accountId}`, accountData);
+    const response = await axios.patch(
+      `${REST_API_BASE_URL2}/${accountId}`,
+      accountData
+    );
     return response.data;
   } catch (error) {
     console.error("Error updating account:", error);

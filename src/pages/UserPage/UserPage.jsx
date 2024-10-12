@@ -11,25 +11,23 @@ const INITIAL_FORM_STATE = {
   firstName: "",
   lastName: "",
   userName: "",
-  password: "",
+  // password: "",
   email: "",
   phone: "",
   avatar: "",
-  roleId: "",
 };
 
 const FORM_VALIDATION = Yup.object().shape({
   firstName: Yup.string().required("Vui lòng nhập tên"),
   lastName: Yup.string().required("Vui lòng nhập họ"),
   userName: Yup.string().required("Vui lòng nhập tên người dùng"),
-  password: Yup.string().required("Vui lòng nhập mật khẩu"),
+  // password: Yup.string().required("Vui lòng nhập mật khẩu"),
   email: Yup.string()
     .email("Email không hợp lệ")
     .required("Vui lòng nhập email"),
   phone: Yup.string()
     .matches(/^[0-9]+$/, "Số điện thoại phải là số")
     .required("Vui lòng nhập số điện thoại"),
-  roleId: Yup.string().required("Vui lòng chọn vai trò người dùng"),
 });
 
 const AccountForm = () => {
@@ -47,11 +45,10 @@ const AccountForm = () => {
           firstName: accountData.firstName,
           lastName: accountData.lastName,
           userName: accountData.userName,
-          password: accountData.password,
+          // password: accountData.password,
           email: accountData.email,
           phone: accountData.phone,
           avatar: accountData.avatar,
-          roleId:accountData.roleId,
         });
       } catch (error) {
         console.error("Error fetching account:", error);
