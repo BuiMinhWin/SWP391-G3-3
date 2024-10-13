@@ -1,22 +1,26 @@
-
+.container-fluid{
+ margin:-45px
+}
 .sidebar {
   width: 20%;
   background-color: #343a40;
   color: white;
-  padding: 20px;
- 
+  padding-top: 20px;
+  
 }
+
 .sidebar.logo{
   width:1%;
 }
-.KoiDeli{
-  margin-left: -130px;
-}
-
 
 .sidebar .profile {
   text-align: center;
   margin-bottom: 20px;
+}
+.sidebar .profile-container img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
 }
 
 .sidebar .profile-img {
@@ -49,6 +53,25 @@
 
 .sidebar nav ul li a:hover {
   color: #ffc107;
+}
+
+.KoiDeli {
+  margin-left: -170px; /* Align the Koi Deli text properly */
+}
+.logo-separator {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+ul.list-unstyled li a {
+  color: #fff;
+  padding: 10px;
+  display: block;
+  text-decoration: none;
+}
+
+ul.list-unstyled li a:hover {
+  background-color: #495057;
+  text-decoration: none;
 }
 
 

@@ -3,7 +3,6 @@
   import { GoogleLogin } from '@react-oauth/google';
   import './Login.css';
   import { loginAccount, googleLogin } from '../../services/EmployeeService';  
-  // import HeaderComponent from '../Header/HeaderComponent';
   import * as jwtJsDecode from 'jwt-js-decode';
 
   const LoginComponent = ({ handleLogin }) => {
@@ -60,7 +59,6 @@
       const { payload } = decodedToken;
       const { given_name: firstName, family_name: lastName, email, picture: avatar } = payload;
     
-      // Retrieve createAt from local storage if it exists
       let createAt = localStorage.getItem('createAt');
     
       const account = {
@@ -111,10 +109,10 @@
 
     return (
       <div className="login-container">
-        <div className='main-content'>
+        <div  className='main-content'>
           <div className="login-image-container"></div>
           <div className="login-form-container">
-            <div className="form-box">
+            <div className="login-form-box">
               <div className="logo-title">
                 <img src="/Logo-Koi/Order.png" alt="Koi Logo" className="koi-logo" />
                 <div className="text-container">
