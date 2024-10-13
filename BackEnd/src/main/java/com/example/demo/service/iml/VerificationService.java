@@ -15,9 +15,6 @@ public class VerificationService {
     @Autowired
     private AccountRepository accountRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     private Map<String, String> verificationCodes = new HashMap<>();
 
     public void saveVerificationCode(String email, String code) {
@@ -39,8 +36,7 @@ public class VerificationService {
             return "Account not found with the provided email.";
         }
 
-        String encodedPassword = passwordEncoder.encode(newPassword);
-        account.setPassword(encodedPassword);
+        account.setPassword(confirmPassword);
 
         accountRepository.save(account);
 
