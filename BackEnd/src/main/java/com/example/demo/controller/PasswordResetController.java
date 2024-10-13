@@ -2,15 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.service.iml.MailService;
+import com.example.demo.service.iml.VerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,24 +16,25 @@ public class PasswordResetController {
     @Autowired
     private AccountRepository accountRepository;
 
-    @PostMapping("/request-password-reset")
-    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
+    @Autowired
+    private VerificationService verificationService;
 
-        boolean checkEmail = accountRepository.existsByEmail(email);
-        if (checkEmail) {
-            String resetLink = "https://yourdomain.com/reset-password?token=someUniqueToken";
-            mailService.sendResetPasswordEmail(email, resetLink);
+    @PostMapping("/forgot")
+    public String forgotPassword(@RequestParam String email) {
+        String verificationCode = mailService.generateVerificationCode();
+        mailService.sendVerificationCode(email, verificationCode);
+        verificationService.saveVerificationCode(email, verificationCode);
+        return "A verification code has been sent to your email.";
+    }
 
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Password reset email has been sent to " + email);
-
-            return ResponseEntity.ok(response);
+    @PostMapping("/verify")
+    public String verifyCode(@RequestParam String email, @RequestParam String code, @RequestParam String newPassword,@RequestParam String confirmPassword) {
+        if (verificationService.verifyCode(email, code)) {
+            verificationService.resetPassword(email, newPassword, confirmPassword);
+            return "Your password has been successfully reset.";
         } else {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Email does not exist in our records.");
-
-            return ResponseEntity.badRequest().body(errorResponse);
+            return "Invalid verification code.";
         }
     }
+
 }
