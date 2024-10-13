@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Grid, InputAdornment, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Grid,
+  InputAdornment,
+  Paper,
+  Typography,
+} from "@mui/material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import TextFieldWrapper from "../FromUI/Textfield";
@@ -11,12 +18,16 @@ import koi_name from "../../data/koiVarieties.json";
 import { createOrder } from "../../services/CustomerService";
 import SideBar from "../SideBar/SideBar";
 import HeaderBar from "../Header/Header/Nguyen";
+import RadioGroupWrapper from "../FromUI/RadioGroup";
+import CustomRadioGroup from "../FromUI/CustomRadioGroup";
+import AccessibleIcon from "@mui/icons-material/Accessible";
+import AccessibleForwardIcon from "@mui/icons-material/AccessibleForward";
 
 // Initial Form State
 const INITIAL_FORM_STATE = {
   origin: "",
-  cityS: "",
-  cityR: "",
+  cityS: "", //
+  cityR: "", //
   destination: "",
   receiverName: "",
   senderName: "",
@@ -28,14 +39,16 @@ const INITIAL_FORM_STATE = {
   postalCodeR: "", // Use string for postal codes
   receiverNote: "",
   senderNote: "",
-  description: "",
-  discount: 0,
-  koi_image: null,
+  orderNote: "",
+  document: [],
+  discount: "",
+  koi_image: [],
   koi_name: "",
   koi_type: "",
-  quantity: 1, // Set initial quantity to 1
-  weight: 0.1, // Set initial weight to 0.1
-  freight: false,
+  quantity: 0,
+  weight: 0.0,
+  freight: "",
+  additional_service: "",
 };
 
 // Validation Schema with Yup
@@ -58,21 +71,20 @@ const FORM_VALIDATION = Yup.object().shape({
     .required("Vui lòng nhập mã bưu điện"),
   receiverNote: Yup.string().nullable(),
   senderNote: Yup.string().nullable(),
-  description: Yup.string().nullable(), // Optional field for additional notes
-  discount: Yup.number()
-    .min(0, "Giảm giá không được nhỏ hơn 0")
-    .required("Vui lòng nhập giảm giá"),
-  cityS: Yup.string().required("Vui lòng chọn thành phố"),
-  cityR: Yup.string().required("Vui lòng chọn thành phố"),
-  koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"),
-  koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"),
+  orderNote: Yup.string().nullable(), // Optional field for additional notes
+  discount: Yup.string().nullable(),
+  cityS: Yup.string().required("Vui lòng chọn thành phố"), //
+  cityR: Yup.string().required("Vui lòng chọn thành phố"), //
+  koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"), //
+  koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"), //
   quantity: Yup.number()
     .min(1, "Số lượng phải lớn hơn 0")
     .required("Vui lòng nhập số lượng"),
   weight: Yup.number()
     .min(0.1, "Cân nặng phải lớn hơn 0")
     .required("Vui lòng nhập cân nặng"),
-  freight: Yup.boolean(),
+  freight: Yup.string().required("Vui lòng chọn phương thức vận chuyển"),
+  additional_service: Yup.string().nullable(),
 });
 
 const OrderForm = () => {
@@ -83,7 +95,7 @@ const OrderForm = () => {
       onSubmit={async (values, { setSubmitting, setErrors }) => {
         console.log("Form values before submission:", values); // Debugging log
 
-        const accountId = localStorage.getItem('accountId');
+        const accountId = localStorage.getItem("accountId");
         console.log("Account ID:", accountId);
 
         try {
@@ -102,12 +114,14 @@ const OrderForm = () => {
             receiverNote: values.receiverNote,
             senderNote: values.senderNote,
             orderNote: values.description, // Corresponds to description in form state
-            discount: Number(values.discount),
+            discount: values.discount,
             koi_image: values.koi_image,
             koi_name: values.koi_name,
             koi_type: values.koi_type,
             quantity: Number(values.quantity),
             weight: parseFloat(values.weight),
+            freight: values.freight,
+            additional_service: values.additional_service,
           };
 
           console.log("Order data ready for submission:", orderData); // Debugging log
@@ -129,7 +143,8 @@ const OrderForm = () => {
         return (
           <Form onSubmit={handleSubmit}>
             <Box
-              sx={{ display: "flex", flexDirection: "column", height: "100vh" }} component={"body"}
+              sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
+              component={"body"}
             >
               <Box
                 sx={{
@@ -140,7 +155,7 @@ const OrderForm = () => {
                   p: 2,
                 }}
               >
-                <HeaderBar/>
+                <HeaderBar />
               </Box>
 
               {/* Sidebar + Content Container */}
@@ -192,6 +207,8 @@ const OrderForm = () => {
                         <TextFieldWrapper
                           name="senderNote"
                           label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
                         />
                       </Grid>
                     </Grid>
@@ -238,6 +255,8 @@ const OrderForm = () => {
                         <TextFieldWrapper
                           name="receiverNote"
                           label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
                         />
                       </Grid>
                     </Grid>
@@ -263,7 +282,7 @@ const OrderForm = () => {
                           options={koi_name}
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid item xs={3}>
                         <TextFieldWrapper
                           name="weight"
                           label="Cân nặng trung bình"
@@ -274,11 +293,17 @@ const OrderForm = () => {
                           }}
                         />
                       </Grid>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper name="quantity" label="Số lượng" />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper name="description" label="Ghi chú" />
+                      <Grid item xs={3}>
+                        <TextFieldWrapper
+                          name="quantity"
+                          label="Số lượng"
+                          type="number"
+                          slotProps={{
+                            inputLabel: {
+                              shrink: true,
+                            },
+                          }}
+                        />
                       </Grid>
                       <Grid item xs={6}>
                         <TextFieldWrapper
@@ -289,6 +314,59 @@ const OrderForm = () => {
                               <InputAdornment position="end">%</InputAdornment>
                             ),
                           }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextFieldWrapper
+                          name="description"
+                          label="Ghi chú"
+                          multiline
+                          rows={4}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <RadioGroupWrapper
+                          name="additional_service"
+                          legend="Bảo hiểm sự cố"
+                          defaultValue="No"
+                          options={[
+                            {
+                              value: "Yes",
+                              label: "Có",
+                            },
+                            {
+                              value: "No",
+                              label: "Không",
+                            },
+                          ]}
+                        />
+                      </Grid>
+                      <Grid item xs ={6}>
+                        
+                      </Grid>
+                      <Grid item xs={12}>
+                        <CustomRadioGroup
+                          name="freight"
+                          options={[
+                            {
+                              value: "Dịch vụ tiêu chuẩn",
+                              label: "Dịch vụ tiêu chuẩn",
+                              description:
+                                "Giao theo tiêu chuẩn dịch vụ 1-4 ngày",
+                              icon: <AccessibleIcon fontSize="large" />,
+                              helpText:
+                                "Phí vận chuyển ước tính sẽ bao gồm phụ phí và trừ đi các khoản chiến khấu/giảm giá bởi khuyến mãi.",
+                            },
+                            {
+                              value: "Dịch vụ hỏa tốc",
+                              label: "Dịch vụ hỏa tốc",
+                              description:
+                                "Giao theo tiêu chuẩn dịch vụ 1-3 giờ",
+                              icon: <AccessibleForwardIcon fontSize="large" />,
+                              helpText:
+                                "Phí vận chuyển ước tính sẽ bao gồm phụ phí và trừ đi các khoản chiến khấu/giảm giá bởi khuyến mãi.",
+                            },
+                          ]}
                         />
                       </Grid>
                     </Grid>
