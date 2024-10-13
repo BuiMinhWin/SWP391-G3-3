@@ -36,13 +36,14 @@ public class OrderMapper {
 //                order.getOriginLongitude(),
 //                order.getDestinationLatitude(),
 //                order.getDestinationLongitude()
-                order.getDistance()
+                order.getDistance(),
+                order.getVnpTxnRef()
         );
     }
 
     public Order mapToOrder(OrderDTO orderDTO, Account account) {
         Order order = new Order();
-        order.setOrderId(orderDTO.getOrderId());
+//        order.setOrderId(orderDTO.getOrderId());
         order.setAccount(account);
         order.setOrderDate(orderDTO.getOrderDate());
         order.setShippedDate(orderDTO.getShippedDate());
@@ -71,6 +72,7 @@ public class OrderMapper {
         order.setTotalPrice(calculatedTotalPrice);
 
         order.setStatus(orderDTO.getStatus());
+        order.setVnpTxnRef(orderDTO.getVnpTxnRef());
 
 //        order.setOriginLatitude(orderDTO.getOriginLatitude());
 //        order.setOriginLongitude(orderDTO.getOriginLongitude());

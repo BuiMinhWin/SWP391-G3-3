@@ -8,6 +8,7 @@ import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
@@ -188,9 +190,18 @@ public class OrderService {
     }
 
     public OrderDTO getOrderByIdV2(String orderId) {
+
         return orderRepository.findById(orderId)
                 .map(order -> new OrderDTO(order.getTotalPrice()))
                 .orElse(null);
+    }
+    public void updateVnpTxnRef(String orderId, String vnpTxnRef) {
+        log.debug("Updating vnpTxnRef for orderId: {} with vnpTxnRef: {}", orderId, vnpTxnRef);
+        orderRepository.findByOrderId(orderId).ifPresent(order -> {
+            order.setVnpTxnRef(vnpTxnRef);
+            orderRepository.save(order);
+            log.debug("vnpTxnRef updated: {}", order);
+        });
     }
 
 }

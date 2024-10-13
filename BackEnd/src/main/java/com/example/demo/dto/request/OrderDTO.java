@@ -38,6 +38,7 @@ public class OrderDTO {
 //    private double destinationLatitude;
 //    private double destinationLongitude;
     private double distance;
+    private String vnpTxnRef;
 
     public OrderDTO(int totalPrice) {
         this.totalPrice = totalPrice;

@@ -5,6 +5,7 @@ import com.example.demo.service.iml.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +15,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentController {
     private final PaymentService paymentService;
     private final OrderService orderService;
 
-    // Endpoint POST để tạo thanh toán VNPay dựa trên orderId
     @PostMapping("/vn-pay")
     public ResponseObject<PaymentDTO.VNPayResponse> pay(
             @Valid @RequestBody PaymentRequest paymentRequest,
@@ -29,13 +30,19 @@ public class PaymentController {
             String errorMessage = bindingResult.getFieldErrors().stream()
                     .map(error -> error.getField() + ": " + error.getDefaultMessage())
                     .collect(Collectors.joining(", "));
+            log.error("Validation errors: {}", errorMessage);
             return new ResponseObject<>(HttpStatus.BAD_REQUEST, errorMessage, null);
         }
+
+        log.debug("Received payment request for orderId: {}", paymentRequest.getOrderId());
+
+        PaymentDTO.VNPayResponse response = paymentService.createVnPayPayment(
+                request, paymentRequest.getOrderId(), paymentRequest.getBankCode());
 
         return new ResponseObject<>(
                 HttpStatus.OK,
                 "Success",
-                paymentService.createVnPayPayment(request, paymentRequest.getOrderId(), paymentRequest.getBankCode())
+                response
         );
     }
 
@@ -43,15 +50,15 @@ public class PaymentController {
     @GetMapping("/vn-pay-callback")
     public ResponseObject<PaymentDTO.VNPayResponse> payCallbackHandler(HttpServletRequest request) {
         String status = request.getParameter("vnp_ResponseCode");
-        String orderId = request.getParameter("vnp_TxnRef"); // Giả sử vnp_TxnRef chứa orderId
+        String vnpTxnRef = request.getParameter("vnp_TxnRef");
 
-        if ("00".equals(status)) { // VNPay trả về "00" cho thành công
-            // Cập nhật trạng thái đơn hàng thành đã thanh toán thành công
-            orderService.updateOrderStatus(orderId, 3); // Giả sử có phương thức này
+        log.debug("Received VNPay callback for vnpTxnRef: {} with status: {}", vnpTxnRef, status);
+
+        if ("00".equals(status)) {
+            orderService.updateOrderStatus(vnpTxnRef, 3); // 3 indicates successful payment
             return new ResponseObject<>(HttpStatus.OK, "Success", new PaymentDTO.VNPayResponse("00", "Success", ""));
         } else {
-            // Cập nhật trạng thái đơn hàng thất bại hoặc cần xem xét
-            orderService.updateOrderStatus(orderId, 1); // Giả sử có phương thức này
+            orderService.updateOrderStatus(vnpTxnRef, 1); // 1 indicates failed payment
             return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Failed", null);
         }
     }

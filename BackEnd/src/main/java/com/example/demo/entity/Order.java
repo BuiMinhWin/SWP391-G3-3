@@ -94,4 +94,7 @@ public class Order {
 
     @Column(name = "distance")
     private double distance;
+
+    @Column(name = "vnp_txn_ref", unique = true)
+    private String vnpTxnRef;
 }
