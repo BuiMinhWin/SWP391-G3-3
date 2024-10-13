@@ -49,4 +49,7 @@ public class OrderDetail {
 
     @Column(name = "status")
     private int status;
+
+    @Column(name = "additional_service")
+    private String additional_service;
 }
