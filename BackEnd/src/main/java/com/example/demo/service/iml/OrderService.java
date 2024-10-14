@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -195,7 +196,6 @@ public class OrderService {
         return orderMapper.mapToOrderDTO(updatedOrder);
     }
 
-    // Phương thức mới để tìm đơn hàng bằng vnpTxnRef
     public OrderDTO getOrderByVnpTxnRef(String vnpTxnRef) {
         return orderRepository.findByVnpTxnRef(vnpTxnRef)
                 .map(orderMapper::convertToDTO)
@@ -210,13 +210,11 @@ public class OrderService {
     }
 
 
-    // Phương thức để lấy vnpTxnRef bằng orderId, vẫn giữ nếu cần thiết
     public Optional<String> getVnpTxnRefByOrderId(String orderId) {
         return orderRepository.findById(orderId)
                 .map(Order::getVnpTxnRef);
     }
 
-    // Sửa phương thức updateVnpTxnRef để lưu trữ đúng vnpTxnRef
     public void updateVnpTxnRef(String orderId, String vnpTxnRef) {
         log.debug("Updating vnpTxnRef for orderId: {} with vnpTxnRef: {}", orderId, vnpTxnRef);
         orderRepository.findById(orderId).ifPresentOrElse(order -> {
