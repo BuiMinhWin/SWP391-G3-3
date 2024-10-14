@@ -4,10 +4,10 @@ import com.example.demo.dto.request.OrderDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Order;
 import com.example.demo.exception.OrderNotFoundException;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.OrderMapper;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OrderRepository;
-import com.example.demo.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -30,6 +30,12 @@ public class OrderService {
     private final AccountRepository accountRepository;
     private final OrderMapper orderMapper;
 
+    // Định nghĩa các trạng thái đơn hàng
+    private static final int STATUS_CANCELLED = 0;
+    private static final int STATUS_PROCESSING = 1;
+    private static final int STATUS_SHIPPED = 2;
+    private static final int STATUS_DELIVERED = 3;
+
     public OrderDTO createOrder(OrderDTO orderDTO) {
         logger.info("Received OrderDTO: {}", orderDTO);
 
@@ -45,9 +51,9 @@ public class OrderService {
             logger.debug("Order date was null, set to current time: {}", order.getOrderDate());
         }
 
-        if (order.getStatus() == 0) {
-            order.setStatus(1);
-            logger.debug("Order status was 0, updated to 1 (Processing)");
+        if (order.getStatus() == STATUS_CANCELLED) {
+            order.setStatus(STATUS_PROCESSING);
+            logger.debug("Order status was 0, updated to {} (Processing)", STATUS_PROCESSING);
         }
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
@@ -65,8 +71,8 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
-        if (order.getStatus() != 0) {
-            order.setStatus(0);
+        if (order.getStatus() != STATUS_CANCELLED) {
+            order.setStatus(STATUS_CANCELLED);
             order.setOrderDate(LocalDateTime.now());
             Order savedOrder = orderRepository.save(order);
             logger.info("Order with ID: {} has been canceled.", orderId);
@@ -83,7 +89,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
-        if (order.getStatus() == 0) {
+        if (order.getStatus() == STATUS_CANCELLED) {
 
             if (orderDTO.getOrderDate() != null) {
                 order.setOrderDate(orderDTO.getOrderDate());
@@ -127,9 +133,9 @@ public class OrderService {
                 logger.debug("Updated postalCode to: {}", orderDTO.getPostalCode());
             }
 
-            order.setStatus(1);
+            order.setStatus(STATUS_PROCESSING);
             Order updatedOrder = orderRepository.save(order);
-            logger.info("Order with ID: {} has been updated and status set to 1 (Processing).", orderId);
+            logger.info("Order with ID: {} has been updated and status set to {} (Processing).", orderId, STATUS_PROCESSING);
 
             return orderMapper.mapToOrderDTO(updatedOrder);
         } else {
@@ -161,9 +167,8 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
-        // Automatically set status to 1 (Processing) if newStatus is not provided or specific
         if (newStatus < 0 || newStatus > 3) {
-            newStatus = 1; // Default to Processing
+            newStatus = STATUS_PROCESSING; // Default to Processing
             logger.info("Invalid status provided. Status automatically set to Processing (1).");
         }
 
@@ -171,16 +176,16 @@ public class OrderService {
         Order updatedOrder = orderRepository.save(order);
 
         switch (newStatus) {
-            case 0:
+            case STATUS_CANCELLED:
                 logger.info("Order status updated to Canceled.");
                 break;
-            case 1:
+            case STATUS_PROCESSING:
                 logger.info("Order status updated to Processing.");
                 break;
-            case 2:
+            case STATUS_SHIPPED:
                 logger.info("Order status updated to Shipped.");
                 break;
-            case 3:
+            case STATUS_DELIVERED:
                 logger.info("Order status updated to Delivered.");
                 break;
             default:
@@ -191,23 +196,38 @@ public class OrderService {
         return orderMapper.mapToOrderDTO(updatedOrder);
     }
 
-    public OrderDTO getOrderByIdV2(String orderId) {
-        return orderRepository.findById(orderId)
-                .map(order -> orderMapper.convertToDTO(order))
-                .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
+    // Phương thức mới để tìm đơn hàng bằng vnpTxnRef
+    public OrderDTO getOrderByVnpTxnRef(String vnpTxnRef) {
+        return orderRepository.findByVnpTxnRef(vnpTxnRef)
+                .map(orderMapper::convertToDTO)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with vnpTxnRef: " + vnpTxnRef));
     }
 
 
+    public OrderDTO getOrderByIdV2(String vnpTxnRef) {
+        return orderRepository.findById(vnpTxnRef)
+                .map(order -> orderMapper.convertToDTO(order))
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + vnpTxnRef));
+    }
 
+
+    // Phương thức để lấy vnpTxnRef bằng orderId, vẫn giữ nếu cần thiết
+    public Optional<String> getVnpTxnRefByOrderId(String orderId) {
+        return orderRepository.findById(orderId)
+                .map(Order::getVnpTxnRef);
+    }
+
+    // Sửa phương thức updateVnpTxnRef để lưu trữ đúng vnpTxnRef
     public void updateVnpTxnRef(String orderId, String vnpTxnRef) {
         log.debug("Updating vnpTxnRef for orderId: {} with vnpTxnRef: {}", orderId, vnpTxnRef);
-        orderRepository.findByOrderId(orderId).ifPresentOrElse(order -> {
+        orderRepository.findById(orderId).ifPresentOrElse(order -> {
             log.debug("Order found: {}", order);
-            order.setVnpTxnRef(vnpTxnRef);
+            order.setVnpTxnRef(vnpTxnRef); // Sửa lỗi ở đây: set vnpTxnRef đúng cách
             orderRepository.save(order);
             log.debug("vnpTxnRef updated and order saved: {}", order);
         }, () -> {
             log.warn("Order not found with orderId: {}", orderId);
+            throw new OrderNotFoundException("Order not found with orderId: " + orderId);
         });
     }
 
