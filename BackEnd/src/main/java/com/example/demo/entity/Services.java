@@ -15,9 +15,8 @@ import lombok.Setter;
 @Table(name = "`services`")
 public class Services {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "services_id", columnDefinition = "CHAR(36)")
-    private String servicesId;
+    private int servicesId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
@@ -29,6 +28,6 @@ public class Services {
     @Column(name = "price")
     private double price;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "service_status")
+    private String serviceStatus;
 }

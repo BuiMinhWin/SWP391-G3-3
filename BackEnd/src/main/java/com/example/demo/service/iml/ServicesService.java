@@ -27,6 +27,35 @@ public class ServicesService {
         Order order = orderRepository.findById(servicesDTO.getOrderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Services not found with id " + servicesDTO.getOrderId()));
 
+        int serviceId = servicesDTO.getServiceId();
+
+        switch (serviceId) {
+            case 1:
+                if ("Yes".equalsIgnoreCase(servicesDTO.getServiceStatus())) {
+                    servicesDTO.setPrice(30.0);
+                } else {
+                    servicesDTO.setPrice(0.0);
+                }
+                break;
+            case 2:
+                if ("Yes".equalsIgnoreCase(servicesDTO.getServiceStatus())) {
+                    servicesDTO.setPrice(50.0);
+                } else {
+                    servicesDTO.setPrice(0.0);
+                }
+                break;
+            case 3:
+                if ("Yes".equalsIgnoreCase(servicesDTO.getServiceStatus())) {
+                    servicesDTO.setPrice(70.0);
+                } else {
+                    servicesDTO.setPrice(0.0);
+                }
+                break;
+            default:
+                servicesDTO.setPrice(0.0);
+                break;
+        }
+
         Services service = ServicesMapper.mapToServices(servicesDTO, order);
 
         System.out.println("Creating Services with Order ID: " + service.getOrder().getOrderId());
@@ -36,3 +65,4 @@ public class ServicesService {
         return ServicesMapper.maptoServicesDTO(savedService);
     }
 }
+

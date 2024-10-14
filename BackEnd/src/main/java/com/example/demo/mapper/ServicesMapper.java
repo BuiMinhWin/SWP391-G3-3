@@ -11,7 +11,7 @@ public class ServicesMapper {
                 service.getServicesId(),
                 service.getOrder().getOrderId(),
                 service.getPrice(),
-                service.getDescription(),
+                service.getServiceStatus(),
                 service.getServicesName()
         );
     }
@@ -21,7 +21,7 @@ public class ServicesMapper {
         service.setServicesId(servicesDTO.getServiceId());
         service.setOrder(order);
         service.setPrice(servicesDTO.getPrice());
-        service.setDescription(servicesDTO.getDescription());
+        service.setServiceStatus(servicesDTO.getServiceStatus());
         service.setServicesName(servicesDTO.getServiceName());
         return service;
     }

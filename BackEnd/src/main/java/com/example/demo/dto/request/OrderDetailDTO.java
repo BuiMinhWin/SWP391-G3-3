@@ -16,7 +16,7 @@ public class OrderDetailDTO {
     private String orderId;
     private int quantity;
     private float weight;
-    private float discount;
+    private String discount;
     private String koiType;
     private LocalDateTime createdAt;
     private String koiName;
