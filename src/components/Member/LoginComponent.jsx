@@ -28,20 +28,20 @@
         localStorage.setItem('roleId', result.roleId);
         console.log("Role ID:", result.roleId);
 
-        if (result.roleId === 'Manager') {
-          navigate('/manager');
-        } else if (result.roleId === 'Delivery') {
-          navigate('/delivery');
-        } else if (result.roleId === 'Customer') {
-          navigate('/customer');
-        }else if (result.roleId === 'Sales') {
-          navigate('/sales');
-        }
-      } catch (error) {
-        console.error('Login Error:', error);
-        alert('An error occurred during login');
+      if (result.roleId === 'Manager') {
+        navigate('/manager');
+      } else if (result.roleId === 'Delivery') {
+        navigate('/delivery');
+      } else if (result.roleId === 'Customer') {
+        navigate('/customer');
+      }else if (result.roleId === 'Sales') {
+        navigate('/salestaff');
       }
-    };
+    } catch (error) {
+      console.error('Login Error:', error);
+      alert('An error occurred during login');
+    }
+  };
 
     const handleGoogleLoginSuccess = (response) => {
       console.log("Google login success:", response);
