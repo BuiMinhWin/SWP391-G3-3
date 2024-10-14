@@ -11,11 +11,12 @@ import CustomerHomePage from '../components/Customer/CustomerHomePage'
 import ManagerComponent from '../components/Manager/ManagerComponent'
 import ListOrderComponent from '../components/DeliveryStaff/ListOrderComponent'
 import EmployeeComponent from '../components/Manager/EmployeeComponent'
-import ProfileComponent from '../components/Member/ProfileComponent'
 import ListEmployeeComponent from '../components/Manager/ListEmployeeComponent'
 import ListCustomerComponent from '../components/Customer/ListCustomerComponent'
 import OrderDetailComponent from '../components/DeliveryStaff/OrderDetailComponent';
 import { OrderProvider } from '../components/DeliveryStaff/OrderContext';
+import CheckoutPage from '../pages/CheckoutPage/CheckoutPage'
+
 
 function index() {
   return (
@@ -29,6 +30,7 @@ function index() {
         <Route path='/user' element={<UserPage/>}/>
         <Route path='/form' element={<OrderForm/>}/>
         <Route path='/manager' element={<ManagerComponent/>} />
+        <Route path="/checkout" element ={<CheckoutPage/>}/>
         <Route path='/salestaff' element={<SaleStaffComponent/>} />
         <Route path='/delivery' element={<DeliveryComponent/>} /> 
         <Route path='/customer' element={<CustomerHomePage/>} /> 

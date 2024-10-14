@@ -16,19 +16,12 @@ import ButtonWrapper from "../FromUI/Button";
 import koi_type from "../../data/koiTypes.json";
 import koi_name from "../../data/koiVarieties.json";
 import { createOrder } from "../../services/CustomerService";
-import {
-  createDocument,
-  createOrderDetail,
-} from "../../services/CustomerService";
 import SideBar from "../SideBar/SideBar";
 import HeaderBar from "../Header/Header/Nguyen";
 import RadioGroupWrapper from "../FromUI/RadioGroup";
 import CustomRadioGroup from "../FromUI/CustomRadioGroup";
 import AccessibleIcon from "@mui/icons-material/Accessible";
 import AccessibleForwardIcon from "@mui/icons-material/AccessibleForward";
-import FileUpload from "../FromUI/FileUpload";
-import CheckboxWrapper from "../FromUI/Checkbox";
-import { useNavigate } from "react-router-dom";
 
 // Initial Form State
 const INITIAL_FORM_STATE = {
@@ -47,9 +40,9 @@ const INITIAL_FORM_STATE = {
   receiverNote: "",
   senderNote: "",
   orderNote: "",
-  document_file: null,
+  document: [],
   discount: "",
-  koi_image: "",
+  koi_image: [],
   koi_name: "",
   koi_type: "",
   quantity: 0,
@@ -92,21 +85,9 @@ const FORM_VALIDATION = Yup.object().shape({
     .required("Vui lòng nhập cân nặng"),
   freight: Yup.string().required("Vui lòng chọn phương thức vận chuyển"),
   additional_service: Yup.string().nullable(),
-  document_file: Yup.mixed()
-    .required("A PDF file is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
-      return value && value.type === "application/pdf";
-    })
-    .test("fileSize", "File size is too large", (value) => {
-      return value && value.size <= 8 * 1024 * 1024; // 8 MB limit
-    }),
-  termsOfService: Yup.boolean()
-    .oneOf([true], "The terms and conditions must be accepted.")
-    .required("The terms and conditions must be accepted."),
 });
 
 const OrderForm = () => {
-  const navigate = useNavigate();
   return (
     <Formik
       initialValues={INITIAL_FORM_STATE}
@@ -119,48 +100,34 @@ const OrderForm = () => {
 
         try {
           const orderData = {
-            ...values,
             accountId,
-            origin: `${values.origin}, ${values.cityS}, ${values.postalCodeS}`,
-            destination: `${values.destinations}, ${values.cityR}, ${values.postalCodeR}`,
-            freight: values.freight,
+            origin: values.origin,
+            cityS: values.cityS,
+            cityR: values.cityR,
+            destination: values.destination,
             receiverName: values.receiverName,
             senderName: values.senderName,
             receiverPhone: values.receiverPhone,
             senderPhone: values.senderPhone,
+            postalCodeS: values.postalCodeS,
+            postalCodeR: values.postalCodeR,
             receiverNote: values.receiverNote,
             senderNote: values.senderNote,
-            orderNote: values.orderNote,
+            orderNote: values.description, // Corresponds to description in form state
+            discount: values.discount,
+            koi_image: values.koi_image,
+            koi_name: values.koi_name,
+            koi_type: values.koi_type,
+            quantity: Number(values.quantity),
+            weight: parseFloat(values.weight),
+            freight: values.freight,
+            additional_service: values.additional_service,
           };
 
           console.log("Order data ready for submission:", orderData); // Debugging log
+
           const response = await createOrder(orderData);
-          const newOrderId = response.orderId;
-
-          // document
-          const documentData = {
-            orderId: newOrderId,
-            document_file: [values.document_file],
-          };
-          const documentResponse = await createDocument(documentData);
-
-          //order detail
-          const orderDetailData = {
-            orderId: newOrderId,
-            quantity: Number(values.quantity),
-            weight: parseFloat(values.weight),
-            discount: values.discount,
-            koiName: values.koi_name,
-            koiType: values.koi_type,
-          };
-          const orderDetailResponse = await createOrderDetail(orderDetailData);
-
-          //check log
-          console.log("Order created successfully with ID:", newOrderId);
-          console.log("Order created successfully");
-
-          navigate("/checkout", { state: { orderId: newOrderId } });
-          // Navigate on success
+          console.log("Order created successfully:", response.data); // Success log
         } catch (error) {
           console.error("Error creating order:", error);
           setErrors({ submit: error.message });
@@ -168,7 +135,7 @@ const OrderForm = () => {
           setSubmitting(false);
         }
       }}
-      validateOnMount={true}
+      validateOnMount={true} // Ensure validation is checked on mount
     >
       {({ handleSubmit, isValid, errors }) => {
         console.log("Validation errors:", errors); // Log validation errors
@@ -339,7 +306,15 @@ const OrderForm = () => {
                         />
                       </Grid>
                       <Grid item xs={6}>
-                        <FileUpload name="document_file" />
+                        <TextFieldWrapper
+                          name="discount"
+                          label="Giảm giá"
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">%</InputAdornment>
+                            ),
+                          }}
+                        />
                       </Grid>
                       <Grid item xs={12}>
                         <TextFieldWrapper
@@ -349,7 +324,26 @@ const OrderForm = () => {
                           rows={4}
                         />
                       </Grid>
-
+                      <Grid item xs={6}>
+                        <RadioGroupWrapper
+                          name="additional_service"
+                          legend="Bảo hiểm sự cố"
+                          defaultValue="No"
+                          options={[
+                            {
+                              value: "Yes",
+                              label: "Có",
+                            },
+                            {
+                              value: "No",
+                              label: "Không",
+                            },
+                          ]}
+                        />
+                      </Grid>
+                      <Grid item xs ={6}>
+                        
+                      </Grid>
                       <Grid item xs={12}>
                         <CustomRadioGroup
                           name="freight"
@@ -375,46 +369,9 @@ const OrderForm = () => {
                           ]}
                         />
                       </Grid>
-                      <Grid item xs={3}>
-                        <TextFieldWrapper
-                          name="discount"
-                          label="Mã giảm giá"
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">%</InputAdornment>
-                            ),
-                          }}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={3}
-                        justifyContent="center" // Center horizontally
-                        alignItems="center"
-                      >
-                        <RadioGroupWrapper
-                          name="additional_service"
-                          legend="Bảo hiểm sự cố"
-                          defaultValue="No"
-                          options={[
-                            {
-                              value: "Yes",
-                              label: "Có",
-                            },
-                            {
-                              value: "No",
-                              label: "Không",
-                            },
-                          ]}
-                        />
-                      </Grid>
                     </Grid>
                   </Paper>
-                  <CheckboxWrapper
-                    name="termsOfService"
-                    legend="Terms Of Service"
-                    label="I agree"
-                  />
+
                   <ButtonWrapper disabled={!isValid}>
                     Submit Order
                   </ButtonWrapper>
