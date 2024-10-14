@@ -15,7 +15,7 @@ import { HelpOutline } from '@mui/icons-material';
 
 const CustomRadioGroup = ({ name, options }) => {
   const { setFieldValue } = useFormikContext();
-  const [field] = useField(name);
+  const [field, meta] = useField(name);
 
   const handleChange = (event) => {
     setFieldValue(name, event.target.value);
@@ -80,6 +80,11 @@ const CustomRadioGroup = ({ name, options }) => {
           </Grid>
         ))}
       </RadioGroup>
+      {meta.touched && meta.error && (
+        <Typography variant="body2" color="error">
+          {meta.error}
+        </Typography>
+      )}
     </FormControl>
   );
 };

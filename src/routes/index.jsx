@@ -11,6 +11,7 @@ import CustomerHomePage from '../components/Customer/CustomerHomePage'
 import ManagerComponent from '../components/Manager/EmployeeComponent'
 import ListOrderComponent from '../components/DeliveryStaff/ListOrderComponent'
 import EmployeeComponent from '../components/Manager/EmployeeComponent'
+import CheckoutPage from '../pages/CheckoutPage/CheckoutPage'
 
 
 function index() {
@@ -21,6 +22,7 @@ function index() {
         <Route path='/register' element={<RegisterComponent/>} />
         <Route path='/user' element={<UserPage/>}/>
         <Route path='/form' element={<OrderForm/>}/>
+        <Route path="/checkout" element ={<CheckoutPage/>}/>
         <Route path='/salestaff' element={<SaleStaffComponent/>} />
         <Route path='/delivery' element={<DeliveryComponent/>} /> 
         <Route path='/orders' element={<ListOrderComponent/>} /> 
