@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { deleteAccount, listAccount } from '../../services/EmployeeService';
+import {deleteAccount , listAccount } from '../../services/EmployeeService';
 import { useNavigate } from 'react-router-dom';
-import './ListEmployee.css';
-import { FaSearch } from "react-icons/fa";
 
-const ListEmployeeComponent = () => {
+const ListCustomerComponent = () => {
   const [accounts, setAccounts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
+  const navigate = useNavigate()  ;
 
   useEffect(() => {
     getAllAccounts();
@@ -17,15 +14,15 @@ const ListEmployeeComponent = () => {
     listAccount()
       .then((response) => {
         if (Array.isArray(response.data)) {
-          const employeeAccounts = response.data.filter(account => (account.roleId !== 'Customer' && account.roleId !== 'Manager'));
-          setAccounts(employeeAccounts);
+          const customerAccounts = response.data.filter(account => account.roleId === 'Customer');
+          setAccounts(customerAccounts);
         } else {
           console.error("API response is not an array", response.data);
           setAccounts([]);
         }
       })
       .catch((error) => {
-        console.error("Error fetching employees: ", error);
+        console.error("Error fetching customer: ", error);
       });
   };
 
@@ -37,8 +34,8 @@ const ListEmployeeComponent = () => {
     navigate(`/edit-account/${accountId}`);
   };
 
-  const removeAccount = (accountId) => {
-    deleteAccount(accountId)
+  const removeAccount = (accountId) => {  
+    deleteAccount (accountId)
       .then(() => {
         getAllAccounts();
       })
@@ -47,37 +44,10 @@ const ListEmployeeComponent = () => {
       });
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const filteredAccounts = accounts.filter(
-    account => 
-      account.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <div className="container">
-      <h2 className="text-center">List of Accounts</h2>
-      <div className="d-flex align-items-center mb-3">
-        <button className="add-btn" onClick={addNewAccount}>
-          Add Account
-        </button>
-        <div className="search-bar ml-auto">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-          <span className="search-icon">
-            <FaSearch />
-          </span>
-        </div>
-    </div>
+      <h2 className="text-center">List of Customer</h2>
+      <button className="btn btn-primary mb-2" onClick={addNewAccount}>Add Account</button>
 
       <table className="table table-striped table-bordered">
         <thead>
@@ -88,13 +58,17 @@ const ListEmployeeComponent = () => {
             <th>Last Name</th>
             <th>Email</th>
             <th>CreateAt</th>
-            {/* <th>Avatar</th> */}
+            <th>Avatar</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filteredAccounts.length > 0 ? (
-            filteredAccounts.map(account => (
+          i
+          {accounts.length > 0 ? (
+            accounts.map(account => (
+              
+             
+             
               <tr key={account.accountId}>
                 <td>{account.accountId}</td>
                 <td>{account.roleId}</td>
@@ -102,7 +76,7 @@ const ListEmployeeComponent = () => {
                 <td>{account.lastName}</td>
                 <td>{account.email}</td>
                 <td>{account.createAt}</td>
-                {/* <td><img src={account.avatar} alt="Avatar" width="50" height="50" /></td> */}
+                <td><img src={account.avatar} alt="Avatar" width="50" height="50" /></td>
                 <td>
                   <button className="btn btn-info" onClick={() => updateAccount(account.accountId)}>Update</button>
                   <button className="btn btn-danger" onClick={() => removeAccount(account.accountId)}>Delete</button>
@@ -111,13 +85,14 @@ const ListEmployeeComponent = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="text-center">No Employees Found</td>
+              <td colSpan="8" className="text-center">No Customer Found</td>
             </tr>
           )}
+        
         </tbody>
       </table>
     </div>
   );
 };
 
-export default ListEmployeeComponent;
+export default ListCustomerComponent;

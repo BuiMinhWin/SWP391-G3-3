@@ -1,22 +1,17 @@
-// Replace with the actual base URL of your API for orders
+import axios from "axios";
+
 const REST_API_BASE_URL = "http://koideliverysystem.id.vn:8080/api/orders";
 
-// Function to list all orders
-export const listOrders = () => {
-  return axios.get(REST_API_BASE_URL, {
-    headers: { 'Content-Type': 'application/json' },
-    withCredentials: true, // If your API requires authentication cookies
-  });
+export const getOrder = (orderId) => {
+  return axios.get(REST_API_BASE_URL + '/' + orderId);
+}
+
+export const listOrder = () => {
+  return axios.get(REST_API_BASE_URL);
 };
 
-// Function to update order status
-export const updateOrderStatus = (orderId, newStatus) => {
-  return axios.put(
-    `${REST_API_BASE_URL}/${orderId}/status`, 
-    { status: newStatus },
-    {
-      headers: { 'Content-Type': 'application/json' },
-      withCredentials: true,  // If your API requires authentication cookies
-    }
-  );
-};
+export const trackingOrder = (orderId) => {
+    return axios.put(`${REST_API_BASE_URL}/updateStatus`, {
+      orderId: orderId,  
+    });
+  };

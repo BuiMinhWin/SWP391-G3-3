@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { createAccount, getAccount, updateAccount } from '../../services/EmployeeService'
 import { useNavigate, useParams } from 'react-router-dom' 
-
+import './Employee.css';
 const EmployeeComponent = () => {
   
   const [firstName, setFirstName] = useState('')
@@ -237,13 +237,14 @@ const EmployeeComponent = () => {
               </div>
 
               <div className='form-group mb-2'>
-                <label>Phone Number</label>
+                <label className='form-label'>Phone Number</label>
                 <input 
-                  type="tel" 
+                 type="text"  
+                  placeholder='Enter Employee phone number'
                   value={phone} 
                   onChange={(e) => setPhone(e.target.value)} 
                   required 
-                  placeholder="Phone Number"
+                  
                 />
             </div>
 

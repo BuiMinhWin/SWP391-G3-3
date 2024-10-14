@@ -1,73 +1,94 @@
-import React, { useState, useEffect } from 'react';
-import './SaleStaff.css';
+import React, {useEffect, useState} from 'react'
+import { listOrder, trackingOrder } from '../../services/SaleStaffService';
 import { useNavigate } from 'react-router-dom';
-import { listOrders, updateOrderStatus } from '../../services/SaleStaffService'; // Import the service
 
-const SalesStaff = () => {
-  const [orders, setOrders] = useState([]); // State to manage orders list
-  const navigate = useNavigate();
+const SaleStaffComponent = () => {
+  const [orders, setOrders] = useState([]);
+  const navigate = useNavigate()  ;
 
-  // Fetch orders when component mounts
   useEffect(() => {
-    fetchOrders();
+    getAllOrders();
   }, []);
 
-  const fetchOrders = async () => {
-    try {
-      const response = await listOrders();  // Call the listOrders function from service
-      setOrders(response.data);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    }
+  const getAllOrders = () => {
+    listOrder()
+      .then((response) => { 
+        console.log(response.data);
+        if (Array.isArray(response.data)) {
+          setOrders(response.data);
+        
+        } else {
+          console.error("API response is not an array", response.data);
+          setOrders([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching employees: ", error);
+      });
   };
+   // Function to handle status update
+   const handleUpdateStatus = (orderId, currentStatus) => {
+  const newStatus = currentStatus === 3 ? 1 : currentStatus + 1;  
 
-  const handleUpdateStatus = async (orderId, newStatus) => {
-    try {
-      // Call the service function to update the order status
-      await updateOrderStatus(orderId, newStatus);
-      // Refresh orders list after the status is updated
-      fetchOrders();
-    } catch (error) {
-      console.error('Error updating order status:', error);
-    }
-  };
+  trackingOrder(orderId, newStatus)  
+    .then((response) => {
+      console.log("Order status updated:", response.data);
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.orderId === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+    })
+    .catch((error) => {
+      console.error("Error updating order status:", error);
+    });
+};
+
 
   return (
-    <div className="sales-staff-container">
-      <h1>Quản lý Đơn hàng</h1>
+    <div className="container">
+      <h1>Sales Staff - Order Management</h1>
 
-      <table className="order-table">
+      <table className="table table-striped table-bordered">
         <thead>
           <tr>
-            <th>Mã Đơn Hàng</th>
-            <th>Khách Hàng</th>
-            <th>Trạng Thái</th>
-            <th>Hành Động</th>
+            <th>Order ID</th>
+            <th>Receiver Name</th>
+            <th>Sender Name</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {orders.map((order) => (
-            <tr key={order.orderId}>
-              <td>{order.orderId}</td>
-              <td>{order.accountId}</td>
-              <td>{order.status}</td>
-              <td>
-                {order.status === 'Pending' && (
-                  <button onClick={() => handleUpdateStatus(order.orderId, 'In Delivery')}>Bắt đầu vận chuyển</button>
-                )}
-                {order.status === 'In Delivery' && (
-                  <button onClick={() => handleUpdateStatus(order.orderId, 'Delivered')}>Đã giao</button>
-                )}
-                {order.status === 'Delivered' && <span>Đã hoàn tất</span>}
-              </td>
+          {orders.length > 0 ? (
+            orders.map(order => (
+              <tr key={order.orderId}>
+                <td>{order.orderId}</td>
+                <td>{order.receiverName}</td>
+                <td>{order.senderName}</td>
+                <td>{order.origin}</td>
+                <td>{order.destination}</td>
+                <td>{order.totalPrice}</td>
+                <td>{order.status}</td>
+                <td>
+                <button onClick={() => handleUpdateStatus(order.orderId, order.status)}>
+                  Update Status
+                </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="8" className="text-center no-orders">No Orders Found</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
-
-      <button className="back-btn" onClick={() => navigate('/')}>Quay lại Trang chủ</button>
     </div>
   );
 };
 
-export default SalesStaff;
+export default SaleStaffComponent

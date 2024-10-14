@@ -5,6 +5,7 @@ import FAQs from "../../components/FAQs/FAQs";
 import logo from '../../assets/Logo.png';
 import blog from '../../assets/Blog.jpg';
 import { useNavigate } from 'react-router-dom';
+import ProfileComponent from '../../components/Member/ProfileComponent';
 
 
 const Homepage = () => {
@@ -13,6 +14,11 @@ const Homepage = () => {
   const [trackingCode, setTrackingCode] = useState(''); // State để quản lý mã đơn hàng
   const [trackingResult, setTrackingResult] = useState(null); // State cho kết quả theo dõi
   const navigate = useNavigate();
+
+  const roleId = localStorage.getItem('roleId'); 
+  console.log('Role ID:', roleId);
+  const accountId = localStorage.getItem('accountId');
+  console.log("Stored Account ID:", accountId);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -30,10 +36,10 @@ const Homepage = () => {
       setTrackingCode(''); // Xóa mã đơn hàng
       setTrackingResult(''); // Xóa kết quả tra cứu
     }
-    const roleId = localStorage.getItem('roleId'); 
-    console.log('Role ID:', roleId);
-    const accountId = localStorage.getItem('accountId');
-    console.log("Stored Account ID:", accountId);
+    // const roleId = localStorage.getItem('roleId'); 
+    // console.log('Role ID:', roleId);
+    // const accountId = localStorage.getItem('accountId');
+    // console.log("Stored Account ID:", accountId);
   }, [activeTab]);
 
 
@@ -57,11 +63,30 @@ const Homepage = () => {
           </div>
           <a href="#" className="nav-link">Giới Thiệu</a>
         </div>
+        
         <div className="navbar-right">
-          <a href="#" className="nav-link support-link"><i className="fas fa-question-circle"></i>Hỗ Trợ</a>
-          <button className="register-btn" onClick={() => navigate('/register')}>Đăng Ký</button>
-          <button className="login-btn" onClick={() => navigate('/login')}>Đăng Nhập</button>  
-        </div>
+          {!roleId ? (
+            <>
+              <button className="register-btn" onClick={() => navigate('/register')}>Đăng Ký</button>
+              <button className="login-btn" onClick={() => navigate('/login')}>Đăng Nhập</button>
+            </>
+          ) : (
+            <>
+              {roleId === 'Manager' ? (
+                <button onClick={() => navigate('/manager')}>Back</button>
+              ) : roleId === 'Delivery' ? (
+                <button onClick={() => navigate('/delivery')}>Back</button>
+              ) : roleId === 'Sales' ? (
+                <button onClick={() => navigate('/sales')}>Back</button>
+              ) : null}
+            </>
+          )}
+          <a href="#" className="nav-link support-link">
+            <i className="fas fa-question-circle"></i>Hỗ Trợ
+          </a>
+      </div>
+              
+        
       </nav>
 
       {/* Welcome section */}

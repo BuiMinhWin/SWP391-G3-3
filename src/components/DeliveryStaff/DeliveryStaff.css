@@ -1,4 +1,6 @@
-
+.container-fluid{
+  margin:-45px
+ }
 .sidebar {
   width: 20%;
   background-color: #343a40;
@@ -11,9 +13,10 @@
 }
 .KoiDeli{
   margin-left: -130px;
+  color: white;
 }
 
-
+  
 .sidebar .profile {
   text-align: center;
   margin-bottom: 20px;
@@ -121,7 +124,7 @@
   font-size: 16px;
 }
 
-.card.total-shipments {
+.card.fail {
   background-color: #EEE8AA;
 }
 
@@ -129,11 +132,11 @@
   background-color: #A1A7FF;
 }
 
-.card.ongoing-shipments {
+.card.delivering {
   background-color: #C4D0BA;
 }
 
-.card.delivered {
+.card.approving {
   background-color: #A1A7FF;
 }
 
@@ -160,7 +163,7 @@
 .delivery-item:last-child {
   border-bottom: none;
 }
-
+/* 
 .delivery-item p {
   margin: 0;
   font-size: 14px;
@@ -210,3 +213,4 @@
 .profits p {
   margin-bottom: 5px;
 }
+   */
