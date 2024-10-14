@@ -70,17 +70,22 @@ const Homepage = () => {
               <button className="register-btn" onClick={() => navigate('/register')}>Đăng Ký</button>
               <button className="login-btn" onClick={() => navigate('/login')}>Đăng Nhập</button>
             </>
-          ):(
-            // <ProfileComponent/>
+          ) : (
             <>
-            <button className="register-btn" onClick={() => navigate('/register')}>Đăng Ký</button>
-            <button className="login-btn" onClick={() => navigate('/login')}>Đăng Nhập</button>
-          </>
-            
+              {roleId === 'Manager' ? (
+                <button onClick={() => navigate('/manager')}>Back</button>
+              ) : roleId === 'Delivery' ? (
+                <button onClick={() => navigate('/delivery')}>Back</button>
+              ) : roleId === 'Sales' ? (
+                <button onClick={() => navigate('/sales')}>Back</button>
+              ) : null}
+            </>
           )}
-          <a href="#" className="nav-link support-link"><i className="fas fa-question-circle"></i>Hỗ Trợ</a>
-        </div>
-        
+          <a href="#" className="nav-link support-link">
+            <i className="fas fa-question-circle"></i>Hỗ Trợ
+          </a>
+      </div>
+              
         
       </nav>
 
