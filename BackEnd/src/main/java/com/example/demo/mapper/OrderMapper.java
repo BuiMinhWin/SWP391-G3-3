@@ -81,4 +81,7 @@ public class OrderMapper {
 
         return order;
     }
+    public OrderDTO convertToDTO(Order order) {
+        return mapToOrderDTO(order);
+    }
 }

@@ -3,6 +3,7 @@ package com.example.demo.service.iml;
 import com.example.demo.dto.request.OrderDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Order;
+import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.mapper.OrderMapper;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.OrderRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -191,9 +193,11 @@ public class OrderService {
 
     public OrderDTO getOrderByIdV2(String orderId) {
         return orderRepository.findById(orderId)
-                .map(order -> new OrderDTO(order.getTotalPrice(), order.getVnpTxnRef()))
-                .orElse(null);
+                .map(order -> orderMapper.convertToDTO(order))
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
     }
+
+
 
     public void updateVnpTxnRef(String orderId, String vnpTxnRef) {
         log.debug("Updating vnpTxnRef for orderId: {} with vnpTxnRef: {}", orderId, vnpTxnRef);

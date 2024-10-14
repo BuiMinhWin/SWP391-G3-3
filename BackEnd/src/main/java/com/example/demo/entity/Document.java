@@ -23,9 +23,8 @@ public class Document {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(name = "document_type")
-    private String documentType;
+    @Column(name = "document_file", columnDefinition = "MEDIUMBLOB")
+    @Lob
+    private byte[] documentFile;
 
-    @Column(name = "description")
-    private String description;
 }

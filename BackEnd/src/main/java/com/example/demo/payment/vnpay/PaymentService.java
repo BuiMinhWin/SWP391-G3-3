@@ -19,11 +19,17 @@ import java.util.UUID;
 @Slf4j
 public class PaymentService {
     private final VNPAYConfig vnPayConfig;
-    private final OrderService orderService;  // Ensure OrderService is injected
+    private final OrderService orderService;
 
     public PaymentDTO.VNPayResponse createVnPayPayment(HttpServletRequest request, String orderId, String bankCode) {
         try {
             log.debug("Creating VNPay payment for orderId: {}", orderId);
+
+            if (orderId == null || orderId.trim().isEmpty()) {
+                log.error("orderId không hợp lệ: {}", orderId);
+                throw new IllegalArgumentException("orderId không được phép null hoặc rỗng");
+            }
+
             OrderDTO orderDTO = orderService.getOrderByIdV2(orderId);
             log.info("Total price for orderId {}: {} VND", orderId, orderDTO.getTotalPrice());
 
@@ -38,11 +44,11 @@ public class PaymentService {
 
             vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
 
-            // **Tạo vnp_TxnRef mới bằng UUID**
+            // Tạo vnp_TxnRef mới bằng UUID
             String vnpTxnRef = UUID.randomUUID().toString();
             vnpParamsMap.put("vnp_TxnRef", vnpTxnRef);
 
-            // **Set vnp_OrderInfo với order details**
+            // Set vnp_OrderInfo với order details
             vnpParamsMap.put("vnp_OrderInfo", "Thanh toan don hang: " + orderId);
 
             // Create query URL and secure hash
@@ -54,7 +60,7 @@ public class PaymentService {
             String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
             log.info("Payment URL generated: {}", paymentUrl);
 
-            // **Lưu vnp_TxnRef vào đơn hàng**
+            // Lưu vnp_TxnRef vào đơn hàng
             orderService.updateVnpTxnRef(orderId, vnpTxnRef);
 
             return PaymentDTO.VNPayResponse.builder()
