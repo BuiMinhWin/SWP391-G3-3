@@ -15,9 +15,11 @@ const ListOrderComponent = () => {
 
   const getAllOrders = () => {
     listOrder()
-      .then((response) => {
+      .then((response) => { 
+        console.log(response.data);
         if (Array.isArray(response.data)) {
           setOrders(response.data);
+        
         } else {
           console.error("API response is not an array", response.data);
           setOrders([]);
