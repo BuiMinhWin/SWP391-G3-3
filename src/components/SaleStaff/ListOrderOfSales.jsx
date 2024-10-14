@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { listOrder, updateStatus } from '../../services/DeliveryService';
-import { useNavigate } from 'react-router-dom';
 
-const ListOrderComponent = () => {
+import React, { useEffect, useState } from 'react';
+import { listOrder, updateStatus } from '../../services/SaleStaffService';
+import { useNavigate } from 'react-router-dom';
+import './SaleStaff.css';
+
+const ListOrderOfSales = () => {
   const [orders, setOrders] = useState([]);
   const [editedStatuses, setEditedStatuses] = useState({});
   const navigate = useNavigate();
-
   useEffect(() => {
     getAllOrders();
   }, []);
-
   const getAllOrders = () => {
     listOrder()
       .then((response) => {
@@ -23,10 +23,8 @@ const ListOrderComponent = () => {
       })
       .catch((error) => {
         console.error("Error fetching orders: ", error);
-
       });
   };
-
   const handleStatusChange = (orderId, newStatus) => {
     // console.log("Before update:", editedStatuses);
   
@@ -39,7 +37,6 @@ const ListOrderComponent = () => {
   
     setEditedStatuses(updatedStatuses); 
   };
-
   const updateOrderStatus = (orderId) => {
     const newStatus = editedStatuses[orderId] ?? orders.status;
     if (newStatus) {
@@ -54,23 +51,20 @@ const ListOrderComponent = () => {
         });
     }
   };
-
   return (
     <div className="container">
       <h2 className="text-center">List of Orders</h2>
-
       <table className="table table-striped table-bordered">
         <thead>
           <tr>
-            <th>OrderId</th>
-            <th>Destination</th>
-            <th>Freight</th>
-            <th>OrderDate</th>
-            <th>ShipDate</th>
-            <th>TotalPrice</th>
+          <th>Order ID</th>
+            <th>Receiver Name</th>
+            <th>Sender Name</th>
             <th>Origin</th>
+            <th>Destination</th>
+            <th>Total Price</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -78,12 +72,12 @@ const ListOrderComponent = () => {
             orders.map(order => (
               <tr key={order.orderId}>
                 <td>{order.orderId}</td>
-                <td>{order.destination}</td>
-                <td>{order.freight}</td>
-                <td>{order.orderDate}</td>
-                <td>{order.shippedDate}</td>
-                <td>{order.totalPrice}</td>
+                <td>{order.receiverName}</td>
+                <td>{order.senderName}</td>
                 <td>{order.origin}</td>
+                <td>{order.destination}</td>
+                <td>{order.totalPrice}</td>
+                <td>{order.status}</td>
                 <td>
                   <input
                     type="text"
@@ -112,4 +106,4 @@ const ListOrderComponent = () => {
   );
 };
 
-export default ListOrderComponent;
+export default ListOrderOfSales

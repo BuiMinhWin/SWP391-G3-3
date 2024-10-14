@@ -146,11 +146,15 @@
 
 
 .title-1 {
+  display: flex;
+  justify-items: left;
   font-family: 'Itim', cursive; /* Apply the Itim font only to this h1 */
   font-size: 4rem; /* Keep the original size */
   /* margin: 0; Keep the original margin */
   padding-top: 20px;
-  padding-left: 150px;
+  padding-left: 50px;
+  color: white;
+  width: 100%;
 }
 
 .title-2 {
@@ -159,6 +163,7 @@
   padding-top: 20px;
   padding-right: 200px;
   margin-left: 10px;
+  color: white;
 }
 
   .order-btn{

@@ -13,6 +13,11 @@ import ListEmployeeComponent from '../components/Manager/ListEmployeeComponent'
 import ListOrderComponent from '../components/DeliveryStaff/ListOrderComponent'
 import ProfileComponent from '../components/Member/ProfileComponent'
 
+import ListOrderOfSales from '../components/SaleStaff/ListOrderOfSales'
+import ReportPage from '../components/SaleStaff/ReportPage'
+import FeedbackPage from '../components/SaleStaff/FeedbackPage'
+import Blog from '../pages/Blog/Blog'
+
 function index() {
   return (
     <Routes>
@@ -30,7 +35,13 @@ function index() {
         <Route path='/customer' element={<CustomerHomePage/>} /> 
         <Route path='/manager' element={<ManagerComponent/>} /> 
         <Route path='/user-page' element={<UserPage/>}/>
+        <Route path='/blog' element = {<Blog/>}/>
 
+        {/*Sales */}
+        <Route path="/salestaff/listsaleorder" element={<ListOrderOfSales />} />
+          
+          <Route path="/salestaff/reports" element={<ReportPage />} />
+          <Route path="/salestaff/feedback" element={<FeedbackPage />} />
              
     </Routes>
 

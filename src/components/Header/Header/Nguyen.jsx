@@ -1,43 +1,49 @@
-import { Navigate } from "react-router-dom";
+import React, { useState } from 'react'; // Thêm useState
+import { Link, Outlet } from 'react-router-dom';
+import avatar from '../../../assets/Avatar.jpg';
 import logo from "../../../assets/Logo.png";
+import './Nguyen.css'
 
 const HeaderBar = () => {
-  return (
-    <div>
-      <div className="navbar-left">
-        <img src={logo} className="logo" alt="Logo" />
-        <a className="nav-link" onClick={() => Navigate("/")}>
-          Trang Chủ
-        </a>
-        {/* Dropdown Dịch Vụ */}
-        <div className="dropdown">
-          <a href="#" className="nav-link">
-            Dịch Vụ
-          </a>
-          <div className="dropdown-content">
-            <a href="/form">Tạo Đơn</a>
-            <a href="#">Ước Tính Chi Phí</a>
-            <a href="#">Theo dõi đơn hàng</a>
-            <a href="#">Quy định vận chuyển</a>
-            <a href="#">Chương trình khuyến mãi</a>
+    const [isDropdownOpen, setDropdownOpen] = useState(false); // Quản lý trạng thái mở dropdown
+
+    const toggleDropdown = () => {
+      setDropdownOpen(!isDropdownOpen);
+    }
+  
+    return (
+      <div className="sale-staff-container">
+  
+        <nav className="navbar-order">
+          <div className="navbar-order-left">
+            <img src={logo} className="logo" alt="Logo" />
           </div>
+          <div className="navbar-order-right">
+            <div className="dropdown" onClick={toggleDropdown}>
+              <img src={avatar} alt="Avatar" className="avatar-order" />
+              {isDropdownOpen && ( // Hiển thị dropdown nếu isDropdownOpen là true
+                <div className=" dropdown-content-avatar">
+                  <a href="#">Tài khoản của tôi</a>
+                  <a href="#">Đăng xuất</a>
+                </div>
+              )}
+            </div>
+          </div>
+        </nav>
+  
+        <aside className="sidebar">
+          <nav className="nav flex-column">
+            <Link to="listsaleorder" className="nav-link">View Orders</Link>
+            <Link to="reports" className="nav-link">View Reports</Link>
+            <Link to="feedback" className="nav-link">View Feedback</Link>
+          </nav>
+        </aside>
+  
+        <div className="content">
+          <Outlet /> {/* Nơi hiển thị các route con */}
         </div>
-        <a href="#" className="nav-link">
-          Giới Thiệu
-        </a>
+  
       </div>
-      <div className="navbar-right">
-        <a href="#" className="nav-link support-link">
-          <i className="fas fa-question-circle"></i>Hỗ Trợ
-        </a>
-        <button className="register-btn" onClick={() => Navigate("/register")}>
-          Đăng Ký
-        </button>
-        <button className="login-btn" onClick={() => Navigate("/login")}>
-          Đăng Nhập
-        </button>
-      </div>
-    </div>
-  );
-};
+    );
+  };
 export default HeaderBar;

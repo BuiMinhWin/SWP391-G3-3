@@ -18,6 +18,6 @@ export const getOrderDetail = (orderId)=>{
   return axios.get(REST_API_BASE_URL2+ '/' + orderId)
 }
 
-export const updateStatus = (orderId, status) => {
-  return axios.put(`${REST_API_BASE_URL}/updateStatus/${orderId}`, { status });
+export const updateStatus = (orderId, newStatus) => {
+  return axios.patch(`${REST_API_BASE_URL}/updateStatus/${orderId}`, { newStatus });
 };
