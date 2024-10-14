@@ -9,35 +9,64 @@
   import { FaLongArrowAltLeft } from "react-icons/fa";
   import { useNavigate } from 'react-router-dom';
 
-  
-  const INITIAL_FORM_STATE = {
-    firstName: "",
-    lastName: "",
-    userName: "",
-    password: "",
-    email: "",
-    phone: "",
-    avatar: "",
-    roleId: "",
-  };
+const INITIAL_FORM_STATE = {
+  firstName: "",
+  lastName: "",
+  userName: "",
+  // password: "",
+  email: "",
+  phone: "",
+  avatar: "",
+};
 
-  const FORM_VALIDATION = Yup.object().shape({
-    firstName: Yup.string().required("Vui lòng nhập tên"),
-    lastName: Yup.string().required("Vui lòng nhập họ"),
-    userName: Yup.string().required("Vui lòng nhập tên người dùng"),
-    password: Yup.string().required("Vui lòng nhập mật khẩu"),
-    email: Yup.string()
-      .email("Email không hợp lệ")
-      .required("Vui lòng nhập email"),
-    phone: Yup.string()
-      .matches(/^[0-9]+$/, "Số điện thoại phải là số")
-      .required("Vui lòng nhập số điện thoại"),
-    roleId: Yup.string().required("Vui lòng chọn vai trò người dùng"),
-  });
+const FORM_VALIDATION = Yup.object().shape({
+  firstName: Yup.string().required("Vui lòng nhập tên"),
+  lastName: Yup.string().required("Vui lòng nhập họ"),
+  userName: Yup.string().required("Vui lòng nhập tên người dùng"),
+  // password: Yup.string().required("Vui lòng nhập mật khẩu"),
+  email: Yup.string()
+    .email("Email không hợp lệ")
+    .required("Vui lòng nhập email"),
+  phone: Yup.string()
+    .matches(/^[0-9]+$/, "Số điện thoại phải là số")
+    .required("Vui lòng nhập số điện thoại"),
+});
 
-  const AccountForm = () => {
-    const [initialValues, setInitialValues] = useState(INITIAL_FORM_STATE);
-    const accountId = localStorage.getItem("accountId"); // Get accountId from localStorage
+const AccountForm = () => {
+  const [initialValues, setInitialValues] = useState(INITIAL_FORM_STATE);
+  const accountId = localStorage.getItem("accountId"); // Get accountId from localStorage
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      try {
+        console.log("Fetching account details for accountId:", accountId); // Debug log
+        const accountData = await getAccountById(accountId);
+        console.log("Account data fetched:", accountData); // Debug log
+
+        setInitialValues({
+          firstName: accountData.firstName,
+          lastName: accountData.lastName,
+          userName: accountData.userName,
+          // password: accountData.password,
+          email: accountData.email,
+          phone: accountData.phone,
+          avatar: accountData.avatar,
+        });
+      } catch (error) {
+        console.error("Error fetching account:", error);
+      }
+    };
+
+    fetchAccount();
+  }, [accountId]);
+
+  return (
+    <Formik
+      initialValues={initialValues}
+      enableReinitialize={true} // Ensures the form reinitializes when initialValues change
+      validationSchema={FORM_VALIDATION}
+      onSubmit={async (values, { setSubmitting, setErrors }) => {
+        console.log("Form values before submission:", values); // Debugging log
 
     useEffect(() => {
       const fetchAccount = async () => {

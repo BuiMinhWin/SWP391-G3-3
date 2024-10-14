@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Grid, InputAdornment, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Grid,
+  InputAdornment,
+  Paper,
+  Typography,
+} from "@mui/material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import TextFieldWrapper from "../FromUI/Textfield";
@@ -9,14 +16,25 @@ import ButtonWrapper from "../FromUI/Button";
 import koi_type from "../../data/koiTypes.json";
 import koi_name from "../../data/koiVarieties.json";
 import { createOrder } from "../../services/CustomerService";
+import {
+  createDocument,
+  createOrderDetail,
+} from "../../services/CustomerService";
 import SideBar from "../SideBar/SideBar";
 import HeaderBar from "../Header/Header/Nguyen";
+import RadioGroupWrapper from "../FromUI/RadioGroup";
+import CustomRadioGroup from "../FromUI/CustomRadioGroup";
+import AccessibleIcon from "@mui/icons-material/Accessible";
+import AccessibleForwardIcon from "@mui/icons-material/AccessibleForward";
+import FileUpload from "../FromUI/FileUpload";
+import CheckboxWrapper from "../FromUI/Checkbox";
+import { useNavigate } from "react-router-dom";
 
 // Initial Form State
 const INITIAL_FORM_STATE = {
   origin: "",
-  cityS: "",
-  cityR: "",
+  cityS: "", //
+  cityR: "", //
   destination: "",
   receiverName: "",
   senderName: "",
@@ -28,14 +46,16 @@ const INITIAL_FORM_STATE = {
   postalCodeR: "", // Use string for postal codes
   receiverNote: "",
   senderNote: "",
-  description: "",
-  discount: 0,
-  koi_image: null,
+  orderNote: "",
+  document_file: null,
+  discount: "",
+  koi_image: "",
   koi_name: "",
   koi_type: "",
-  quantity: 1, // Set initial quantity to 1
-  weight: 0.1, // Set initial weight to 0.1
-  freight: false,
+  quantity: 0,
+  weight: 0.0,
+  freight: "",
+  additional_service: "",
 };
 
 // Validation Schema with Yup
@@ -58,24 +78,35 @@ const FORM_VALIDATION = Yup.object().shape({
     .required("Vui lòng nhập mã bưu điện"),
   receiverNote: Yup.string().nullable(),
   senderNote: Yup.string().nullable(),
-  description: Yup.string().nullable(), // Optional field for additional notes
-  discount: Yup.number()
-    .min(0, "Giảm giá không được nhỏ hơn 0")
-    .required("Vui lòng nhập giảm giá"),
-  cityS: Yup.string().required("Vui lòng chọn thành phố"),
-  cityR: Yup.string().required("Vui lòng chọn thành phố"),
-  koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"),
-  koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"),
+  orderNote: Yup.string().nullable(), // Optional field for additional notes
+  discount: Yup.string().nullable(),
+  cityS: Yup.string().required("Vui lòng chọn thành phố"), //
+  cityR: Yup.string().required("Vui lòng chọn thành phố"), //
+  koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"), //
+  koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"), //
   quantity: Yup.number()
     .min(1, "Số lượng phải lớn hơn 0")
     .required("Vui lòng nhập số lượng"),
   weight: Yup.number()
     .min(0.1, "Cân nặng phải lớn hơn 0")
     .required("Vui lòng nhập cân nặng"),
-  freight: Yup.boolean(),
+  freight: Yup.string().required("Vui lòng chọn phương thức vận chuyển"),
+  additional_service: Yup.string().nullable(),
+  document_file: Yup.mixed()
+    .required("A PDF file is required")
+    .test("fileType", "Only PDF files are allowed", (value) => {
+      return value && value.type === "application/pdf";
+    })
+    .test("fileSize", "File size is too large", (value) => {
+      return value && value.size <= 8 * 1024 * 1024; // 8 MB limit
+    }),
+  termsOfService: Yup.boolean()
+    .oneOf([true], "The terms and conditions must be accepted.")
+    .required("The terms and conditions must be accepted."),
 });
 
 const OrderForm = () => {
+  const navigate = useNavigate();
   return (
     <Formik
       initialValues={INITIAL_FORM_STATE}
@@ -83,37 +114,53 @@ const OrderForm = () => {
       onSubmit={async (values, { setSubmitting, setErrors }) => {
         console.log("Form values before submission:", values); // Debugging log
 
-        const accountId = localStorage.getItem('accountId');
+        const accountId = localStorage.getItem("accountId");
         console.log("Account ID:", accountId);
 
         try {
           const orderData = {
+            ...values,
             accountId,
-            origin: values.origin,
-            cityS: values.cityS,
-            cityR: values.cityR,
-            destination: values.destination,
+            origin: `${values.origin}, ${values.cityS}, ${values.postalCodeS}`,
+            destination: `${values.destinations}, ${values.cityR}, ${values.postalCodeR}`,
+            freight: values.freight,
             receiverName: values.receiverName,
             senderName: values.senderName,
             receiverPhone: values.receiverPhone,
             senderPhone: values.senderPhone,
-            postalCodeS: values.postalCodeS,
-            postalCodeR: values.postalCodeR,
             receiverNote: values.receiverNote,
             senderNote: values.senderNote,
-            orderNote: values.description, // Corresponds to description in form state
-            discount: Number(values.discount),
-            koi_image: values.koi_image,
-            koi_name: values.koi_name,
-            koi_type: values.koi_type,
-            quantity: Number(values.quantity),
-            weight: parseFloat(values.weight),
+            orderNote: values.orderNote,
           };
 
           console.log("Order data ready for submission:", orderData); // Debugging log
-
           const response = await createOrder(orderData);
-          console.log("Order created successfully:", response.data); // Success log
+          const newOrderId = response.orderId;
+
+          // document
+          const documentData = {
+            orderId: newOrderId,
+            document_file: [values.document_file],
+          };
+          const documentResponse = await createDocument(documentData);
+
+          //order detail
+          const orderDetailData = {
+            orderId: newOrderId,
+            quantity: Number(values.quantity),
+            weight: parseFloat(values.weight),
+            discount: values.discount,
+            koiName: values.koi_name,
+            koiType: values.koi_type,
+          };
+          const orderDetailResponse = await createOrderDetail(orderDetailData);
+
+          //check log
+          console.log("Order created successfully with ID:", newOrderId);
+          console.log("Order created successfully");
+
+          navigate("/checkout", { state: { orderId: newOrderId } });
+          // Navigate on success
         } catch (error) {
           console.error("Error creating order:", error);
           setErrors({ submit: error.message });
@@ -121,7 +168,7 @@ const OrderForm = () => {
           setSubmitting(false);
         }
       }}
-      validateOnMount={true} // Ensure validation is checked on mount
+      validateOnMount={true}
     >
       {({ handleSubmit, isValid, errors }) => {
         console.log("Validation errors:", errors); // Log validation errors
@@ -129,7 +176,8 @@ const OrderForm = () => {
         return (
           <Form onSubmit={handleSubmit}>
             <Box
-              sx={{ display: "flex", flexDirection: "column", height: "100vh" }} component={"body"}
+              sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
+              component={"body"}
             >
               <Box
                 sx={{
@@ -140,7 +188,7 @@ const OrderForm = () => {
                   p: 2,
                 }}
               >
-                <HeaderBar/>
+                <HeaderBar />
               </Box>
 
               {/* Sidebar + Content Container */}
@@ -192,6 +240,8 @@ const OrderForm = () => {
                         <TextFieldWrapper
                           name="senderNote"
                           label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
                         />
                       </Grid>
                     </Grid>
@@ -238,6 +288,8 @@ const OrderForm = () => {
                         <TextFieldWrapper
                           name="receiverNote"
                           label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
                         />
                       </Grid>
                     </Grid>
@@ -263,7 +315,7 @@ const OrderForm = () => {
                           options={koi_name}
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid item xs={3}>
                         <TextFieldWrapper
                           name="weight"
                           label="Cân nặng trung bình"
@@ -274,16 +326,59 @@ const OrderForm = () => {
                           }}
                         />
                       </Grid>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper name="quantity" label="Số lượng" />
+                      <Grid item xs={3}>
+                        <TextFieldWrapper
+                          name="quantity"
+                          label="Số lượng"
+                          type="number"
+                          slotProps={{
+                            inputLabel: {
+                              shrink: true,
+                            },
+                          }}
+                        />
                       </Grid>
                       <Grid item xs={6}>
-                        <TextFieldWrapper name="description" label="Ghi chú" />
+                        <FileUpload name="document_file" />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid item xs={12}>
+                        <TextFieldWrapper
+                          name="description"
+                          label="Ghi chú"
+                          multiline
+                          rows={4}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <CustomRadioGroup
+                          name="freight"
+                          options={[
+                            {
+                              value: "Dịch vụ tiêu chuẩn",
+                              label: "Dịch vụ tiêu chuẩn",
+                              description:
+                                "Giao theo tiêu chuẩn dịch vụ 1-4 ngày",
+                              icon: <AccessibleIcon fontSize="large" />,
+                              helpText:
+                                "Phí vận chuyển ước tính sẽ bao gồm phụ phí và trừ đi các khoản chiến khấu/giảm giá bởi khuyến mãi.",
+                            },
+                            {
+                              value: "Dịch vụ hỏa tốc",
+                              label: "Dịch vụ hỏa tốc",
+                              description:
+                                "Giao theo tiêu chuẩn dịch vụ 1-3 giờ",
+                              icon: <AccessibleForwardIcon fontSize="large" />,
+                              helpText:
+                                "Phí vận chuyển ước tính sẽ bao gồm phụ phí và trừ đi các khoản chiến khấu/giảm giá bởi khuyến mãi.",
+                            },
+                          ]}
+                        />
+                      </Grid>
+                      <Grid item xs={3}>
                         <TextFieldWrapper
                           name="discount"
-                          label="Giảm giá"
+                          label="Mã giảm giá"
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">%</InputAdornment>
@@ -291,9 +386,35 @@ const OrderForm = () => {
                           }}
                         />
                       </Grid>
+                      <Grid
+                        item
+                        xs={3}
+                        justifyContent="center" // Center horizontally
+                        alignItems="center"
+                      >
+                        <RadioGroupWrapper
+                          name="additional_service"
+                          legend="Bảo hiểm sự cố"
+                          defaultValue="No"
+                          options={[
+                            {
+                              value: "Yes",
+                              label: "Có",
+                            },
+                            {
+                              value: "No",
+                              label: "Không",
+                            },
+                          ]}
+                        />
+                      </Grid>
                     </Grid>
                   </Paper>
-
+                  <CheckboxWrapper
+                    name="termsOfService"
+                    legend="Terms Of Service"
+                    label="I agree"
+                  />
                   <ButtonWrapper disabled={!isValid}>
                     Submit Order
                   </ButtonWrapper>

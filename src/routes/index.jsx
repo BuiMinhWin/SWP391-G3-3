@@ -16,6 +16,7 @@ import ListEmployeeComponent from '../components/Manager/ListEmployeeComponent'
 import ListCustomerComponent from '../components/Customer/ListCustomerComponent'
 import OrderDetailComponent from '../components/DeliveryStaff/OrderDetailComponent';
 import { OrderProvider } from '../components/DeliveryStaff/OrderContext';
+import CheckoutPage from '../pages/CheckoutPage/CheckoutPage'
 
 import ListOrderOfSales from '../components/SaleStaff/ListOrderOfSales'
 import ReportPage from '../components/SaleStaff/ReportPage'
@@ -34,6 +35,7 @@ function index() {
         <Route path='/user' element={<UserPage/>}/>
         <Route path='/form' element={<OrderForm/>}/>
         <Route path='/manager' element={<ManagerComponent/>} />
+        <Route path="/checkout" element ={<CheckoutPage/>}/>
         <Route path='/salestaff' element={<SaleStaffComponent/>} />
         <Route path='/delivery' element={<DeliveryComponent/>} /> 
         <Route path='/customer' element={<CustomerHomePage/>} /> 
