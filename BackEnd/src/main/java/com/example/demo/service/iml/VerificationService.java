@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class VerificationService {
@@ -14,15 +15,36 @@ public class VerificationService {
     @Autowired
     private AccountRepository accountRepository;
 
-    private Map<String, String> verificationCodes = new HashMap<>();
+    private Map<String, VerificationData> verificationCodes = new HashMap<>();
+
+    private static class VerificationData {
+        String code;
+        long timestamp;
+
+        VerificationData(String code, long timestamp) {
+            this.code = code;
+            this.timestamp = timestamp;
+        }
+    }
 
     public void saveVerificationCode(String email, String code) {
-        verificationCodes.put(email, code);
+        long currentTime = System.currentTimeMillis();
+        verificationCodes.put(email, new VerificationData(code, currentTime));
     }
 
     public boolean verifyCode(String email, String code) {
-        String storedCode = verificationCodes.get(email);
-        return storedCode != null && storedCode.equals(code);
+        VerificationData storedData = verificationCodes.get(email);
+
+        if (storedData == null) {
+            return false;
+        }
+
+        boolean isCodeValid = storedData.code.equals(code);
+        boolean isExpired = System.currentTimeMillis() - storedData.timestamp > TimeUnit.MINUTES.toMillis(5);
+
+        verificationCodes.remove(email);
+
+        return isCodeValid && !isExpired;
     }
 
     public String resetPassword(String email, String newPassword, String confirmPassword) {
@@ -35,7 +57,7 @@ public class VerificationService {
             return "Account not found with the provided email.";
         }
 
-        account.setPassword(confirmPassword);
+        account.setPassword(newPassword);
 
         accountRepository.save(account);
 
