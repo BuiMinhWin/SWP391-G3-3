@@ -17,6 +17,11 @@ import ListCustomerComponent from '../components/Customer/ListCustomerComponent'
 import OrderDetailComponent from '../components/DeliveryStaff/OrderDetailComponent';
 import { OrderProvider } from '../components/DeliveryStaff/OrderContext';
 
+import ListOrderOfSales from '../components/SaleStaff/ListOrderOfSales'
+import ReportPage from '../components/SaleStaff/ReportPage'
+import FeedbackPage from '../components/SaleStaff/FeedbackPage'
+import Blog from '../pages/Blog/Blog'
+
 function index() {
   return (
     // <OrderProvider>
@@ -38,8 +43,14 @@ function index() {
         <Route path='/add-account' element={ <EmployeeComponent />} />
         <Route path='/edit-account/:accountId' element={<EmployeeComponent/> } />
         <Route path='/user-page' element={<UserPage/>}/>
-        
-      
+        <Route path='/blog' element = {<Blog/>}/>
+
+        {/*Sales */}
+        <Route path="/salestaff/listsaleorder" element={<ListOrderOfSales />} />
+          
+          <Route path="/salestaff/reports" element={<ReportPage />} />
+          <Route path="/salestaff/feedback" element={<FeedbackPage />} />
+             
     </Routes>
   );
 }
