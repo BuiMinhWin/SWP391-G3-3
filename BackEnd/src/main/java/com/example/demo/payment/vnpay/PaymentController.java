@@ -1,5 +1,7 @@
 package com.example.demo.payment.vnpay;
 
+import com.example.demo.dto.request.OrderDTO;
+import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.response.ResponseObject;
 import com.example.demo.service.iml.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -54,12 +57,23 @@ public class PaymentController {
 
         log.debug("Received VNPay callback for vnpTxnRef: {} with status: {}", vnpTxnRef, status);
 
-        if ("00".equals(status)) {
-            orderService.updateOrderStatus(vnpTxnRef, 3); // 3 indicates successful payment
-            return new ResponseObject<>(HttpStatus.OK, "Success", new PaymentDTO.VNPayResponse("00", "Success", ""));
-        } else {
-            orderService.updateOrderStatus(vnpTxnRef, 1); // 1 indicates failed payment
-            return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Failed", null);
+        // Tìm đơn hàng bằng vnpTxnRef
+        try {
+            OrderDTO orderDTO = orderService.getOrderByVnpTxnRef(vnpTxnRef);
+
+            if ("00".equals(status)) {
+                orderService.updateOrderStatus(orderDTO.getOrderId(), 3); // 3 indicates successful payment
+                return new ResponseObject<>(HttpStatus.OK, "Success", new PaymentDTO.VNPayResponse("00", "Success", ""));
+            } else {
+                orderService.updateOrderStatus(orderDTO.getOrderId(), 1); // 1 indicates failed payment
+                return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Failed", null);
+            }
+        } catch (OrderNotFoundException e) {
+            log.warn("No order found for vnpTxnRef: {}", vnpTxnRef);
+            return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Order not found", null);
+        } catch (Exception e) {
+            log.error("Error processing VNPay callback for vnpTxnRef: {}: {}", vnpTxnRef, e.getMessage());
+            return new ResponseObject<>(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", null);
         }
     }
 }

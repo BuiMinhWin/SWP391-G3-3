@@ -26,15 +26,18 @@ public class PaymentService {
             log.debug("Creating VNPay payment for orderId: {}", orderId);
 
             if (orderId == null || orderId.trim().isEmpty()) {
-                log.error("orderId không hợp lệ: {}", orderId);
-                throw new IllegalArgumentException("orderId không được phép null hoặc rỗng");
+                log.error("Invalid orderId: {}", orderId);
+                throw new IllegalArgumentException("orderId cannot be null or empty");
             }
 
-            OrderDTO orderDTO = orderService.getOrderByIdV2(orderId);
+            // Lấy thông tin đơn hàng
+            OrderDTO orderDTO = orderService.getOrderByIdV2(orderId); // Đảm bảo phương thức này đã được sửa đúng cách
             log.info("Total price for orderId {}: {} VND", orderId, orderDTO.getTotalPrice());
 
+            // Tính toán số tiền
             BigDecimal amount = BigDecimal.valueOf(orderDTO.getTotalPrice()).multiply(new BigDecimal(100));
 
+            // Lấy cấu hình VNPay
             Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
             vnpParamsMap.put("vnp_Amount", amount.toPlainString());
 
@@ -48,10 +51,10 @@ public class PaymentService {
             String vnpTxnRef = UUID.randomUUID().toString();
             vnpParamsMap.put("vnp_TxnRef", vnpTxnRef);
 
-            // Set vnp_OrderInfo với order details
+            // Set vnp_OrderInfo với thông tin đơn hàng
             vnpParamsMap.put("vnp_OrderInfo", "Thanh toan don hang: " + orderId);
 
-            // Create query URL and secure hash
+            // Tạo URL thanh toán và secure hash
             String queryUrl = VNPayUtil.getPaymentURL(vnpParamsMap, true);
             String hashData = VNPayUtil.getPaymentURL(vnpParamsMap, false);
             String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
@@ -60,7 +63,7 @@ public class PaymentService {
             String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
             log.info("Payment URL generated: {}", paymentUrl);
 
-            // Lưu vnp_TxnRef vào đơn hàng
+            // Lưu vnpTxnRef vào đơn hàng
             orderService.updateVnpTxnRef(orderId, vnpTxnRef);
 
             return PaymentDTO.VNPayResponse.builder()
