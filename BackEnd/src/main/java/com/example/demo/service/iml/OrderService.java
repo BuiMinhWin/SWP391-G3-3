@@ -190,17 +190,20 @@ public class OrderService {
     }
 
     public OrderDTO getOrderByIdV2(String orderId) {
-
         return orderRepository.findById(orderId)
-                .map(order -> new OrderDTO(order.getTotalPrice()))
+                .map(order -> new OrderDTO(order.getTotalPrice(), order.getVnpTxnRef()))
                 .orElse(null);
     }
+
     public void updateVnpTxnRef(String orderId, String vnpTxnRef) {
         log.debug("Updating vnpTxnRef for orderId: {} with vnpTxnRef: {}", orderId, vnpTxnRef);
-        orderRepository.findByOrderId(orderId).ifPresent(order -> {
+        orderRepository.findByOrderId(orderId).ifPresentOrElse(order -> {
+            log.debug("Order found: {}", order);
             order.setVnpTxnRef(vnpTxnRef);
             orderRepository.save(order);
-            log.debug("vnpTxnRef updated: {}", order);
+            log.debug("vnpTxnRef updated and order saved: {}", order);
+        }, () -> {
+            log.warn("Order not found with orderId: {}", orderId);
         });
     }
 

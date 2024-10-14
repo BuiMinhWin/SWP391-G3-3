@@ -43,4 +43,9 @@ public class OrderDTO {
     public OrderDTO(int totalPrice) {
         this.totalPrice = totalPrice;
     }
+
+    public OrderDTO(int totalPrice, String vnpTxnRef) {
+        this.totalPrice = totalPrice;
+        this.vnpTxnRef = vnpTxnRef;
+    }
 }

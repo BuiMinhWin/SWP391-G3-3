@@ -64,7 +64,7 @@ public class VNPayUtil {
                                 StandardCharsets.US_ASCII)
                                 : entry.getKey()) + "=" +
                                 URLEncoder.encode(entry.getValue()
-                                , StandardCharsets.US_ASCII))
+                                        , StandardCharsets.US_ASCII))
                 .collect(Collectors.joining("&"));
     }
 }
