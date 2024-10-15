@@ -35,6 +35,9 @@ public class AccountService {
         if (accountDTO.getCreateAt() == null) {
             account.setCreateAt(LocalDateTime.now());
         }
+        if (accountDTO.getStatus() == 0) {
+            account.setStatus(1);
+        }
         if (accountDTO.getAvatar() == null || accountDTO.getAvatar().isEmpty()) {
             account.setAvatar("");
         }
@@ -91,7 +94,8 @@ public class AccountService {
     public void deleteAccount(String accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
-        accountRepository.deleteById(accountId);
+        account.setStatus(0);
+        accountRepository.save(account);
     }
 
     public AccountDTO createAccountGG(AccountDTO accountDTO) {

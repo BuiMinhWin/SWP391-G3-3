@@ -1,7 +1,6 @@
 package com.example.demo.service.iml;
 
 import com.example.demo.dto.request.FeedbackDTO;
-import com.example.demo.entity.Account;
 import com.example.demo.entity.Feedback;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.FeedbackMapper;
@@ -83,4 +82,12 @@ public class FeedbackService {
 
         return FeedbackMapper.maptoFeedbackDTO(savedResponseFeedback);
     }
+
+    public void deleteFeedback(String feedbackId) {
+        Feedback feedback = feedbackRepository.findById(feedbackId)
+                .orElseThrow(() -> new ResourceNotFoundException("Feedback not found with id " + feedbackId));
+
+        feedbackRepository.delete(feedback);
+    }
+
 }

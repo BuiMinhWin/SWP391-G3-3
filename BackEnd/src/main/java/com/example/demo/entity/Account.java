@@ -44,6 +44,9 @@ public class Account {
     @Column(name = "avatar")
     private String avatar;
 
+    @Column(name = "status")
+    private int status;
+
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createAt;
