@@ -35,9 +35,9 @@ public class AccountService {
         if (accountDTO.getCreateAt() == null) {
             account.setCreateAt(LocalDateTime.now());
         }
-        if (accountDTO.getStatus() == 0) {
-            account.setStatus(1);
-        }
+
+        account.setStatus(1);
+
         if (accountDTO.getAvatar() == null || accountDTO.getAvatar().isEmpty()) {
             account.setAvatar("");
         }

@@ -22,8 +22,9 @@ public class DeliveryStatus {
     @Column(name = "delivery_status_id", columnDefinition = "CHAR(36)")
     private String deliveryStatusId;
 
-    @Column(name = "order_id", nullable = false)
-    private String orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     @Column(name = "time_tracking", nullable = false)
     private LocalDateTime timeTracking;
