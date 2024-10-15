@@ -100,16 +100,7 @@
               <Box
                 sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
               >
-                {/* {
-                  (roleId === 'Manager' )? (
-                    <button onClick={() => navigate('/manager')}><FaLongArrowAltLeft size={24} />Back</button>
-                  ) : roleId === 'Delivery' ? (
-                    <button onClick={() => navigate('/delivery')}><FaLongArrowAltLeft size={24} />Back</button>
-                  ) : roleId === 'Sales' ? (
-                    <button onClick={() => navigate('/sales')}><FaLongArrowAltLeft size={24} />Back</button>
-                  ) : null  
-                } */}
-
+                
                 {
                   (roleId === 'Manager') ? (
                     <button
