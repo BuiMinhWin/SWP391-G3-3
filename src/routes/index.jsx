@@ -15,7 +15,7 @@ import EmployeeComponent from '../components/Manager/EmployeeComponent'
 import ListEmployeeComponent from '../components/Manager/ListEmployeeComponent'
 import ListCustomerComponent from '../components/Customer/ListCustomerComponent'
 import OrderDetailComponent from '../components/DeliveryStaff/OrderDetailComponent';
-import { OrderProvider } from '../components/DeliveryStaff/OrderContext';
+// import { OrderProvider } from '../components/DeliveryStaff/OrderContext';
 import CheckoutPage from '../pages/CheckoutPage/CheckoutPage'
 
 import ListOrderOfSales from '../components/SaleStaff/ListOrderOfSales'
@@ -29,27 +29,29 @@ function index() {
     <Routes>
         <Route path='/' element={<Homepage/>} />
         <Route path='/login' element={<LoginComponent/>} />
-        <Route path='/accounts' element={<ListEmployeeComponent/>}/>
-        <Route path='/orders' element={<ListOrderComponent/>}/>
+        <Route path='/user-page' element={<UserPage/>}/>
         <Route path='/register' element={<RegisterComponent/>} />
+        <Route path="/checkout" element ={<CheckoutPage/>}/>
+
         <Route path='/user' element={<UserPage/>}/>
         <Route path='/form' element={<OrderForm/>}/>
-        <Route path='/manager' element={<ManagerComponent/>} />
-        <Route path="/checkout" element ={<CheckoutPage/>}/>
-        <Route path='/salestaff' element={<SaleStaffComponent/>} />
-        <Route path='/delivery' element={<DeliveryComponent/>} /> 
-        <Route path='/customer' element={<CustomerHomePage/>} /> 
-        <Route path='/manager' element={<ManagerComponent/>} /> 
-        <Route path='/accounts'element={< ListEmployeeComponent/>}/>
-        <Route path='/listcustomers'element={<ListCustomerComponent/>}/>
-        <Route path='/add-account' element={ <EmployeeComponent />} />
-        <Route path='/edit-account/:accountId' element={<EmployeeComponent/> } />
-        <Route path='/user-page' element={<UserPage/>}/>
         <Route path='/blog' element = {<Blog/>}/>
 
+        <Route path='/manager' element={<ManagerComponent/>} /> 
+        <Route path='/accounts'element={< ListEmployeeComponent/>}/>
+        <Route path='/add-account' element={ <EmployeeComponent />} />
+        <Route path='/edit-account/:accountId' element={<EmployeeComponent/> } />
+        <Route path='/listcustomers'element={<ListCustomerComponent/>}/>
+        
+        
+        <Route path='/delivery' element={<DeliveryComponent/>} /> 
+        <Route path='/customer' element={<CustomerHomePage/>} /> 
+        <Route path='/orders' element={<ListOrderComponent/>}/>
+        <Route path='/orders/:orderId' element={<OrderDetailComponent/>}/>
+        
         {/*Sales */}
         <Route path="/salestaff/listsaleorder" element={<ListOrderOfSales />} />
-          
+        <Route path='/salestaff' element={<SaleStaffComponent/>} />  
           <Route path="/salestaff/reports" element={<ReportPage />} />
           <Route path="/salestaff/feedback" element={<FeedbackPage />} />
              

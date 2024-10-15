@@ -84,7 +84,7 @@ const Homepage = () => {
               ) : roleId === 'Delivery' ? (
                 <button onClick={() => navigate('/delivery')}>Back</button>
               ) : roleId === 'Sales' ? (
-                <button onClick={() => navigate('/sales')}>Back</button>
+                <button onClick={() => navigate('/salestaff')}>Back</button>
               ) : null}
             </>
           )}

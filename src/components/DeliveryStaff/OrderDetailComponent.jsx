@@ -1,44 +1,44 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { getOrderDetail } from '../../services/DeliveryService';
 
 const OrderDetailComponent = () => {
-  const {orderId,setOrderId } = useState([]);
-  // const [orderDetail, setOrderDetail] = useState(null);
+  const [orderId, setOrderId] = useState(1); // có thể thay đổi được 
+  //const {orderId,setOrderId } = useState([]); chuỗi rỗng 
+  const [orderDetail, setOrderDetail] = useState([]); // Dùng để lưu danh sách orderDetail
 
   useEffect(() => {
     if (orderId) {
-      getOrderDetail(orderId)
+      getOrderDetail(orderId) // Gọi API với orderId
         .then(response => {
-          console.log(response.data); // Log the response to ensure it matches
-          setOrderId([response.data]); // Wrap in array if expecting multiple records
+          console.log(response.data); // In kết quả trả về để kiểm tra
+          setOrderDetail(response.data); // Lưu lại danh sách chi tiết đơn hàng
         })
         .catch(error => console.error('Error fetching order details:', error));
     } else {
-      console.log("Not found");
+      console.log("Order ID not found");
     }
-  }, [orderId]);
+  }, [orderId]); // Gọi lại khi orderId thay đổi
 
   return (
     <div className="order-detail">
-  {orderId ? (
-    <div>
-      <h2>Order Details for Order ID: {orderId}</h2>
-      {orderId.map((order) => (
-        <div key={order.orderId} className="order-detail-item">
-          <p>CreatedAt: {order.createdAt}</p>
-          <p>KoiName: {order.koiName}</p>
-          <p>KoiType: {order.koiType}</p>
-          <p>Quantity: {order.quantity}</p>
-          <p>Weight: {order.weight}</p>
-          <p>Status: {order.status}</p>
+      {orderDetail && orderDetail.length > 0 ? (
+        <div>
+          <h2>Order Details for Order ID: {orderId}</h2>
+          {orderDetail.map((order) => (
+            <div key={order.orderDetailId} className="order-detail-item">
+              <p>CreatedAt: {order.createdAt}</p>
+              <p>KoiName: {order.koiName}</p>
+              <p>KoiType: {order.koiType}</p>
+              <p>Quantity: {order.quantity}</p>
+              <p>Weight: {order.weight}</p>
+              <p>Status: {order.status}</p>
+            </div>
+          ))}
         </div>
-      ))}
+      ) : (
+        <p>Loading order details...</p>
+      )}
     </div>
-  ) : (
-    <p>Loading order details...</p>
-  )}
-</div>
   );
 };
 
