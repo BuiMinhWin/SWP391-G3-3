@@ -4,14 +4,12 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Manager.css';
-import { FiHome } from "react-icons/fi";
+import { FiHome, FiUsers } from "react-icons/fi";
 import { CgProfile } from "react-icons/cg";
-import { FiUsers } from "react-icons/fi";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
-import { MdOutlineMessage } from "react-icons/md";
-import { MdSupportAgent } from "react-icons/md";  
+import { MdOutlineMessage, MdSupportAgent } from "react-icons/md";
 import { logout } from '../Member/auth'; 
 import { useNavigate } from 'react-router-dom';
 // import ProfileComponent from '../Member/ProfileComponent';
