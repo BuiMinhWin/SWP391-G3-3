@@ -17,6 +17,7 @@ public class AccountMapper {
                 account.getPhone(),
                 account.getRoleId(),
                 account.getAvatar(),
+                account.getStatus(),
                 account.getCreateAt()
 
         );
@@ -32,6 +33,7 @@ public class AccountMapper {
         account.setEmail(accountDTO.getEmail());
         account.setPhone(accountDTO.getPhone());
         account.setRoleId(accountDTO.getRoleId());
+        account.setStatus(accountDTO.getStatus());
         account.setAvatar(accountDTO.getAvatar());
         account.setCreateAt(accountDTO.getCreateAt());
         return account;

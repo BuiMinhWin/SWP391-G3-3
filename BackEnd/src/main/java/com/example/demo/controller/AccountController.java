@@ -47,9 +47,9 @@ public class AccountController {
 
     // Build Delete Account REST API
     @DeleteMapping("{accountId}")
-    public ResponseEntity<String> deleteAccount(@PathVariable("accountId") String accountId) {
+    public ResponseEntity<String> deleteAccount(@PathVariable String accountId) {
         accountService.deleteAccount(accountId);
-        return ResponseEntity.ok("Account deleted successfully");
+        return ResponseEntity.ok("Account status set to inactive (soft delete) successfully.");
     }
 
 
