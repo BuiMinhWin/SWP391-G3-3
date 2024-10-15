@@ -9,64 +9,35 @@
   import { FaLongArrowAltLeft } from "react-icons/fa";
   import { useNavigate } from 'react-router-dom';
 
-const INITIAL_FORM_STATE = {
-  firstName: "",
-  lastName: "",
-  userName: "",
-  // password: "",
-  email: "",
-  phone: "",
-  avatar: "",
-};
+  
+  const INITIAL_FORM_STATE = {
+    firstName: "",
+    lastName: "",
+    userName: "",
+    password: "",
+    email: "",
+    phone: "",
+    avatar: "",
+    roleId: "",
+  };
 
-const FORM_VALIDATION = Yup.object().shape({
-  firstName: Yup.string().required("Vui lòng nhập tên"),
-  lastName: Yup.string().required("Vui lòng nhập họ"),
-  userName: Yup.string().required("Vui lòng nhập tên người dùng"),
-  // password: Yup.string().required("Vui lòng nhập mật khẩu"),
-  email: Yup.string()
-    .email("Email không hợp lệ")
-    .required("Vui lòng nhập email"),
-  phone: Yup.string()
-    .matches(/^[0-9]+$/, "Số điện thoại phải là số")
-    .required("Vui lòng nhập số điện thoại"),
-});
+  const FORM_VALIDATION = Yup.object().shape({
+    firstName: Yup.string().required("Vui lòng nhập tên"),
+    lastName: Yup.string().required("Vui lòng nhập họ"),
+    userName: Yup.string().required("Vui lòng nhập tên người dùng"),
+    password: Yup.string().required("Vui lòng nhập mật khẩu"),
+    email: Yup.string()
+      .email("Email không hợp lệ")
+      .required("Vui lòng nhập email"),
+    phone: Yup.string()
+      .matches(/^[0-9]+$/, "Số điện thoại phải là số")
+      .required("Vui lòng nhập số điện thoại"),
+    roleId: Yup.string().required("Vui lòng chọn vai trò người dùng"),
+  });
 
-const AccountForm = () => {
-  const [initialValues, setInitialValues] = useState(INITIAL_FORM_STATE);
-  const accountId = localStorage.getItem("accountId"); // Get accountId from localStorage
-
-  useEffect(() => {
-    const fetchAccount = async () => {
-      try {
-        console.log("Fetching account details for accountId:", accountId); // Debug log
-        const accountData = await getAccountById(accountId);
-        console.log("Account data fetched:", accountData); // Debug log
-
-        setInitialValues({
-          firstName: accountData.firstName,
-          lastName: accountData.lastName,
-          userName: accountData.userName,
-          // password: accountData.password,
-          email: accountData.email,
-          phone: accountData.phone,
-          avatar: accountData.avatar,
-        });
-      } catch (error) {
-        console.error("Error fetching account:", error);
-      }
-    };
-
-    fetchAccount();
-  }, [accountId]);
-
-  return (
-    <Formik
-      initialValues={initialValues}
-      enableReinitialize={true} // Ensures the form reinitializes when initialValues change
-      validationSchema={FORM_VALIDATION}
-      onSubmit={async (values, { setSubmitting, setErrors }) => {
-        console.log("Form values before submission:", values); // Debugging log
+  const AccountForm = () => {
+    const [initialValues, setInitialValues] = useState(INITIAL_FORM_STATE);
+    const accountId = localStorage.getItem("accountId"); // Get accountId from localStorage
 
     useEffect(() => {
       const fetchAccount = async () => {
@@ -129,16 +100,7 @@ const AccountForm = () => {
               <Box
                 sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
               >
-                {/* {
-                  (roleId === 'Manager' )? (
-                    <button onClick={() => navigate('/manager')}><FaLongArrowAltLeft size={24} />Back</button>
-                  ) : roleId === 'Delivery' ? (
-                    <button onClick={() => navigate('/delivery')}><FaLongArrowAltLeft size={24} />Back</button>
-                  ) : roleId === 'Sales' ? (
-                    <button onClick={() => navigate('/sales')}><FaLongArrowAltLeft size={24} />Back</button>
-                  ) : null  
-                } */}
-
+                
                 {
                   (roleId === 'Manager') ? (
                     <button

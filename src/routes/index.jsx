@@ -11,7 +11,7 @@ import CustomerHomePage from '../components/Customer/CustomerHomePage'
 import ManagerComponent from '../components/Manager/ManagerComponent'
 import ListOrderComponent from '../components/DeliveryStaff/ListOrderComponent'
 import EmployeeComponent from '../components/Manager/EmployeeComponent'
-import ProfileComponent from '../components/Member/ProfileComponent'
+
 import ListEmployeeComponent from '../components/Manager/ListEmployeeComponent'
 import ListCustomerComponent from '../components/Customer/ListCustomerComponent'
 import OrderDetailComponent from '../components/DeliveryStaff/OrderDetailComponent';
