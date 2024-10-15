@@ -161,6 +161,15 @@ public class OrderService {
         return orderMapper.mapToOrderDTO(order);
     }
 
+    public void deleteOrder(String orderId) {
+        logger.info("Deleting Order with ID: {}", orderId);
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
+        orderRepository.delete(order);
+        logger.info("Order with ID: {} has been deleted.", orderId);
+    }
+
+
     public OrderDTO updateOrderStatus(String orderId, int newStatus) {
         logger.info("Updating status of Order with ID: {} to {}", orderId, newStatus);
 
