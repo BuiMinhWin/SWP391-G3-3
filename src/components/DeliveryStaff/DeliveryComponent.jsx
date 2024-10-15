@@ -7,6 +7,7 @@
   import { useNavigate } from 'react-router-dom';
   import { listOrder,getOrderDetail } from '../../services/DeliveryService';
   import { logout } from '../Member/auth'; 
+  import { FaSearch } from "react-icons/fa";
 
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler );
 
@@ -29,7 +30,8 @@
 
     const [selectedDelivery, setSelectedDelivery] = useState(null);
     const [monthFilter, setMonthFilter] = useState('');
-    const [regionFilter, setRegionFilter] = useState('');
+    const [provinceFilter, setProvinceFilter] = useState('');
+    const [provinces, setProvinces] = useState([]);
     const [statusFilter, setStatusFilter] = useState('');
     const [transportationFilter, setTransportationFilter] = useState('');
     
@@ -51,20 +53,19 @@
     
 
     useEffect(() => {
-  
-      const fetchDeliveries = async () => {
+      
+      const fetchProvinces = async () => {
         try {
-          const response = await fetch('http://koideliverysystem.id.vn:8080/api/orders'); 
+          const response = await fetch('https://provinces.open-api.vn/api/');
           const data = await response.json();
-          
-          setSelectedDelivery(data[0]); 
+          console.log(data);
+          setProvinces(data);
         } catch (error) {
-          console.error('Error fetching deliveries:', error);
+          console.error('Error fetching provinces:', error);
         }
       };
-
-      
-      fetchDeliveries();
+  
+      fetchProvinces();
       getAllOrders();
     }, []);
 
@@ -151,25 +152,27 @@
       scales: {
         y: {
           ticks: {
-            stepSize: 1, 
-            beginAtZero: true, 
+            stepSize: 1,
+            beginAtZero: true,
           },
-          min: 0, 
-          max: 6, 
+          min: 0,
+          max: Math.max(...getStatusCounts()) + 1, // Dynamically adjust max
         },
       },
     };
 
-    const handleFilterChange = () => {
-      getAllOrders();  
-    };
-
+    // const handleFilterChange = () => {
+    //   getAllOrders();  
+    // };
+    const host = "https://provinces.open-api.vn/api/";
     const filteredOrders = orders.filter(order => {
-      const matchesMonth = monthFilter ? order.orderDate.includes(monthFilter) : true;
-      const matchesRegion = regionFilter ? order.destination.includes(regionFilter) : true;
+      const orderMonth = new Date(order.orderDate).getMonth() + 1;
+      const matchesMonth = monthFilter ? orderMonth === parseInt(monthFilter) : true;
+      const matchesProvince = provinceFilter ? order.destination.includes(provinceFilter) : true;
       const matchesStatus = statusFilter ? order.status === parseInt(statusFilter) : true;
-      const matchesTransportation = transportationFilter ? order.transportation === transportationFilter : true;
-      return matchesMonth && matchesRegion && matchesStatus && matchesTransportation ;
+      const matchesTransportation = transportationFilter ? order.freight === transportationFilter : true;
+    
+      return matchesMonth && matchesProvince && matchesStatus && matchesTransportation;
     });
 
     return (
@@ -213,6 +216,9 @@
               <h1>Dashboard</h1>
               <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
               <div className="d-flex align-items-center search-container" style={{ flex: 1 }}>
+              <span className="search-icon">
+                <FaSearch />
+             </span>
               <input
                   type="text"
                   className="form-control me-2"
@@ -220,7 +226,9 @@
                   value={searchQuery}
                   onChange={handleSearch}
                   style={{ width:    '100%' }}
+                
                 />
+            
               </div>
               <div className="d-flex align-items-center">
                 <select className="form-select me-2">
@@ -308,10 +316,18 @@
                 <div className="filter-bar d-flex mb-3">
                   <select className="form-select me-2" value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)}>
                     <option value="">All Months</option>
-                    <option value="01">January</option>
-                    <option value="02">February</option>
-                    <option value="03">March</option>
-                    {/* Add other months */}
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
                   </select>
                   {/* <select className="form-select me-2" value={regionFilter} onChange={(e) => setRegionFilter(e.target.value)}>
                     <option value="">All Regions</option>
@@ -322,32 +338,34 @@
 
                   <select className="form-select me-2" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                     <option value="">All Statuses</option>
-                    <option value="0">Pending</option>
+                    <option value="0">Waiting for approval</option>
                     <option value="1">In Progress</option>
-                    <option value="2">Delivered</option>
+                    <option value="2">Delivering</option>
+                    <option value="3">Delivered</option>
                     {/* Add other statuses */}
                   </select>
                   <select className="form-select me-2" value={transportationFilter} onChange={(e) => setTransportationFilter(e.target.value)}>
                     <option value="">All Transport</option>
                     <option value="Truck">Truck</option>
                     <option value="Van">Van</option>
+                    <option value="car">Car</option>
                     {/* Add other transportation methods */}
                   </select>
 
                   
-                  {/* <select class="form-select form-select-sm mb-3" id="city" aria-label=".form-select-sm">
-                    <option value="" selected>Chọn tỉnh thành</option>           
+                  <select
+                    className="form-select me-2"
+                    value={provinceFilter}
+                    onChange={(e) => setProvinceFilter(e.target.value)}
+                  >
+                    <option value="">Chọn tỉnh thành</option>
+                    {provinces.map((province) => (
+                      <option key={province.code} value={province.name}>
+                        {province.name}
+                    </option>
+                    ))}
                   </select>
-                            
-                  <select class="form-select form-select-sm mb-3" id="district" aria-label=".form-select-sm">
-                    <option value="" selected>Chọn quận huyện</option>
-                  </select>
-
-                  <select class="form-select form-select-sm" id="ward" aria-label=".form-select-sm">
-                    <option value="" selected>Chọn phường xã</option>
-                  </select> */}
-                
-                  <button className="btn btn-primary" onClick={handleFilterChange}>Apply Filters</button>
+            
                 </div>
                 
                 <table className="table table-striped table-bordered">
@@ -365,44 +383,34 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.length > 0 ? (
-                      orders.map((order) => (
-                        <tr
-                          key={order.orderId}
-                          onMouseEnter={() => handleMouseEnter(order)} 
-                          onMouseLeave={handleMouseLeave} 
-                        >
-                          <td>{order.orderId}</td>
-                          <td>{order.destination}</td>
-                          <td>{order.freight}</td>
-                          <td>{order.orderDate}</td>
-                          <td>{order.shippedDate}</td>
-                          <td>{order.totalPrice}</td>
-                          <td>{order.origin}</td>
-                          <td>{order.status}</td>
-                          <td>
+                  {filteredOrders.length > 0 ? (
+                    filteredOrders.map((order) => (
+                      <tr
+                        key={order.orderId}
+                        onMouseEnter={() => handleMouseEnter(order)}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <td>{order.orderId}</td>
+                        <td>{order.destination}</td>
+                        <td>{order.freight}</td>
+                        <td>{order.orderDate}</td>
+                        <td>{order.shippedDate}</td>
+                        <td>{order.totalPrice}</td>
+                        <td>{order.origin}</td>
+                        <td>{order.status}</td>
+                        <td>
                           <button onClick={() => handleViewOrder(order.orderId)}>View</button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="12" className="text-center">No Orders Found</td>
+                        </td>
                       </tr>
-                    )}
-                  </tbody>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="12" className="text-center">No Orders Found</td>
+                    </tr>
+                  )}
+                </tbody>
                 </table>
 
-                {/* {hoveredOrder && (
-                  <div className="hovered-order-details mt-3 p-3 bg-light border rounded">
-                  <h4>Order Details</h4>
-                  <p><strong>Destination:</strong> {hoveredOrder.destination}</p>
-                  <p><strong>Freight:</strong> {hoveredOrder.freight}</p>
-                  <p><strong>OrderDate:</strong> {hoveredOrder.orderDate}</p>
-                  <p><strong>ShipDate:</strong> {hoveredOrder.shippedDate}</p>
-                  <p><strong>Origin:</strong> {hoveredOrder.origin}</p>
-                </div>
-                )} */}
               </div>
             
             </section>

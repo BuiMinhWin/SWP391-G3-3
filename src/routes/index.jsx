@@ -47,7 +47,7 @@ function index() {
         <Route path='/delivery' element={<DeliveryComponent/>} /> 
         <Route path='/customer' element={<CustomerHomePage/>} /> 
         <Route path='/orders' element={<ListOrderComponent/>}/>
-        <Route path='/orders/:orderId' element={<OrderDetailComponent/>}/>
+        <Route path="/order/:orderId" element={<OrderDetailComponent />} />
         
         {/*Sales */}
         <Route path="/salestaff/listsaleorder" element={<ListOrderOfSales />} />

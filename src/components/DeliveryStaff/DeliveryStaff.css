@@ -16,6 +16,13 @@
   color: white;
 }
 
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
   
 .sidebar .profile {
   text-align: center;

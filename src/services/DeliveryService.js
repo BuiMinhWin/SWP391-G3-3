@@ -14,7 +14,7 @@ export const trackingOrder = (orderId) => {
   return axios.post(`${REST_API_BASE_URL}/update`, orderId);
 } 
 
-export const getOrderDetail = (orderId) => {
+export const getOrderDetail =(orderId) => {
   return axios.get(`${REST_API_BASE_URL2}/${orderId}`);
 };
 
