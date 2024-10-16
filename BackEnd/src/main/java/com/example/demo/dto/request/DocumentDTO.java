@@ -13,5 +13,6 @@ import lombok.Setter;
 public class DocumentDTO {
     private String documentId;
     private String orderId;
-    private byte[] documentFile;
+    private String fileId;
+    private String fileName;
 }

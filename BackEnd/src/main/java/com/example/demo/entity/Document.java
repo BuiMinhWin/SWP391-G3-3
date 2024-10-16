@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,8 +25,10 @@ public class Document {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(name = "document_file", columnDefinition = "MEDIUMBLOB")
-    @Lob
-    private byte[] documentFile;
+    @Column(name = "file_id")
+    private String fileId;
+
+    @Column(name = "file_name")
+    private String fileName;
 
 }

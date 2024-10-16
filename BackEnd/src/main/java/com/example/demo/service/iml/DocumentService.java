@@ -63,7 +63,9 @@ public class DocumentService {
             existingDocument.setOrder(order);
         }
 
-        existingDocument.setDocumentFile(documentDTO.getDocumentFile());
+        existingDocument.setFileId(documentDTO.getFileId());
+
+        existingDocument.setFileName(documentDTO.getFileName());
 
         Document updatedDocument = documentRepository.save(existingDocument);
         return documentMapper.mapToDocumentDTO(updatedDocument);

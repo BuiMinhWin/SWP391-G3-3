@@ -12,7 +12,8 @@ public class DocumentMapper {
         return new DocumentDTO(
                 document.getDocumentId(),
                 document.getOrder().getOrderId(),
-                document.getDocumentFile()
+                document.getFileId(),
+                document.getFileName()
         );
     }
 
@@ -20,7 +21,8 @@ public class DocumentMapper {
         Document document = new Document();
         document.setDocumentId(documentDTO.getDocumentId());
         document.setOrder(order);
-        document.setDocumentFile(documentDTO.getDocumentFile());
+        document.setFileId(documentDTO.getFileId());
+        document.setFileName(documentDTO.getFileName());
         return document;
     }
 }
