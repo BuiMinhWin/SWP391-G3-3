@@ -1,6 +1,5 @@
 package com.example.demo.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,13 +21,18 @@ public class Transaction {
     @Column(name = "transaction_id", columnDefinition = "CHAR(36)")
     private String transactionId;
 
-    @Column(name = "order_id", nullable = false)
-    private String orderId;
-
-    @Column(name = "payment_method")
-    private String freight;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate;
 
+    @Column(name = "status", nullable = false)
+    private int status;
+
+    public void setOrder(Order order) {
+        this.order = order;
+        this.status = order.getStatus();
+    }
 }

@@ -30,7 +30,6 @@ public class OrderService {
     private final AccountRepository accountRepository;
     private final OrderMapper orderMapper;
 
-    // Định nghĩa các trạng thái đơn hàng
     private static final int STATUS_CANCELLED = 0;
     private static final int STATUS_PROCESSING = 1;
     private static final int STATUS_SHIPPED = 2;
@@ -51,7 +50,7 @@ public class OrderService {
             logger.debug("Order date was null, set to current time: {}", order.getOrderDate());
         }
 
-        if (order.getStatus() == STATUS_CANCELLED) {
+        if (order.getStatus() == STATUS_CANCELLED ) {
             order.setStatus(STATUS_PROCESSING);
             logger.debug("Order status was 0, updated to {} (Processing)", STATUS_PROCESSING);
         }
