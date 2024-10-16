@@ -1,18 +1,14 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
-import java.time.LocalDateTime;
-
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Data
+@Builder
 @Table(name = "`document`")
 public class Document {
 
@@ -21,12 +17,17 @@ public class Document {
     @Column(name = "document_id", columnDefinition = "CHAR(36)")
     private String documentId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(name = "file_id")
-    private String fileId;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] imageData;
+
+    @Column(name = "file_type")
+    private String fileType;
 
     @Column(name = "file_name")
     private String fileName;

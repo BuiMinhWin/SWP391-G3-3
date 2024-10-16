@@ -1,13 +1,16 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.request.DocumentDTO;
 import com.example.demo.service.iml.DocumentService;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/documents")
@@ -16,35 +19,26 @@ public class DocumentController {
     @Autowired
     private DocumentService documentService;
 
+    @PostMapping(value = "/{orderId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadImage(
+            @Parameter(description = "File to upload", required = true)
+            @RequestPart("document_file") MultipartFile file,
+            @PathVariable("orderId") String orderId) throws IOException {
 
-    @PostMapping("/create")
-    public ResponseEntity<DocumentDTO> createDocument(@RequestBody DocumentDTO documentDTO) {
-        DocumentDTO createdDocument = documentService.createDocument(documentDTO);
-        return new ResponseEntity<>(createdDocument, HttpStatus.CREATED);
+        String uploadImage = documentService.uploadImage(file, orderId);
+        return ResponseEntity.status(HttpStatus.OK).body(uploadImage);
     }
 
-    @GetMapping
-    public ResponseEntity<List<DocumentDTO>> getAllDocuments() {
-        List<DocumentDTO> documents = documentService.getAllDocuments();
-        return new ResponseEntity<>(documents, HttpStatus.OK);
+
+
+    @GetMapping("/download/order/{orderId}")
+    public ResponseEntity<ByteArrayResource> downloadImage(@PathVariable String orderId) {
+        byte[] imageData = documentService.downloadImage(orderId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(new ByteArrayResource(imageData));
     }
 
-    @GetMapping("/order/{orderId}")
-    public ResponseEntity<List<DocumentDTO>> getDocumentsByOrderId(@PathVariable String orderId) {
-        List<DocumentDTO> documents = documentService.getDocumentsByOrderId(orderId);
-        return new ResponseEntity<>(documents, HttpStatus.OK);
-    }
-
-    @PutMapping("/{documentId}")
-    public ResponseEntity<DocumentDTO> updateDocument(@PathVariable String documentId, @RequestBody DocumentDTO documentDTO) {
-        DocumentDTO updatedDocument = documentService.updateDocument(documentId, documentDTO);
-        return new ResponseEntity<>(updatedDocument, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{documentId}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable String documentId) {
-        documentService.deleteDocument(documentId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 
 }

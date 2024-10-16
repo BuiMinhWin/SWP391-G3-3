@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-
-
 import com.example.demo.dto.request.AccountDTO;
 import com.example.demo.service.iml.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +21,18 @@ public class AccountController {
         return new ResponseEntity<>(savedAccount, HttpStatus.CREATED);
     }
 
-    // Build Get Account by ID REST API
     @GetMapping("{accountId}")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable("accountId") String accountId) {
         AccountDTO accountDTO = accountService.getAccountById(accountId);
         return ResponseEntity.ok(accountDTO);
     }
 
-    // Build Get All Accounts REST API
     @GetMapping
     public ResponseEntity<List<AccountDTO>> getAllAccounts() {
         List<AccountDTO> accounts = accountService.getAllAccounts();
         return ResponseEntity.ok(accounts);
     }
 
-    // Build Partial Update Account REST API
     @PatchMapping("{accountId}")
     public ResponseEntity<AccountDTO> updateAccount(@PathVariable("accountId") String accountId, @RequestBody AccountDTO updatedAccountDTO) {
         AccountDTO accountDTO = accountService.updateAccount(accountId, updatedAccountDTO);
@@ -45,7 +40,6 @@ public class AccountController {
     }
 
 
-    // Build Delete Account REST API
     @DeleteMapping("{accountId}")
     public ResponseEntity<String> deleteAccount(@PathVariable String accountId) {
         accountService.deleteAccount(accountId);
