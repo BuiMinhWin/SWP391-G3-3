@@ -1,107 +1,35 @@
-.container-fluid{
-  margin:-45px
- }
-.sidebar {
-  width: 20%;
-  background-color: #343a40;
-  color: white;
-  padding: 20px;
- 
-}
-.sidebar.logo{
-  width:1%;
-}
-.KoiDeli{
-  margin-left: -130px;
-  color: white;
-}
-
-.search-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #888;
-}
   
-.sidebar .profile {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.sidebar .profile-img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  margin-bottom: 10px;
-}
-
-.sidebar nav ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar nav ul li {
-  margin-bottom: 15px;
-}
-
-.sidebar nav ul li a {
-  color: white;
-  text-decoration: none;
-  font-size: 16px;
+.header-content {
+  gap: 20px; 
   display: flex;
   align-items: center;
+  width: 250%;
 }
 
-.sidebar nav ul li a i {
-  margin-right: 10px;
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 200px; 
+  background-color: #f8f9fa;
+  z-index: 1000;
+  overflow-y: auto;
+  
 }
 
-.sidebar nav ul li a:hover {
-  color: #ffc107;
+.KoiDeli{
+  margin-left: -100px;
+  color: white;
 }
-
 
 .dashboard {
-  width: 75%; 
+  margin-left: 300px; 
+  margin-top: -10px;
   padding: 20px;
   background-color: #ffffff;
-  overflow-y: auto; 
-}
+  z-index: 1000; 
 
-.dashboard header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.dashboard header h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.language-select select {
-  padding: 5px;
-  font-size: 14px;
-}
-
-
-.dashboard {
-  background-color: #fff;
-  border-left: 1px solid #ddd;
-}
-
-.dashboard header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.dashboard header h1 {
-  margin: 0;
-  font-size: 24px;
 }
 
 .dashboard header input.form-control {
@@ -171,41 +99,59 @@
   border-bottom: none;
 }
 
-.search-container .search-icon {
-    position: absolute;
-    left: 15px; 
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-    font-size: 1.5rem;
+.search-bar{
+  flex: 1;/* phát triển cùng với trang*/
+  height: 36px;
+  padding-left: 10px;
+  font-size: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(192, 192, 192);
+  box-shadow: inset 1px 2px 3px rgba(0, 0, 0, 0.05);
+  width: 0;/*thu gọn thanh tìm kiếm , để thanh tìm kiếm shrink(co lai)*/
 }
-  
-.search-container input {
-    padding-left: 50px; 
-    height: 45px; 
-    font-size: 1.1rem; 
-    width: 100%; 
-    border-radius: 8px; 
+
+.search-bar::placeholder {
+  font-family:Arial;
+  font-size: 16px;
 }
-.search-icon{
-  margin-top: -320px;
-  margin-left: 1250px;
+
+.search-button{
+  height: 40px;
+  width: 66px;
+  background-color: rgb(240, 240, 240);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(192, 192, 192);
+  margin-left: -1px;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  font-family:  Arial;
+  position: absolute;
+  background-color: gray;
+  color: white;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 2px;
+  font-size: 12px;
+  bottom: -30px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+  white-space: nowrap;
 }
-  
-  /* Adjust spacing between notification icon, search bar, and profile dropdown */
-.header-content {
-    gap: 20px; /* Add gap between items */
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-  
 
 .notification-icon {
     
     position: relative;
     cursor: pointer;
     font-size: 1.9rem; 
+
 }
   
 .notification-icon .notification-text {

@@ -1,7 +1,6 @@
   import React, { useState, useEffect } from 'react';
   import { Line } from 'react-chartjs-2';
   import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler  } from 'chart.js';
-  import { Dropdown } from 'react-bootstrap';
   import 'bootstrap/dist/css/bootstrap.min.css';
   import './DeliveryStaff.css';
   import { useNavigate } from 'react-router-dom';
@@ -10,13 +9,14 @@
   import { FaSearch } from "react-icons/fa";
   import { FiHome } from "react-icons/fi";
   import { IoSettingsOutline } from "react-icons/io5";
-  import { MdSupportAgent,  MdOutlineMessage } from "react-icons/md";
+  import { MdSupportAgent} from "react-icons/md";
   import { IoIosNotificationsOutline } from "react-icons/io";
-
   import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
   import { FaRegMessage } from "react-icons/fa6";
   import { CgProfile } from "react-icons/cg";
   import { CiLogout } from "react-icons/ci";
+  
+
   
 
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler );
@@ -29,8 +29,8 @@
     };
 
     
-  const [isDropdownOpen, setDropdownOpen] = useState(false); // Quản lý trạng thái mở dropdown
-
+ 
+  
   const toggleDropdown = () => {
     setDropdownOpen(!isDropdownOpen);
   }
@@ -51,6 +51,12 @@
     const [provinces, setProvinces] = useState([]);
     const [statusFilter, setStatusFilter] = useState('');
     const [transportationFilter, setTransportationFilter] = useState('');
+
+    const [currentPage, setCurrentPage] = useState(1);  // Trang hiện tại
+    const ordersPerPage = 10; 
+  
+    const [isDropdownOpen, setDropdownOpen] = useState(false); 
+  
     
     const getOrderCounts = () => {
       const totalOrders = orders.length;
@@ -73,10 +79,16 @@
       
       const fetchProvinces = async () => {
         try {
-          const response = await fetch('https://provinces.open-api.vn/api/');
+          const response = await fetch('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Token': 'ba986de0-8bd6-11ef-9db4-127d7400f642',
+            },
+          });
           const data = await response.json();
-          // console.log(data);
-          setProvinces(data);
+          // console.log(data); 
+          setProvinces(data.data); 
         } catch (error) {
           console.error('Error fetching provinces:', error);
         }
@@ -131,6 +143,7 @@
         setOrderDetail(null);  
       }
     };
+
     // const getStatusCounts = () => {
     //   const statusCounts = orders.reduce((acc, order) => {
     //     const status = order.status;
@@ -188,26 +201,36 @@
       const matchesProvince = provinceFilter ? order.destination.includes(provinceFilter) : true;
       const matchesStatus = statusFilter ? order.status === parseInt(statusFilter) : true;
       const matchesTransportation = transportationFilter ? order.freight === transportationFilter : true;
-    
+  
       return matchesMonth && matchesProvince && matchesStatus && matchesTransportation;
     });
+  
+    const indexOfLastOrder = currentPage * ordersPerPage;
+    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+    const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+
+    const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+  
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
       <div className="container-fluid">
         <div className="row">
-          <aside className="sidebar col-2 p-3 border-end">
+          <aside className="sidebar col-2 p-3 ">
             <div className="profile-container text-center mb-4">
               <div className="SideKoi d-flex align-items-center justify-content-between">
-                <img src="/Logo-Koi/Order.png" alt="Profile " className="profile-img rounded-circle me-3" />
+                <img src="/Logo-Koi/Order.png" alt="Profile "className="profile-img rounded-circle " />
                 <div className="text-start KoiLogo">
-                  <p className="KoiDeli mb-0">Koi Deli</p>
+                  <p className="KoiDeli ">Koi Deli</p>
                 </div>
               </div>
-              <hr className="logo-separator" />
+              <hr className="logo-separator" /> 
+              {/* border */}
               
             </div>
             <nav>
         <ul className="list-unstyled">
+
           {/* <li>
             <a href="#"><i className="bi bi-speedometer2 me-2"></i> Dashboard</a>
             
@@ -234,33 +257,38 @@
            </li>
          
         </ul>
-      </nav>
+        </nav>
 
           </aside>
 
-          <main className="dashboard col-10 p-4  m-2">
-          <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-              <h1></h1>
-              <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-              <div className="header-content" style={{ width: '100%' }}> 
+          <main className="dashboard ">
+          <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-4">
+              <h1>Dashboard</h1>
+              <header className="d-flex justify-content-between align-items-center mb-4 ">
+              <div className="header-content" style={{ width: '%' }}> 
                 <div className="d-flex align-items-center search-container">
-                  <span className="search-icon">
+                  {/* <span className="search-icon">
                     <FaSearch />
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control me-2"
-                    placeholder="Search by Order ID..."
-                    value={searchQuery}
-                    onChange={handleSearch}
-                    style={{ width: '100%' }} 
-                  />
+                  </span> */}
+                <input className="search-bar form-control me-3" 
+                        type="text" 
+                        value={searchQuery}
+                        onChange={handleSearch}
+                        placeholder="Search Order" 
+                />
+                  <button className="search-button">
+                    <img className="search-icon"  src= "../icons/search.svg" alt="" />
+                    <div className="tooltip">Search</div>
+                    
+                  </button>
+
                 </div>
+                
                 
                 <div className="navbar-cus-right">
                   <div className="dropdown" onClick={toggleDropdown}>
                     <img src="/Delivery/User.png" alt="Avatar" className="avatar" />
-                    {isDropdownOpen && ( // Hiển thị dropdown nếu isDropdownOpen là true
+                    {isDropdownOpen && ( 
                       <div className="dropdown-content">
                         <a  href="user-page"><CgProfile /> View Profile</a>
                         <a  onClick={handleLogout}><CiLogout /> Logout</a>
@@ -272,9 +300,9 @@
 
               </div>
 
-              <div className="notification-icon m-3">
+              <div className="notification-icon m-4">
                   <IoIosNotificationsOutline />
-                  <span className="notification-text"></span>
+                  {/* <span className="notification-text">somethinghere</span> */}
                 </div>
             </header>
 
@@ -377,19 +405,14 @@
                   </select>
 
                   
-                  <select
-                    className="form-select me-2"
-                    value={provinceFilter}
-                    onChange={(e) => setProvinceFilter(e.target.value)}
-                  >
-                    <option value="">Chọn tỉnh thành</option>
-                    {provinces.map((province) => (
-                      <option key={province.code} value={province.name}>
-                        {province.name}
+                  <select className="form-select me-2" value={provinceFilter} onChange={(e) => setProvinceFilter(e.target.value)}>
+                  <option value="">All Provinces</option>
+                  {provinces?.map((province) => (
+                    <option key={province.ProvinceID} value={province.ProvinceName}>
+                      {province.ProvinceName}
                     </option>
-                    ))}
-                  </select>
-            
+                  ))}
+                </select>
                 </div>
                 
                 <table className="table table-striped table-bordered">
@@ -407,13 +430,9 @@
                     </tr>
                   </thead>
                   <tbody>
-                  {filteredOrders.length > 0 ? (
-                    filteredOrders.map((order) => (
-                      <tr
-                        key={order.orderId}
-                        // onMouseEnter={() => handleMouseEnter(order)}
-                        // onMouseLeave={handleMouseLeave}
-                      >
+                  {currentOrders.length > 0 ? (
+                    currentOrders.map((order) => (
+                      <tr key={order.orderId}>
                         <td>{order.orderId}</td>
                         <td>{order.destination}</td>
                         <td>{order.freight}</td>
@@ -434,6 +453,18 @@
                   )}
                 </tbody>
                 </table>
+
+                <nav>
+                <ul className="pagination">
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <li key={index} className="page-item">
+                    <button onClick={() => paginate(index + 1)} className="page-link">
+                      {index + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              </nav>
 
               </div>
             
