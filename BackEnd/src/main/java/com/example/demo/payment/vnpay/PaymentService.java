@@ -91,4 +91,10 @@ public class PaymentService {
                     .build();
         }
     }
+
+    public String extractAndLogTxnRef(HttpServletRequest request) {
+        String vnpTxnRef = request.getParameter("vnp_TxnRef");
+        log.info("Extracted vnp_TxnRef: {}", vnpTxnRef);
+        return vnpTxnRef;
+    }
 }

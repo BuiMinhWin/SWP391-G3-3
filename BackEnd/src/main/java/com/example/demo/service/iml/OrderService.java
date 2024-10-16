@@ -187,6 +187,11 @@ public class OrderService {
         switch (newStatus) {
             case STATUS_CANCELLED:
                 logger.info("Order status updated to Canceled.");
+                String vnpTxnRef = order.getVnpTxnRef();
+                String accountId = order.getAccount().getAccountId();
+                double refundAmount = order.getTotalPrice();
+                logger.info("Refund of {} has been processed for Order ID: {}, vnpTxnRef: {} of Account ID: {}",
+                        refundAmount, orderId, vnpTxnRef, accountId);
                 break;
             case STATUS_PROCESSING:
                 logger.info("Order status updated to Processing.");

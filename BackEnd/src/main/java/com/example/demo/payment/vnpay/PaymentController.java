@@ -53,19 +53,18 @@ public class PaymentController {
     @GetMapping("/vn-pay-callback")
     public ResponseObject<PaymentDTO.VNPayResponse> payCallbackHandler(HttpServletRequest request) {
         String status = request.getParameter("vnp_ResponseCode");
-        String vnpTxnRef = request.getParameter("vnp_TxnRef");
+//        String vnpTxnRef = request.getParameter("vnp_TxnRef");
+        String vnpTxnRef = paymentService.extractAndLogTxnRef(request);
 
         log.debug("Received VNPay callback for vnpTxnRef: {} with status: {}", vnpTxnRef, status);
-
-        // Tìm đơn hàng bằng vnpTxnRef
         try {
             OrderDTO orderDTO = orderService.getOrderByVnpTxnRef(vnpTxnRef);
 
             if ("00".equals(status)) {
-                orderService.updateOrderStatus(orderDTO.getOrderId(), 3); // 3 indicates successful payment
+                orderService.updateOrderStatus(orderDTO.getOrderId(), 1);
                 return new ResponseObject<>(HttpStatus.OK, "Success", new PaymentDTO.VNPayResponse("00", "Success", ""));
             } else {
-                orderService.updateOrderStatus(orderDTO.getOrderId(), 1); // 1 indicates failed payment
+                orderService.updateOrderStatus(orderDTO.getOrderId(), 0);
                 return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Failed", null);
             }
         } catch (OrderNotFoundException e) {
