@@ -8,7 +8,12 @@
   padding-top: 20px;
   
 }
-
+.manager-sidebar{
+  margin-left: 60px;
+}
+.admin{
+  margin-top: 21.5px;
+}
 .sidebar.logo{
   width:1%;
 }

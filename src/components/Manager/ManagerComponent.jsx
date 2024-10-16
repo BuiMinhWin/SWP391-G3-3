@@ -71,50 +71,6 @@ const ManagerComponent = () => {
       });
   };
 
- 
-  // const {totalUsers, totalCustomers,totalOrders, totalRevenue} = getOrderCounts();
-  // useEffect(() => {
-  //   const fetchOverviewData = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:8080/api/overview'); 
-  //       const data = await response.json();
-  //       setOverviewData(data);
-  //     } catch (error) {
-  //       console.error('Error fetching overview data:', error);
-  //     }
-  //   };
-
-  //   const fetchDeliveries = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:8080/api/delivery'); 
-  //       const data = await response.json();
-  //       setDeliveries(data);
-  //       setSelectedDelivery(data[0]); 
-  //     } catch (error) {
-  //       console.error('Error fetching deliveries:', error);
-  //     }
-  //   };
-
-  //   fetchOverviewData();
-  //   fetchDeliveries();
-  // }, []);
-
-  // const fetchOrderDetails = async (orderId) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:8080/api/orders/${orderId}`); 
-  //     const data = await response.json();
-     
-  //     updateChartData(data);
-  //   } catch (error) {
-  //     console.error('Error fetching order details:', error);
-  //   }
-  // };
-
-  // const handleDeliveryClick = (delivery) => {
-  //   setSelectedDelivery(delivery);
-  //   fetchOrderDetails(delivery.orderId); 
-  // };
-
   const getStatusCounts = () => {
     const statusCounts = orders.reduce((acc, order) => {
       const status = order.status;
@@ -188,10 +144,11 @@ const ManagerComponent = () => {
     <div className="container-fluid">
       <div className="row">
          <aside className="sidebar col-2 p-3 border-end">
+          <div className='manager-sidebar'>
           <div className="profile-container text-center mb-4">
             <div className="SideKoi d-flex align-items-center justify-content-between">
               <img src="/Logo-Koi/Order.png" alt="Profile " className="profile-img rounded-circle me-3" />
-              <div className="text-start KoiLogo">
+              <div className=" KoiLogo">
                 <p className="KoiDeli mb-0">Koi Deli</p>
               </div>
             </div>
@@ -254,11 +211,11 @@ const ManagerComponent = () => {
       
       </ul>
     </nav>
-
+    </div>
         </aside>
 
         <main className="dashboard col-10 p-4">
-        <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <header className="admin d-flex justify-content-between align-items-center mb-4 border-bottom pb-5">
             <h1>Admin page</h1>
             
             <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">

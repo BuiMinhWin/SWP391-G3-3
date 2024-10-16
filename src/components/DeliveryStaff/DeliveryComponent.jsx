@@ -216,11 +216,12 @@
     return (
       <div className="container-fluid">
         <div className="row">
-          <aside className="sidebar col-2 p-3 ">
+          <aside className="sidebar col- p-3 ">
+            <div className='side-bar'>
             <div className="profile-container text-center mb-4">
               <div className="SideKoi d-flex align-items-center justify-content-between">
                 <img src="/Logo-Koi/Order.png" alt="Profile "className="profile-img rounded-circle " />
-                <div className="text-start KoiLogo">
+                <div className=" KoiLogo">
                   <p className="KoiDeli ">Koi Deli</p>
                 </div>
               </div>
@@ -258,7 +259,7 @@
          
         </ul>
         </nav>
-
+        </div>
           </aside>
 
           <main className="dashboard ">
@@ -266,23 +267,15 @@
               <h1>Dashboard</h1>
               <header className="d-flex justify-content-between align-items-center mb-4 ">
               <div className="header-content" style={{ width: '%' }}> 
-                <div className="d-flex align-items-center search-container">
-                  {/* <span className="search-icon">
-                    <FaSearch />
-                  </span> */}
-                <input className="search-bar form-control me-3" 
-                        type="text" 
-                        value={searchQuery}
-                        onChange={handleSearch}
-                        placeholder="Search Order" 
-                />
-                  <button className="search-button">
-                    <img className="search-icon"  src= "../icons/search.svg" alt="" />
-                    <div className="tooltip">Search</div>
-                    
-                  </button>
-
-                </div>
+              <div className="d-flex align-items-center justify-content-center search-container">
+              <input
+                  className="search-bar"
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  placeholder="Search Order"
+              />
+             </div>
                 
                 
                 <div className="navbar-cus-right">

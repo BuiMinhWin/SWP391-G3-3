@@ -9,13 +9,14 @@
 .sidebar {
   position: fixed;
   top: 0;
-  left: 0;
+  left: -70px;
   height: 100vh;
   width: 200px; 
-  background-color: #f8f9fa;
-  z-index: 1000;
-  overflow-y: auto;
-  
+
+}
+
+.side-bar{
+  margin-left:60px;
 }
 
 .KoiDeli{
@@ -99,51 +100,20 @@
   border-bottom: none;
 }
 
-.search-bar{
-  flex: 1;/* phát triển cùng với trang*/
-  height: 36px;
-  padding-left: 10px;
-  font-size: 16px;
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgb(192, 192, 192);
-  box-shadow: inset 1px 2px 3px rgba(0, 0, 0, 0.05);
-  width: 0;/*thu gọn thanh tìm kiếm , để thanh tìm kiếm shrink(co lai)*/
-}
-
-.search-bar::placeholder {
-  font-family:Arial;
-  font-size: 16px;
-}
-
-.search-button{
-  height: 40px;
-  width: 66px;
-  background-color: rgb(240, 240, 240);
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgb(192, 192, 192);
-  margin-left: -1px;
-  margin-right: 10px;
+.search-container {
   display: flex;
-  justify-content: center;
   align-items: center;
-  position: relative;
-  font-family:  Arial;
-  position: absolute;
-  background-color: gray;
-  color: white;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-radius: 2px;
-  font-size: 12px;
-  bottom: -30px;
-  opacity: 0;
-  transition: opacity 0.15s;
-  pointer-events: none;
-  white-space: nowrap;
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  margin-top: 20px; /* Nếu cần */
+ 
+}
+
+.search-bar {
+  flex-grow: 1; 
+  margin: 0 20px; 
+  min-width: 300px; 
+  max-width: 100%; 
+ 
 }
 
 .notification-icon {
