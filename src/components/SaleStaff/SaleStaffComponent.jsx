@@ -1,73 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react'; // Thêm useState
+import { Link, Outlet } from 'react-router-dom';
+import logo from '../../assets/Logo.png';
+import avatar from '../../assets/Avatar.jpg';
 import './SaleStaff.css';
-import { useNavigate } from 'react-router-dom';
-import { listOrders, updateOrderStatus } from '../../services/SaleStaffService'; // Import the service
 
-const SalesStaff = () => {
-  const [orders, setOrders] = useState([]); // State to manage orders list
-  const navigate = useNavigate();
+const SaleStaffComponent = () => {
 
-  // Fetch orders when component mounts
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  const [isDropdownOpen, setDropdownOpen] = useState(false); // Quản lý trạng thái mở dropdown
 
-  const fetchOrders = async () => {
-    try {
-      const response = await listOrders();  // Call the listOrders function from service
-      setOrders(response.data);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    }
-  };
-
-  const handleUpdateStatus = async (orderId, newStatus) => {
-    try {
-      // Call the service function to update the order status
-      await updateOrderStatus(orderId, newStatus);
-      // Refresh orders list after the status is updated
-      fetchOrders();
-    } catch (error) {
-      console.error('Error updating order status:', error);
-    }
-  };
+  const toggleDropdown = () => {
+    setDropdownOpen(!isDropdownOpen);
+  }
 
   return (
-    <div className="sales-staff-container">
-      <h1>Quản lý Đơn hàng</h1>
+    <div className="sale-staff-container">
 
-      <table className="order-table">
-        <thead>
-          <tr>
-            <th>Mã Đơn Hàng</th>
-            <th>Khách Hàng</th>
-            <th>Trạng Thái</th>
-            <th>Hành Động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.orderId}>
-              <td>{order.orderId}</td>
-              <td>{order.accountId}</td>
-              <td>{order.status}</td>
-              <td>
-                {order.status === 'Pending' && (
-                  <button onClick={() => handleUpdateStatus(order.orderId, 'In Delivery')}>Bắt đầu vận chuyển</button>
-                )}
-                {order.status === 'In Delivery' && (
-                  <button onClick={() => handleUpdateStatus(order.orderId, 'Delivered')}>Đã giao</button>
-                )}
-                {order.status === 'Delivered' && <span>Đã hoàn tất</span>}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <nav className="navbar-cus">
+        <div className="navbar-cus-left">
+          <img src={logo} className="logo" alt="Logo" />
+        </div>
+        <div className="navbar-cus-right">
+          <div className="dropdown" onClick={toggleDropdown}>
+            <img src={avatar} alt="Avatar" className="avatar" />
+            {isDropdownOpen && ( // Hiển thị dropdown nếu isDropdownOpen là true
+              <div className="dropdown-content">
+                <a href="#">Tài khoản của tôi</a>
+                <a href="#">Đăng xuất</a>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
 
-      <button className="back-btn" onClick={() => navigate('/')}>Quay lại Trang chủ</button>
+      <aside className="sidebar">
+        <nav className="nav flex-column">
+          <Link to="listsaleorder" className="nav-link">View Orders</Link>
+          <Link to="reports" className="nav-link">View Reports</Link>
+          <Link to="feedback" className="nav-link">View Feedback</Link>
+        </nav>
+      </aside>
+
+      <div className="content">
+        <Outlet /> {/* Nơi hiển thị các route con */}
+      </div>
+
     </div>
   );
 };
 
-export default SalesStaff;
+export default SaleStaffComponent;

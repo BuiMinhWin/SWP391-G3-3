@@ -6,6 +6,8 @@ import logo from '../../assets/Logo.png';
 import blog from '../../assets/Blog.jpg';
 import avatar from '../../assets/Avatar.jpg';
 import { useNavigate } from 'react-router-dom';
+import { getOrder } from '../../services/CustomerService';
+
 
 
 const Homepage = () => {
@@ -20,24 +22,28 @@ const Homepage = () => {
   };
 
   const handleTrackingSubmit = () => {
-    // Xử lý logic theo dõi đơn hàng ở đây, tạm thời giả lập kết quả
     if (trackingCode) {
-      setTrackingResult(`Kết quả theo dõi cho mã: ${trackingCode}`);
+      getOrder(trackingCode)
+        .then((response) => {
+          // Lưu thông tin đơn hàng vào trackingResult
+          setTrackingResult(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching order:", error);
+          setTrackingResult([]); // Nếu không tìm thấy đơn hàng
+        });
     }
   };
 
-   useEffect(() => {
+  useEffect(() => {
     if (activeTab !== 'tracking') {
       setTrackingCode(''); // Xóa mã đơn hàng
-      setTrackingResult(''); // Xóa kết quả tra cứu
+      setTrackingResult(null); // Xóa kết quả tra cứu
     }
   }, [activeTab]);
 
   const [isDropdownOpen, setDropdownOpen] = useState(false); // Quản lý trạng thái mở dropdown
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!isDropdownOpen);
-  }
 
   return (
     <div className="homepage-container">
@@ -67,8 +73,8 @@ const Homepage = () => {
       </a>
       <div className="dropdown">
           <img src={avatar} alt="Avatar" className="avatar" />
-            <div className="dropdown-content">
-              <a href="user-page">Tài khoản của tôi</a>
+            <div className="dropdown-content-avatar ">
+              <a href="#">Tài khoản của tôi</a>
               <a href="#">Đăng xuất</a>
             </div>  
       </div>
@@ -79,7 +85,7 @@ const Homepage = () => {
       <header className="homepage-header">
         <h1 className='title-1'>VẬN CHUYỂN CÁ KOI</h1>
         <h1 className='title-2'>GẦN GŨI - TIN CẬY - HIỆU QUẢ</h1>
-        <button className="order-btn">TẠO ĐƠN TẠI ĐÂY</button>  
+        <button className="order-btn" onClick={() => navigate('/form')}>TẠO ĐƠN TẠI ĐÂY</button>  
       </header>
 
       {/* Main content */}
@@ -115,11 +121,31 @@ const Homepage = () => {
 
             {/* Kết quả theo dõi đơn hàng */}
             {trackingResult && (
-              <div className="tracking-result active">
-                {trackingResult}
-              </div>
-            )}
+          <div className="tracking-result active">
+            <table className="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>TotalPrice</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {trackingResult.orderId ? (
+                  <tr key={trackingResult.orderId}>
+                    <td>{trackingResult.totalPrice}</td>
+                    <td>{trackingResult.status}</td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="text-center">No Orders Found</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
+        )}
+
+        </div>
         )}
 
         {activeTab === 'estimate' && (
@@ -200,7 +226,7 @@ const Homepage = () => {
         cách giữ cho cá Koi của bạn khỏe mạnh và hạnh phúc trong suốt quá trình vận chuyển,
         cũng như nhiều điều thú vị khác liên quan. Hãy cùng khám phá!
         </p>
-        <button className="blog-btn">Thông tin về Blog</button>
+        <button className="blog-btn" onClick={() => navigate('/blog')}>Thông tin về Blog</button>
       </div>
       <div className="blog-image">
       <img src={blog} className="img" alt="Blog" />
@@ -229,7 +255,7 @@ const Homepage = () => {
     {/* The end section */}
     <header className="order-header">
         <h1>Bắt đầu tạo đơn với Koi Express</h1>
-        <button className="order-btn-end">TẠO ĐƠN TẠI ĐÂY</button>  
+        <button className="order-btn-end" onClick={() => navigate('/form')}>TẠO ĐƠN TẠI ĐÂY</button>  
       </header>
 
       {/* Footer */}
@@ -260,7 +286,7 @@ const Homepage = () => {
           <h4>Dịch Vụ</h4>
           <a href="#">Theo Dõi Đơn Hàng</a><br />
           <a href="#">Ước Tính Chi Phí</a><br />
-          <a href="#">Tạo đơn hàng</a><br />
+          <a href="/form">Tạo đơn hàng</a><br />
           <a href="#">Quy định vận chuyển</a><br />
           <a href="#">Chương trình khuyến mãi</a>
         </div>

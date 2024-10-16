@@ -3,19 +3,24 @@ body, html {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
+  overflow-x: hidden;
   height: 100%;
 }
 
 .main-content {
+  overflow-x: hidden;
   height: 100vh;
   width: 100vw;
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
+  margin-top:-25px;
   background-image: url('/Koi-image/shutterstock_1683545551_web.jpg');
-  
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat;   
 }
 
 .login-container {
@@ -30,15 +35,18 @@ body, html {
 }
 
 .login-form-container {
-  width: 100%; 
-  height: 100%; 
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 30%;
+  height: 85%;
+  padding: 20px;
+  background-color: #2b3a4d;
+  border-radius: 15px;
   
 }
 
-.form-box {
+.login-form-box {
   width: 100%;   
   height: 100%;  
   padding: 20px;
@@ -47,6 +55,7 @@ body, html {
   flex-direction: column;
   justify-content: center;
 }
+
 
 .logo-title {
   display: flex;
@@ -77,8 +86,8 @@ form div {
 label {
   display: block;
   font-size: 15px; 
-  color: #333;
-  margin-bottom: 8px; 
+  color: white;
+  /* margin-bottom: white;  */
 }
 
 input[type="text"], input[type="password"] {
@@ -152,6 +161,7 @@ button:hover {
 .sign-up {
   margin-top: 30px; 
   text-align: center;
+  color: white;
 }
 
 .sign-up a {

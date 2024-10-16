@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { listOrder, updateStatus, getOrderDetail } from '../../services/DeliveryService';
-import { FaLongArrowAltLeft } from "react-icons/fa";
-import { useNavigate } from 'react-router-dom';
 
-const ListOrderComponent = () => {
+import React, { useEffect, useState } from 'react';
+import { listOrder, updateStatus } from '../../services/SaleStaffService';
+import { useNavigate } from 'react-router-dom';
+import './SaleStaff.css';
+
+const ListOrderOfSales = () => {
   const [orders, setOrders] = useState([]);
   const [editedStatuses, setEditedStatuses] = useState({});
-  const [orderDetail, setOrderDetail] = useState(null); // Lưu chi tiết đơn hàng ở đây
   const navigate = useNavigate();
-
   useEffect(() => {
     getAllOrders();
   }, []);
-
   const getAllOrders = () => {
     listOrder()
       .then((response) => {
@@ -27,70 +25,46 @@ const ListOrderComponent = () => {
         console.error("Error fetching orders: ", error);
       });
   };
-
   const handleStatusChange = (orderId, newStatus) => {
+    // console.log("Before update:", editedStatuses);
+  
     const updatedStatuses = {
-      ...editedStatuses,
-      [orderId]: newStatus,
+      ...editedStatuses,  
+      [orderId]: newStatus,  
     };
-    setEditedStatuses(updatedStatuses);
+  
+    // console.log("After update:", updatedStatuses);
+  
+    setEditedStatuses(updatedStatuses); 
   };
-
   const updateOrderStatus = (orderId) => {
-    const newStatus = editedStatuses[orderId] ?? orders.find(order => order.orderId === orderId)?.status;
+    const newStatus = editedStatuses[orderId] ?? orders.status;
     if (newStatus) {
       console.log('New status to update:', newStatus);
-      updateStatus(orderId, newStatus)
+      updateStatus(orderId, newStatus)  
         .then((response) => {
           console.log('Status updated successfully:', response);
-          getAllOrders();
+          getAllOrders();  
         })
         .catch((error) => {
           console.error('Error updating status:', error);
         });
     }
   };
-
-  const handleViewOrder = (orderId) => {
-    navigate(`/order/${orderId}`);
-  };
-
   return (
     <div className="container">
-       <button
-        type="button"
-        onClick={() => navigate('/delivery')}
-        style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          position: 'absolute',
-          top: '10px',
-          left: '120px',
-          padding: '5px',
-          fontSize: '14px',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        <FaLongArrowAltLeft size={16} color="black" />
-        <span style={{ marginLeft: '15px' }}>Back</span>
-      </button>
-
       <h2 className="text-center">List of Orders</h2>
       <table className="table table-striped table-bordered">
         <thead>
           <tr>
-            <th>OrderId</th>
-            <th>Destination</th>
-            <th>Freight</th>
-            <th>OrderDate</th>
-            <th>ShipDate</th>
-            <th>TotalPrice</th>
+          <th>Order ID</th>
+            <th>Receiver Name</th>
+            <th>Sender Name</th>
             <th>Origin</th>
+            <th>Destination</th>
+            <th>Total Price</th>
             <th>Status</th>
-            <th>Actions</th>
-            <th>Details</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -98,12 +72,12 @@ const ListOrderComponent = () => {
             orders.map(order => (
               <tr key={order.orderId}>
                 <td>{order.orderId}</td>
-                <td>{order.destination}</td>
-                <td>{order.freight}</td>
-                <td>{order.orderDate}</td>
-                <td>{order.shippedDate}</td>
-                <td>{order.totalPrice}</td>
+                <td>{order.receiverName}</td>
+                <td>{order.senderName}</td>
                 <td>{order.origin}</td>
+                <td>{order.destination}</td>
+                <td>{order.totalPrice}</td>
+                <td>{order.status}</td>
                 <td>
                   <input
                     type="text"
@@ -119,14 +93,6 @@ const ListOrderComponent = () => {
                     Update Status
                   </button>
                 </td>
-                <td>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => handleViewOrder(order.orderId)}
-                  >
-                    View
-                  </button>
-                </td>
               </tr>
             ))
           ) : (
@@ -140,4 +106,4 @@ const ListOrderComponent = () => {
   );
 };
 
-export default ListOrderComponent;
+export default ListOrderOfSales
