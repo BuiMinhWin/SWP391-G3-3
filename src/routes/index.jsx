@@ -17,10 +17,7 @@ import ListCustomerComponent from "../components/Customer/ListCustomerComponent"
 import OrderDetailComponent from "../components/DeliveryStaff/OrderDetailComponent";
 // import { OrderProvider } from '../components/DeliveryStaff/OrderContext';
 import CheckoutPage from "../pages/CheckoutPage/CheckoutPage";
-
 import ListOrderOfSales from "../components/SaleStaff/ListOrderOfSales";
-import ReportPage from "../components/SaleStaff/ReportPage";
-import FeedbackPage from "../components/SaleStaff/FeedbackPage";
 import Blog from "../pages/Blog/Blog";
 import Layout from "../components/Layout/Layout";
 import OrderDetailDocumentComponent from '../components/SaleStaff/OrderDetailDocumentComponent';
@@ -57,8 +54,9 @@ function index() {
       {/*Sales */}
       <Route path="/salestaff/listsaleorder" element={<ListOrderOfSales />} />
       <Route path="/salestaff" element={<SaleStaffComponent />} />
-      <Route path="/salestaff/reports" element={<ReportPage />} />
-      <Route path="/salestaff/feedback" element={<FeedbackPage />} />
+      <Route path="/confirm" element={<ListOfConfirmOrder />} />
+      <Route path="/confirmDetail/:orderId" element={<OrderDetailDocumentComponent />} />
+    
     </Routes>
   );
 }
