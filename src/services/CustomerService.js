@@ -13,23 +13,38 @@ export const createOrder = async (orderData) => {
     const response = await axios.post(`${REST_API_BASE_URL}/create`, orderData);
     return response.data;
   } catch (error) {
-    console.error("Error creating order:", error.response || error.message);
+    console.error("Error creating order:", error.message); // Log only the message
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
+      console.error("Response headers:", error.response.headers);
+    } else if (error.request) {
+      console.error("Request data:", error.request);
+    }
     throw error;
   }
 };
 
-export const createDocument = async (DocumentData) => {
+export const uploadDocument = async (file, orderId) => {
+  const formData = new FormData();
+  formData.append("document_file", file);
+  formData.append("orderId", orderId); // Attach orderId to the form data
+
   try {
     const response = await axios.post(
-      `${REST_API_DOCUMENT_URL}/create`,
-      DocumentData
+      `${REST_API_DOCUMENT_URL}/${orderId}`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
     );
     return response.data;
   } catch (error) {
-    console.error("Error creating order:", error.response || error.message);
-    throw error;
+    console.error("File upload failed:", error);
+    throw new Error("Upload failed");
   }
 };
+
 export const createOrderDetail = async (orderDetailData) => {
   try {
     const response = await axios.post(
@@ -71,22 +86,26 @@ export const getAccountById = async (accountId) => {
   }
 };
 
-export const updateAccount = async (accountId, accountData) => {
-  try {
-    const response = await axios.patch(
-      `${REST_API_BASE_URL2}/${accountId}`,
-      accountData
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error updating account:", error);
-    throw error;
+// Example of updateAccount function
+export const updateAccount = async (accountId, values) => {
+  const response = await fetch(`${REST_API_BASE_URL2}/${accountId}`, {
+    method: "PATCH", // Make sure the method is PATCH
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(values),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
   }
+
+  return await response.json(); // Return the updated data
 };
 
 
 const REST_API_BASE_URL3 = "http://koideliverysystem.id.vn:8080/api/orders";
 
 export const getOrder = (orderId) => {
-  return axios.get(REST_API_BASE_URL3 + '/' + orderId);
-}
+  return axios.get(REST_API_BASE_URL3 + "/" + orderId);
+};
