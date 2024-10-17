@@ -10,8 +10,8 @@ import koi_type from "../../data/koiTypes.json";
 import koi_name from "../../data/koiVarieties.json";
 import { createOrder, order, uploadDocument } from "../../services/CustomerService";
 import { createOrderDetail } from "../../services/CustomerService";
-import SideBar from "../SideBar/SideBar";
-import HeaderBar from "../Header/Header/Nguyen";
+// import SideBar from "../SideBar/SideBar";
+// import HeaderBar from "../Header/Header/Nguyen";
 import RadioGroupWrapper from "../FromUI/RadioGroup";
 import CustomRadioGroup from "../FromUI/CustomRadioGroup";
 import AccessibleIcon from "@mui/icons-material/Accessible";
@@ -170,30 +170,9 @@ const OrderForm = () => {
 
         return (
           <Form onSubmit={handleSubmit}>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
-              component={"body"}
-            >
-              <Box
-                sx={{
-                  height: "64px",
-                  bgcolor: "primary.main",
-                  display: "flex",
-                  alignItems: "center",
-                  p: 2,
-                }}
-              >
-                <HeaderBar />
-              </Box>
-
-              {/* Sidebar + Content Container */}
-              <Box sx={{ display: "flex", flex: 1 }}>
-                <Box>
-                  <SideBar />
-                </Box>
-
                 {/* Content */}
-                <Box sx={{ flex: 1, p: 3, bgcolor: "#eeeeee" }}>
+                <>
+                <Box sx={{ p: 4, bgcolor: "#eeeeee" }}>
                   {/* Paper 1: Receiver Information */}
                   <Paper elevation={4} sx={{ padding: "20px" }}>
                     <Typography variant="h6" gutterBottom>
@@ -412,8 +391,7 @@ const OrderForm = () => {
                   />
                   <ButtonWrapper>Submit Order</ButtonWrapper>
                 </Box>
-              </Box>
-            </Box>
+                </>
           </Form>
         );
       }}
