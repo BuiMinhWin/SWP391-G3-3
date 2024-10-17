@@ -17,6 +17,10 @@ import {
   cancelOrder,
   getOrderPDF,
 } from "../../services/CustomerService";
+import axios from "axios";
+
+const REST_API_BANK_URL =
+  "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
 
 const steps = ["Pending", "Confirmed", "Completed", "Delivered"];
 
@@ -75,8 +79,36 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleProceedToPayment = () => {
-    navigate(`/payment/${orderId}`);
+  const handleProceedToPayment = async () => {
+    try {
+      console.log("Order ID:", orderId);
+
+      const response = await axios.post(REST_API_BANK_URL, {
+        orderId,
+        bankCode: "NCB",
+      });
+
+      console.log("Payment API Response:", response.data);
+
+      // Accessing nested paymentUrl correctly
+      const paymentUrl = response.data.data?.paymentUrl;
+      console.log("Payment URL:", paymentUrl);
+
+      if (paymentUrl) {
+        window.location.href = paymentUrl;
+      } else {
+        throw new Error("Payment URL not found.");
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error("API Error:", error.response.data);
+      } else if (error.request) {
+        console.error("No Response from API:", error.request);
+      } else {
+        console.error("Unexpected Error:", error.message);
+      }
+      alert("Failed to proceed to payment.");
+    }
   };
 
   if (!orderId) return <Navigate to="/" />;

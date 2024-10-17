@@ -22,6 +22,7 @@ import Blog from "../pages/Blog/Blog";
 import Layout from "../components/Layout/Layout";
 import OrderDetailDocumentComponent from '../components/SaleStaff/OrderDetailDocumentComponent';
 import ListOfConfirmOrder from '../components/SaleStaff/ListOfConfirmOrder'
+import OrderReport from "../pages/Order/OrderReport";
 
 function index() {
   return (
@@ -36,6 +37,7 @@ function index() {
         <Route path="/user" element={<UserPage />} />
         <Route path="/form" element={<OrderForm />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-report" element={<OrderReport />} />
       </Route>
 
       <Route path="/blog" element={<Blog />} />

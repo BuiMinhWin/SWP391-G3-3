@@ -7,40 +7,17 @@ import {
   CssBaseline,
   Box,
   Drawer,
-  IconButton,
-  Avatar,
-  Menu,
-  MenuItem,
   List,
   ListItem,
   ListItemText,
-  Tooltip,
   Stack,
   Button,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import HelpIcon from "@mui/icons-material/Help";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-
 const drawerWidth = 180;
 
 const Layout = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-
-  const handleAvatarClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    console.log("User logged out");
-    setAnchorEl(null);
-  };
-
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <CssBaseline />
@@ -103,10 +80,10 @@ const Layout = () => {
               <Button
                 color="inherit"
                 component={Link}
-                to="/help"
+                to="/order-report"
                 startIcon={<HelpIcon />} // Add the Help icon
               >
-                Giúp đỡ
+                Order
               </Button>
             </Stack>
           </Toolbar>

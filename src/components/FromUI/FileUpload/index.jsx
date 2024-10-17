@@ -1,4 +1,3 @@
-// FileUpload.js
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Typography } from '@mui/material';
@@ -38,10 +37,14 @@ const FileUpload = ({ name, ...otherProps }) => {
       ) : (
         <Typography>Drag 'n' drop a PDF file here, or click to select</Typography>
       )}
+      {field.value && (
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          Uploaded file: {field.value.name} 
+        </Typography>
+      )}
       {errorText && <Typography color="error">{errorText}</Typography>} {/* Show error */}
     </Box>
   );
 };
 
 export default FileUpload;
-
