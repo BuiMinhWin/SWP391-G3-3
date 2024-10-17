@@ -60,7 +60,7 @@ public class OrderService {
             logger.debug("Order status was 0", STATUS_CANCELLED);
         }
 
-        order.setPaymentStatus(0);
+//        order.setPaymentStatus(0);
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
 
@@ -204,9 +204,9 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
-        if (newStatus < 0 || newStatus > 3) {
+        if (newStatus < 0 || newStatus > 5) { // Ensure valid status range
             newStatus = STATUS_PROCESSING; // Default to Processing
-            logger.info("Invalid status provided. Status automatically set to Processing (1).");
+            logger.info("Invalid status provided. Status automatically set to Processing (2).");
         }
 
         order.setStatus(newStatus);

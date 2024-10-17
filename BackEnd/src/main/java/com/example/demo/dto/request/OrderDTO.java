@@ -32,7 +32,7 @@ public class OrderDTO {
     private String orderNote;
     private int totalPrice;
     private int status;
-    private int paymentStatus;
+//    private int paymentStatus;
 
 //    private double originLatitude;
 //    private double originLongitude;
