@@ -83,42 +83,43 @@ const ManagerComponent = () => {
 
   
     return [
-      // statusCounts[0] || 0,
+      statusCounts[0] || 0,
       statusCounts[1] || 0,
       statusCounts[2] || 0,
       statusCounts[3] || 0,
       statusCounts[4] || 0,
-      // statusCounts[5] || 0,
+      statusCounts[5] || 0,
     ];
   };
-  const ordersByStatusChartData = {
-    labels: ['Status 1', 'Status 2', 'Status 3', 'Status 4'], 
-    datasets: [
-      {
-        label: 'Number of Orders by Status', 
-        data: getStatusCounts(), 
-        backgroundColor: 'rgba(75, 192, 192, 0.2)', 
-        borderColor: 'rgba(75, 192, 192, 1)', 
-        borderWidth: 2, 
-        fill: true, 
-      },
-    ],
-  };
+
+ const ordersByStatusChartData = {
+      labels: ['Status 1', 'Status 2', 'Status 3', 'Status 4','Status 5'], 
+      datasets: [
+        {
+          label: 'Number of Orders by Status', 
+          data: getStatusCounts(), 
+          backgroundColor: 'rgba(75, 192, 192, 0.2)', 
+          borderColor: 'rgba(75, 192, 192, 1)', 
+          borderWidth: 2, 
+          fill: true, 
+        },
+      ],
+    };
 
   const chartOptions = {
     scales: {
-      y: {
-        ticks: {
-          stepSize: 1, 
-          beginAtZero: true, 
+          y: {
+            ticks: {
+              stepSize: 1,
+              beginAtZero: true,
+            },
+            min: 0,
+            max: Math.max(...getStatusCounts()) + 1, 
+          },
         },
-        min: 0, 
-        max: 6, 
-      },
-    },
   };
   const ordersByStatusPieData = {
-    labels: ['Status 1', 'Status 2', 'Status 3', 'Status 4'],
+    labels: ['Status 1', 'Status 2', 'Status 3', 'Status 4','Status 5'],
     datasets: [
       {
         label: 'Orders by Status',
@@ -127,13 +128,15 @@ const ManagerComponent = () => {
           'rgba(255, 99, 132, 0.2)',
           'rgba(54, 162, 235, 0.2)',
           'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
+          'rgba(255, 69, 0, 0.2)',
+          'rgba(25, 171, 90, 0.2)',
         ],
         borderColor: [
           'rgba(255, 99, 132, 1)',
           'rgba(54, 162, 235, 1)',
           'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
+          'rgba(255, 69, 0, 1)',
+          'rgba(25, 192, 172, 1)',
         ],
         borderWidth: 1,
       },
@@ -215,7 +218,7 @@ const ManagerComponent = () => {
         </aside>
 
         <main className="dashboard col-10 p-4">
-        <header className="admin d-flex justify-content-between align-items-center mb-4 border-bottom pb-5">
+        <header className="admin d-flex justify-content-between align-items-center mb-4 border-bottom pb-4">
             <h1>Admin page</h1>
             
             <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
