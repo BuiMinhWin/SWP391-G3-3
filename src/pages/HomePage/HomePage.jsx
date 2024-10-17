@@ -85,7 +85,10 @@ const Homepage = () => {
                 <button onClick={() => navigate('/delivery')}>Back</button>
               ) : roleId === 'Sales' ? (
                 <button onClick={() => navigate('/salestaff')}>Back</button>
-              ) : null}
+              ) : roleId === 'Customer' ?(
+                <button onClick={() => navigate('/customer')}>Back</button>
+              ):null
+              }
             </>
           )}
           <a href="#" className="nav-link support-link">

@@ -1,4 +1,4 @@
-import React ,{ useState, useEffect }from "react";
+import React from "react";
 import { Box, Grid, InputAdornment, Paper, Typography } from "@mui/material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -151,12 +151,7 @@ const OrderForm = () => {
             orderNote: values.orderNote,
             distance : calculateDistance(senderCoordinates[1], senderCoordinates[0], receiverCoordinates[1], receiverCoordinates[0]),
           };
-
-         
-
-          // distance = calculateDistance(senderCoordinates[1], senderCoordinates[0], receiverCoordinates[1], receiverCoordinates[0]);
-          // console.log(`Khoảng cách giữa người gửi và người nhận: ${distance.toFixed(2)} km`);
-
+          
           const orderResponse = await createOrder(orderData);
           if (!orderResponse?.orderId) {
             throw new Error("Order ID not found in the response");
