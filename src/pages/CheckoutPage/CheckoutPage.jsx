@@ -86,6 +86,7 @@ const CheckoutPage = () => {
       const response = await axios.post(REST_API_BANK_URL, {
         orderId,
         bankCode: "NCB",
+        returnUrl: "http://localhost:3000/checkout",
       });
 
       console.log("Payment API Response:", response.data);
