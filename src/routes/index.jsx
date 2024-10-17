@@ -23,6 +23,8 @@ import ReportPage from "../components/SaleStaff/ReportPage";
 import FeedbackPage from "../components/SaleStaff/FeedbackPage";
 import Blog from "../pages/Blog/Blog";
 import Layout from "../components/Layout/Layout";
+import OrderDetailDocumentComponent from '../components/SaleStaff/OrderDetailDocumentComponent';
+import ListOfConfirmOrder from '../components/SaleStaff/ListOfConfirmOrder'
 
 function index() {
   return (
