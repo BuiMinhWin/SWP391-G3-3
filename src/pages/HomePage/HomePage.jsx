@@ -71,7 +71,10 @@ const Homepage = () => {
           <a href="#" className="nav-link">Giới Thiệu</a>
         </div>
         
-        <div className="navbar-right">
+        {/* <div className="navbar-right">
+        <a href="#" className="nav-link support-link">
+            <i className="fas fa-question-circle"></i>Hỗ Trợ
+          </a>
           {!roleId ? (
             <>
               <button className="register-btn" onClick={() => navigate('/register')}>Đăng Ký</button>
@@ -88,10 +91,14 @@ const Homepage = () => {
               ) : null}
             </>
           )}
-          <a href="#" className="nav-link support-link">
-            <i className="fas fa-question-circle"></i>Hỗ Trợ
-          </a>
-      </div>
+        
+      </div> */}
+
+        <div className="navbar-right">
+          <a href="#" className="nav-link support-link"><i className="fas fa-question-circle"></i>Hỗ Trợ</a>
+          <button className="register-btn" onClick={() => navigate('/register')}>Đăng Ký</button>
+          <button className="login-btn" onClick={() => navigate('/login')}>Đăng Nhập</button>  
+        </div>
               
         
       </nav>

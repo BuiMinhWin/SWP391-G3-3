@@ -29,8 +29,6 @@
     };
 
     
- 
-  
   const toggleDropdown = () => {
     setDropdownOpen(!isDropdownOpen);
   }
@@ -276,8 +274,7 @@
                   placeholder="Search Order"
               />
              </div>
-                
-                
+
                 <div className="navbar-cus-right">
                   <div className="dropdown" onClick={toggleDropdown}>
                     <img src="/Delivery/User.png" alt="Avatar" className="avatar" />
@@ -361,7 +358,7 @@
   )}
 
             <section className="ongoing-delivery mt-4 d-flex border-top pt-3">
-            <div className="delivery-list col-12">
+            <div className="delivery-list col-12 " >
                 <h2>List of Orders</h2>
 
                 <div className="filter-bar d-flex mb-3">
@@ -408,7 +405,7 @@
                 </select>
                 </div>
                 
-                <table className="table table-striped table-bordered">
+                <table className="table table-striped table-bordered ">
                   <thead>
                     <tr>
                     <th>OrderId</th>
