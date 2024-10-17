@@ -31,9 +31,12 @@ public class OrderService {
     private final OrderMapper orderMapper;
 
     private static final int STATUS_CANCELLED = 0;
-    private static final int STATUS_PROCESSING = 1;
-    private static final int STATUS_SHIPPED = 2;
-    private static final int STATUS_DELIVERED = 3;
+    private static final int STATUS_PENDING = 1;
+    private static final int STATUS_PROCESSING = 2;
+    private static final int STATUS_READY_FOR_PICKUP = 3;
+    private static final int STATUS_IN_TRANSIT = 4;
+    private static final int STATUS_DELIVERED = 5;
+
 
     public OrderDTO createOrder(OrderDTO orderDTO) {
         logger.info("Received OrderDTO: {}", orderDTO);
@@ -51,8 +54,8 @@ public class OrderService {
         }
 
         if (order.getStatus() == STATUS_CANCELLED ) {
-            order.setStatus(STATUS_PROCESSING);
-            logger.debug("Order status was 0, updated to {} (Processing)", STATUS_PROCESSING);
+            order.setStatus(STATUS_PENDING);
+            logger.debug("Order status was 0, updated to {} (Processing)", STATUS_PENDING);
         }
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
@@ -192,11 +195,17 @@ public class OrderService {
                 logger.info("Refund of {} has been processed for Order ID: {}, vnpTxnRef: {} of Account ID: {}",
                         refundAmount, orderId, vnpTxnRef, accountId);
                 break;
+            case STATUS_PENDING:
+                logger.info("Order status updated to Pending.");
+                break;
             case STATUS_PROCESSING:
                 logger.info("Order status updated to Processing.");
                 break;
-            case STATUS_SHIPPED:
-                logger.info("Order status updated to Shipped.");
+            case STATUS_READY_FOR_PICKUP:
+                logger.info("Order status updated to Ready for Pickup.");
+                break;
+            case STATUS_IN_TRANSIT:
+                logger.info("Order status updated to In Transit.");
                 break;
             case STATUS_DELIVERED:
                 logger.info("Order status updated to Delivered.");
