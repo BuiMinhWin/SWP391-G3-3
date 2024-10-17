@@ -77,8 +77,17 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Document> documents;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<OrderDetail> orderDetails; // Relationship with OrderDetail
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Transaction> transactions; // Relationship with Transaction
+
     @Column(name = "status")
     private int status;
+
+    @Column(name = "payment_status")
+    private int paymentStatus;
 
 //    @Column(name = "origin_latitude")
 //    private double originLatitude;

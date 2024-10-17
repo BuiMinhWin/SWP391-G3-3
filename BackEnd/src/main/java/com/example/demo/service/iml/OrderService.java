@@ -6,8 +6,7 @@ import com.example.demo.entity.Order;
 import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.OrderMapper;
-import com.example.demo.repository.AccountRepository;
-import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -28,6 +27,9 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final AccountRepository accountRepository;
+    private final DocumentRepository documentRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final TransactionRepository transactionRepository;
     private final OrderMapper orderMapper;
 
     private static final int STATUS_CANCELLED = 0;
@@ -53,10 +55,12 @@ public class OrderService {
             logger.debug("Order date was null, set to current time: {}", order.getOrderDate());
         }
 
-        if (order.getStatus() == STATUS_CANCELLED ) {
-            order.setStatus(STATUS_PENDING);
-            logger.debug("Order status was 0, updated to {} (Processing)", STATUS_PENDING);
+        if (order.getStatus() < 0 || order.getStatus() > 1) {
+            order.setStatus(STATUS_CANCELLED);
+            logger.debug("Order status was 0", STATUS_CANCELLED);
         }
+
+        order.setPaymentStatus(0);
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
 
@@ -164,11 +168,33 @@ public class OrderService {
     }
 
     public void deleteOrder(String orderId) {
-        logger.info("Deleting Order with ID: {}", orderId);
+        logger.info("Deleting Order and related entities with ID: {}", orderId);
+
+        // Fetch the order from the repository
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
+
+        // Delete documents associated with the order
+        if (order.getDocuments() != null && !order.getDocuments().isEmpty()) {
+            documentRepository.deleteAll(order.getDocuments());
+            logger.info("Deleted {} documents associated with Order ID: {}", order.getDocuments().size(), orderId);
+        }
+
+        // Delete order details associated with the order
+        if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
+            orderDetailRepository.deleteAll(order.getOrderDetails());
+            logger.info("Deleted {} order details associated with Order ID: {}", order.getOrderDetails().size(), orderId);
+        }
+
+        // Delete transactions associated with the order
+        if (order.getTransactions() != null && !order.getTransactions().isEmpty()) {
+            transactionRepository.deleteAll(order.getTransactions());
+            logger.info("Deleted {} transactions associated with Order ID: {}", order.getTransactions().size(), orderId);
+        }
+
+        // Finally, delete the order
         orderRepository.delete(order);
-        logger.info("Order with ID: {} has been deleted.", orderId);
+        logger.info("Order with ID: {} and its related entities have been deleted.", orderId);
     }
 
 
