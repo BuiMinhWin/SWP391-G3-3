@@ -2,7 +2,7 @@ import React from "react";
 import { useFormikContext } from "formik";
 import { Button } from "@mui/material";
 
-const ButtonWrapper = ({ children ,dirty, ...otherProps }) => {
+const ButtonWrapper = ({ children , ...otherProps }) => {
   const { submitForm, isSubmitting, isValid } = useFormikContext();
 
   const handleSubmit = () => {
@@ -14,7 +14,7 @@ const ButtonWrapper = ({ children ,dirty, ...otherProps }) => {
     color: "primary",
     fullWidth: true,
     onClick: handleSubmit,
-    disabled:!dirty || !isValid || isSubmitting, // Disable if invalid or submitting
+    disabled: !isValid || isSubmitting, // Disable if invalid or submitting
     ...otherProps, // Spread other props
   };
 
