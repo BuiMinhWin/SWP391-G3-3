@@ -107,56 +107,7 @@ const FORM_VALIDATION = Yup.object().shape({
 
 
 const OrderForm = () => {
-  const navigate = useNavigate();
-
-  // const [viewport, setViewport] = useState({
-  //   latitude: 10.8231,
-  //   longitude: 106.6297,
-  //   zoom: 14,
-  //   width: "100vw",
-  //   height: "100vh",
-  // });
-  // const [addressMarker, setAddressMarker] = useState([]);
-
-  // const myAddress = "số 110 võ văn ngân phường linh chiểu thành phố thủ đức";
-  // const customerAddress ="số  182 Lã Xuân Oai phường Tăng Nhơn Phú A thành phố thủ đức";
-  // useEffect(() => {
-  //   const fetchCoordinates = async (customerAddress) => {
-  //     try {
-  //       const myAddressResponse = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(myAddress)}.json?access_token=pk.eyJ1IjoiYm10aGFuZzIwMDQiLCJhIjoiY20xdWJsYTV2MGF4bDJybXlmdHVnZ2k3cyJ9.08eXbVTzmWjVZp4NhGnoVw`);
-  //       const myCoordinates = myAddressResponse.data.features[0].center;
-
-  //       const customerResponse = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(customerAddress)}.json?access_token=pk.eyJ1IjoiYm10aGFuZzIwMDQiLCJhIjoiY20xdWJsYTV2MGF4bDJybXlmdHVnZ2k3cyJ9.08eXbVTzmWjVZp4NhGnoVw`);
-  //       const customerCoordinates = customerResponse.data.features[0].center;
-
-  //       setAddressMarker([
-  //         { id: 1, latitude: myCoordinates[1], longitude: myCoordinates[0], label: 'My Address' },
-  //         { id: 2, latitude: customerCoordinates[1], longitude: customerCoordinates[0], label: 'Customer Address' }
-  //       ]);
-
-  //       const distance = calculateDistance(myCoordinates[1], myCoordinates[0], customerCoordinates[1], customerCoordinates[0]);
-  //       console.log(`Khoảng cách giữa bạn và khách hàng: ${distance.toFixed(2)} km`);
-
-  //       const midLat = (myCoordinates[1] + customerCoordinates[1]) / 2;
-  //       const midLon = (myCoordinates[0] + customerCoordinates[0]) / 2;
-  //       const newZoom = distance > 1000 ? 4 : distance > 100 ? 6 : 10; 
-  //       setViewport(v => ({
-  //         ...v,
-  //         latitude: midLat,
-  //         longitude: midLon,
-  //         zoom: newZoom,
-  //       }));
-
-  //     } catch (error) {
-  //       console.error(`call fail`, error);
-  //     }
-  //   };
-
-  //   if (customerAddress) {
-  //     fetchCoordinates(customerAddress);
-  //   }
-  // }, [customerAddress, myAddress]); 
-  
+  const navigate = useNavigate();  
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371;
     const dLat = (lat2 - lat1) * (Math.PI / 180);
