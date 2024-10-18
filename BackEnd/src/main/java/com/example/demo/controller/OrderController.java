@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.request.OrderDTO;
+import com.example.demo.dto.request.ServicesDTO;
 import com.example.demo.dto.request.UpdateStatusDTO;
 import com.example.demo.service.iml.OrderService;
+import com.example.demo.service.iml.ServicesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +16,24 @@ import java.util.List;
 @RequestMapping("/api/orders")
 
 public class OrderController {
+
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private ServicesService servicesService;
 
     @PostMapping("/create")
     public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
         OrderDTO savedOrder = orderService.createOrder(orderDTO);
+
+        ServicesDTO servicesDTO = new ServicesDTO();
+        servicesDTO.setOrderId(savedOrder.getOrderId());
+        servicesService.createServicesForOrder(servicesDTO);
+
         return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
     }
+
     @PatchMapping("/cancel/{orderId}")
     public ResponseEntity<OrderDTO> cancelOrder(@PathVariable String orderId) {
         OrderDTO canceledOrder = orderService.cancelOrder(orderId);

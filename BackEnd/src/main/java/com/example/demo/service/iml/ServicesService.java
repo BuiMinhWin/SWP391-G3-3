@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,48 +27,47 @@ public class ServicesService {
     @Autowired
     private OrderRepository orderRepository;
 
-    public ServicesDTO createService(ServicesDTO servicesDTO) {
+    public List<ServicesDTO> createServicesForOrder(ServicesDTO servicesDTO) {
 
         Order order = orderRepository.findById(servicesDTO.getOrderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Services not found with id " + servicesDTO.getOrderId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + servicesDTO.getOrderId()));
 
-        int servicesId = servicesDTO.getServiceId();
+        List<ServicesDTO> servicesDTOList = new ArrayList<>();
 
-        switch (servicesId) {
-            case 1:
-                if ("Yes".equalsIgnoreCase(servicesDTO.getServiceStatus())) {
-                    servicesDTO.setPrice(30.0);
-                } else {
-                    servicesDTO.setPrice(0.0);
-                }
-                break;
-            case 2:
-                if ("Yes".equalsIgnoreCase(servicesDTO.getServiceStatus())) {
-                    servicesDTO.setPrice(50.0);
-                } else {
-                    servicesDTO.setPrice(0.0);
-                }
-                break;
-            case 3:
-                if ("Yes".equalsIgnoreCase(servicesDTO.getServiceStatus())) {
-                    servicesDTO.setPrice(70.0);
-                } else {
-                    servicesDTO.setPrice(0.0);
-                }
-                break;
-            default:
-                servicesDTO.setPrice(0.0);
-                break;
+        for (int serviceId = 1; serviceId <= 3; serviceId++) {
+            ServicesDTO newServiceDTO = new ServicesDTO();
+            newServiceDTO.setOrderId(servicesDTO.getOrderId());
+            newServiceDTO.setServiceId(serviceId);
+            newServiceDTO.setServiceStatus("No");
+            newServiceDTO.setPrice(0.0);
+
+            String serviceName;
+            switch (serviceId) {
+                case 1:
+                    serviceName = "Service Type A";
+                    break;
+                case 2:
+                    serviceName = "Service Type B";
+                    break;
+                case 3:
+                    serviceName = "Service Type C";
+                    break;
+                default:
+                    serviceName = "Unknown Service";
+                    break;
+            }
+            newServiceDTO.setServiceName(serviceName);
+
+            Services service = ServicesMapper.mapToServices(newServiceDTO, order);
+            Services savedService = serviceRepository.save(service);
+
+            servicesDTOList.add(ServicesMapper.maptoServicesDTO(savedService));
         }
 
-        Services service = ServicesMapper.mapToServices(servicesDTO, order);
-
-        System.out.println("Creating Services with Order ID: " + service.getOrder().getOrderId());
-
-        Services savedService = serviceRepository.save(service);
-
-        return ServicesMapper.maptoServicesDTO(savedService);
+        return servicesDTOList;
     }
+
+
 
     public List<ServicesDTO> getServices(String orderId) {
         Order order = orderRepository.findById(orderId)

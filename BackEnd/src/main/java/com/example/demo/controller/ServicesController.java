@@ -19,12 +19,6 @@ public class ServicesController {
     @Autowired
     private ServicesService servicesService;
 
-    @PostMapping("/create")
-    public ResponseEntity<ServicesDTO> createService(@RequestBody ServicesDTO servicesDTO) {
-        ServicesDTO savedServices = servicesService.createService(servicesDTO);
-        return new ResponseEntity<>(savedServices, HttpStatus.CREATED);
-    }
-
     @GetMapping("/getServices/{orderId}")
     public ResponseEntity<List<ServicesDTO>> getServices(@PathVariable String orderId) {
         List<ServicesDTO> services = servicesService.getServices(orderId);
