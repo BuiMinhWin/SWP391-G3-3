@@ -37,53 +37,78 @@
   margin-right: 10px;
 }
 
-.overview {
+.delivery-overview {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 20px;
 }
 
-.overview .card {
+.delivery-overview .card {
   padding: 20px;
   width: 23%;
   text-align: center;
   border-radius: 10px;
 }
 
-.overview .card h3 {
+.delivery-overview .card h3 {
   font-size: 18px;
   margin-bottom: 10px;
 }
 
-.overview .card p {
+.delivery-overview .card p {
   font-size: 16px;
 }
 
-.card.fail {
-  background-color: #EEE8AA;
+.card.delivery-fail {
+  background-color: #f8f9fa;
+  padding: 20px;
+  flex: 1;
+  text-align: center;
+  margin-right: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
 }
 
-.card.total-orders{
-  background-color: #A1A7FF;
+.card.delivery-total-orders{
+  background-color: #f8f9fa;
+  padding: 20px;
+  flex: 1;
+  text-align: center;
+  margin-right: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
 }
 
-.card.delivering {
-  background-color: #C4D0BA;
+.card.delivery-delivering {
+  background-color: #f8f9fa;
+  padding: 20px;
+  flex: 1;
+  text-align: center;
+  margin-right: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
 }
 
-.card.approving {
-  background-color: #A1A7FF;
+.card.delivery-approving {
+  background-color: #f8f9fa;
+  padding: 20px;
+  flex: 1;
+  text-align: center;
+  margin-right: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
 }
 
-.ongoing-delivery {
+.delivery-ongoing-delivery {
   display: flex;
   gap: 20px;
 }
 
-.ongoing-delivery h2 {
+.delivery-ongoing-delivery h2 {
   font-size: 20px;
   margin-bottom: 20px;
+  margin-left:-910px;
 }
 
 .delivery-list {
