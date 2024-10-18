@@ -97,4 +97,25 @@ public class PaymentService {
         log.info("Extracted vnp_TxnRef: {}", vnpTxnRef);
         return vnpTxnRef;
     }
+
+    public PaymentDTO.VNPayResponse handlePayCallback(String vnpTxnRef, String status) {
+        try {
+            OrderDTO orderDTO = orderService.getOrderByVnpTxnRef(vnpTxnRef);
+
+            if ("00".equals(status)) {
+                orderService.updatePaymentStatus(orderDTO.getOrderId(), true);
+                orderService.updateOrderStatus(orderDTO.getOrderId(), 1);
+                return new PaymentDTO.VNPayResponse("00", "Success", "http://localhost:3000/checkout");
+            } else {
+                orderService.updateOrderStatus(orderDTO.getOrderId(), 0);
+                return new PaymentDTO.VNPayResponse("01", "Failed", null);
+            }
+        } catch (OrderNotFoundException e) {
+            log.warn("No order found for vnpTxnRef: {}", vnpTxnRef);
+            return new PaymentDTO.VNPayResponse("404", "Order not found", null);
+        } catch (Exception e) {
+            log.error("Error processing VNPay callback for vnpTxnRef: {}: {}", vnpTxnRef, e.getMessage());
+            return new PaymentDTO.VNPayResponse("500", "Internal Server Error", null);
+        }
+    }
 }

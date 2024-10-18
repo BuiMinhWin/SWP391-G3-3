@@ -49,30 +49,19 @@ public class PaymentController {
         );
     }
 
-    // Endpoint GET để xử lý callback từ VNPay
     @GetMapping("/vn-pay-callback")
     public ResponseObject<PaymentDTO.VNPayResponse> payCallbackHandler(HttpServletRequest request) {
         String status = request.getParameter("vnp_ResponseCode");
-//        String vnpTxnRef = request.getParameter("vnp_TxnRef");
         String vnpTxnRef = paymentService.extractAndLogTxnRef(request);
 
         log.debug("Received VNPay callback for vnpTxnRef: {} with status: {}", vnpTxnRef, status);
-        try {
-            OrderDTO orderDTO = orderService.getOrderByVnpTxnRef(vnpTxnRef);
+        PaymentDTO.VNPayResponse response = paymentService.handlePayCallback(vnpTxnRef, status);
 
-            if ("00".equals(status)) {
-                orderService.updateOrderStatus(orderDTO.getOrderId(), 1);
-                return new ResponseObject<>(HttpStatus.OK, "Success", new PaymentDTO.VNPayResponse("00", "Success", ""));
-            } else {
-                orderService.updateOrderStatus(orderDTO.getOrderId(), 0);
-                return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Failed", null);
-            }
-        } catch (OrderNotFoundException e) {
-            log.warn("No order found for vnpTxnRef: {}", vnpTxnRef);
-            return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Order not found", null);
-        } catch (Exception e) {
-            log.error("Error processing VNPay callback for vnpTxnRef: {}: {}", vnpTxnRef, e.getMessage());
-            return new ResponseObject<>(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", null);
+        if ("00".equals(response.getCode())) {
+            return new ResponseObject<>(HttpStatus.OK, "Success", response);
+        } else {
+            return new ResponseObject<>(HttpStatus.BAD_REQUEST, response.getMessage(), null);
         }
     }
+
 }

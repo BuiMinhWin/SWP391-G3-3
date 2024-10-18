@@ -8,8 +8,5 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, String> {
-    Optional<Order> findByOrderId(String orderId);
     Optional<Order> findByVnpTxnRef(String vnpTxnRef);
-    @Query("SELECT o.vnpTxnRef FROM Order o WHERE o.orderId = :orderId")
-    Optional<String> findVnpTxnRefByOrderId(@Param("orderId") String orderId);
 }

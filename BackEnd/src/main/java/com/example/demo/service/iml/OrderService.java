@@ -57,10 +57,10 @@ public class OrderService {
 
         if (order.getStatus() < 0 || order.getStatus() > 1) {
             order.setStatus(STATUS_CANCELLED);
-            logger.debug("Order status was 0", STATUS_CANCELLED);
+            logger.debug("Order status was invalid, set to: {}", STATUS_CANCELLED);
         }
 
-//        order.setPaymentStatus(0);
+        order.setPaymentStatus(false);
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
 
@@ -274,6 +274,14 @@ public class OrderService {
             log.warn("Order not found with orderId: {}", orderId);
             throw new OrderNotFoundException("Order not found with orderId: " + orderId);
         });
+    }
+
+    public void updatePaymentStatus(String orderId, boolean paymentStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found for orderId: " + orderId));
+
+        order.setPaymentStatus(paymentStatus);
+        orderRepository.save(order);
     }
 
 }
