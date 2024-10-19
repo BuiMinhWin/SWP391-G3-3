@@ -95,60 +95,38 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
-        if (order.getStatus() == STATUS_CANCELLED) {
-
-            if (orderDTO.getOrderDate() != null) {
-                order.setOrderDate(orderDTO.getOrderDate());
-                logger.debug("Updated orderDate to: {}", orderDTO.getOrderDate());
-            }
-
-            if (orderDTO.getShippedDate() != null) {
-                order.setShippedDate(orderDTO.getShippedDate());
-                logger.debug("Updated shippedDate to: {}", orderDTO.getShippedDate());
-            }
-
-            if (orderDTO.getOrigin() != null) {
-                order.setOrigin(orderDTO.getOrigin());
-                logger.debug("Updated origin to: {}", orderDTO.getOrigin());
-            }
-
-            if (orderDTO.getDestination() != null) {
-                order.setDestination(orderDTO.getDestination());
-                logger.debug("Updated destination to: {}", orderDTO.getDestination());
-            }
-
-            if (orderDTO.getFreight() != null) {
-                order.setFreight(orderDTO.getFreight());
-                logger.debug("Updated freight to: {}", orderDTO.getFreight());
-            }
-
-            if (orderDTO.getTotalPrice() != 0) {
-                order.setTotalPrice(orderDTO.getTotalPrice());
-                logger.debug("Updated totalPrice to: {}", orderDTO.getTotalPrice());
-            }
-
-            if (orderDTO.getAccountId() != null) {
-                Account account = accountRepository.findById(orderDTO.getAccountId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + orderDTO.getAccountId()));
-                order.setAccount(account);
-                logger.debug("Updated account to: {}", account.getAccountId());
-            }
-
-            if (orderDTO.getPostalCode() != null) {
-                order.setPostalCode(orderDTO.getPostalCode());
-                logger.debug("Updated postalCode to: {}", orderDTO.getPostalCode());
-            }
-
-            order.setStatus(STATUS_PROCESSING);
-            Order updatedOrder = orderRepository.save(order);
-            logger.info("Order with ID: {} has been updated and status set to {} (Processing).", orderId, STATUS_PROCESSING);
-
-            return orderMapper.mapToOrderDTO(updatedOrder);
-        } else {
+        if (order.getStatus() != STATUS_CANCELLED) {
             logger.warn("Attempted to update an order that is not canceled with ID: {}", orderId);
             throw new IllegalStateException("Order can only be updated if it is canceled.");
         }
+
+        updateOrderFields(order, orderDTO);
+
+        order.setStatus(STATUS_PROCESSING);
+        Order updatedOrder = orderRepository.save(order);
+
+        logger.info("Order with ID: {} has been updated and status set to Processing.", orderId);
+
+        return orderMapper.mapToOrderDTO(updatedOrder);
     }
+
+    private void updateOrderFields(Order order, OrderDTO orderDTO) {
+        Optional.ofNullable(orderDTO.getOrderDate()).ifPresent(order::setOrderDate);
+        Optional.ofNullable(orderDTO.getShippedDate()).ifPresent(order::setShippedDate);
+        Optional.ofNullable(orderDTO.getOrigin()).ifPresent(order::setOrigin);
+        Optional.ofNullable(orderDTO.getDestination()).ifPresent(order::setDestination);
+        Optional.ofNullable(orderDTO.getFreight()).ifPresent(order::setFreight);
+        if (orderDTO.getTotalPrice() != 0) {
+            order.setTotalPrice(orderDTO.getTotalPrice());
+        }
+        Optional.ofNullable(orderDTO.getAccountId()).ifPresent(accountId -> {
+            Account account = accountRepository.findById(accountId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + accountId));
+            order.setAccount(account);
+        });
+        Optional.ofNullable(orderDTO.getPostalCode()).ifPresent(order::setPostalCode);
+    }
+
 
     public List<OrderDTO> getAllOrders() {
         logger.info("Fetching all orders.");
@@ -204,22 +182,28 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
-        if (newStatus < 0 || newStatus > 5) { // Ensure valid status range
-            newStatus = STATUS_PROCESSING; // Default to Processing
-            logger.info("Invalid status provided. Status automatically set to Processing (2).");
-        }
+        newStatus = validateStatus(newStatus);
 
         order.setStatus(newStatus);
         Order updatedOrder = orderRepository.save(order);
 
-        switch (newStatus) {
+        handleStatusSpecificLogic(order, newStatus);
+
+        return orderMapper.mapToOrderDTO(updatedOrder);
+    }
+
+    private int validateStatus(int newStatus) {
+        if (newStatus < STATUS_CANCELLED || newStatus > STATUS_DELIVERED) {
+            logger.info("Invalid status provided. Defaulting to Processing.");
+            return STATUS_PROCESSING;
+        }
+        return newStatus;
+    }
+
+    private void handleStatusSpecificLogic(Order order, int status) {
+        switch (status) {
             case STATUS_CANCELLED:
-                logger.info("Order status updated to Canceled.");
-                String vnpTxnRef = order.getVnpTxnRef();
-                String accountId = order.getAccount().getAccountId();
-                double refundAmount = order.getTotalPrice();
-                logger.info("Refund of {} has been processed for Order ID: {}, vnpTxnRef: {} of Account ID: {}",
-                        refundAmount, orderId, vnpTxnRef, accountId);
+                processRefund(order);
                 break;
             case STATUS_PENDING:
                 logger.info("Order status updated to Pending.");
@@ -237,12 +221,19 @@ public class OrderService {
                 logger.info("Order status updated to Delivered.");
                 break;
             default:
-                logger.warn("Order status updated to an unrecognized status: {}", newStatus);
+                logger.warn("Order status updated to an unrecognized status: {}", status);
                 break;
         }
-
-        return orderMapper.mapToOrderDTO(updatedOrder);
     }
+
+    private void processRefund(Order order) {
+        String vnpTxnRef = order.getVnpTxnRef();
+        String accountId = order.getAccount().getAccountId();
+        double refundAmount = order.getTotalPrice();
+        logger.info("Refund of {} has been processed for Order ID: {}, vnpTxnRef: {} of Account ID: {}",
+                refundAmount, order.getOrderId(), vnpTxnRef, accountId);
+    }
+
 
     public OrderDTO getOrderByVnpTxnRef(String vnpTxnRef) {
         return orderRepository.findByVnpTxnRef(vnpTxnRef)
