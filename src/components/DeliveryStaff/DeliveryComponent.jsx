@@ -7,6 +7,7 @@
   import { listOrder,getOrderDetail } from '../../services/DeliveryService';
   import { logout } from '../Member/auth'; 
   import { FaSearch } from "react-icons/fa";
+  import { FaRegCalendarAlt } from "react-icons/fa";
   import { FiHome } from "react-icons/fi";
   import { IoSettingsOutline } from "react-icons/io5";
   import { MdSupportAgent} from "react-icons/md";
@@ -15,10 +16,11 @@
   import { FaRegMessage } from "react-icons/fa6";
   import { CgProfile } from "react-icons/cg";
   import { CiLogout } from "react-icons/ci";
+  import { FaTruckFast } from "react-icons/fa6";
+  import { FiAlertTriangle } from "react-icons/fi";
+  import { FaRegRectangleList } from "react-icons/fa6";
+  import { FaBoxesStacked } from "react-icons/fa6";
   
-
-  
-
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler );
 
   
@@ -53,7 +55,7 @@
     const [currentPage, setCurrentPage] = useState(1);  // Trang hiện tại
     const ordersPerPage = 10; 
   
-    const [isDropdownOpen, setDropdownOpen] = useState(false); 
+    const [isDropdownOpen, setDropdownOpen] = useState(true); //drop down
   
     
     const getOrderCounts = () => {
@@ -70,7 +72,7 @@
       };
     };
 
-    const { totalOrders, delivering, delivered, fail } = getOrderCounts();
+    const { totalOrders, delivering, approving, fail } = getOrderCounts();
     
 
     useEffect(() => {
@@ -198,7 +200,7 @@
       const matchesMonth = monthFilter ? orderMonth === parseInt(monthFilter) : true;
       const matchesProvince = provinceFilter ? order.destination.includes(provinceFilter) : true;
       const matchesStatus = statusFilter ? order.status === parseInt(statusFilter) : true;
-      const matchesTransportation = transportationFilter ? order.freight === transportationFilter : true;
+      const matchesTransportation = transportationFilter ? order.orderNote === transportationFilter : true;
   
       return matchesMonth && matchesProvince && matchesStatus && matchesTransportation;
     });
@@ -223,7 +225,7 @@
                   <p className="KoiDeli ">Koi Deli</p>
                 </div>
               </div>
-              <hr className="logo-separator" /> 
+              {/* <hr className="logo-separator" />  */}
               {/* border */}
               
             </div>
@@ -239,16 +241,22 @@
               <a href="/"><i className="bi bi-speedometer2 me-2"> <FiHome /> </i>  Homepage</a>
           </li>
 
-          <li>
-            <a href="#"><i className="bi bi-chat-dots me-2"> <FaRegMessage/> </i>  Messages</a>
-          </li>
+          
 
           <li>
             <a href="/orders"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Orders</a>
           </li>
 
           <li>
+            <a href="#"><i className="bi bi-chat-dots me-2"><FaRegCalendarAlt /></i> Calendar</a>
+           </li>
+
+          <li>
             <a href="#"><i className="bi bi-life-preserver me-2"><MdSupportAgent /></i> Help & Support</a>
+          </li>
+
+          <li>
+            <a href="#"><i className="bi bi-chat-dots me-2"> <FaRegMessage/> </i>  Messages</a>
           </li>
 
           <li>
@@ -261,8 +269,9 @@
           </aside>
 
           <main className="dashboard ">
-          <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-4">
-              <h1>Dashboard</h1>
+          <header className="d-flex justify-content-between align-items-center mb-4 border-bottom ">
+              <h1>Delivery Orders</h1> 
+              {/* <h6>Delivery Orders</h6>          */}
               <header className="d-flex justify-content-between align-items-center mb-4 ">
               <div className="header-content" style={{ width: '%' }}> 
               <div className="d-flex align-items-center justify-content-center search-container">
@@ -297,25 +306,28 @@
             </header>
 
             </header>
-
-            <section className="overview">
-              <div className="card total-orders">
-                <h3>Total Orders</h3>
+               
+            <section className="delivery-overview">
+              <div className="card delivery-total-orders">
+                <h3>Total Orders <FaBoxesStacked /></h3>
+                
                 <p>{totalOrders}</p>
               </div>
 
-              <div className="card delivering">
-                <h3>Delivering</h3>
+              <div className="card delivery-delivering">
+                <h3>Delivering  <FaTruckFast /> </h3>
+                
                 <p>{delivering}</p>
               </div>
 
-              <div className="card approving">
-                <h3>Approving</h3>
-                <p>{delivered}</p>
+              <div className="card delivery-approving">
+                <h3>Approving <FaRegRectangleList /> </h3>
+                
+                <p>{approving}</p>
               </div>
                 
-              <div className="card fail">
-                <h3>Fail</h3>
+              <div className="card delivery-fail">
+                <h3>Delivery Issue <FiAlertTriangle /></h3>
                 <p>{fail}</p>
               </div>
             </section>
@@ -357,9 +369,9 @@
             </section>
   )}
 
-            <section className="ongoing-delivery mt-4 d-flex border-top pt-3">
+            <section className="delivery-ongoing-delivery mt-4 d-flex border-top pt-3">
             <div className="delivery-list col-12 " >
-                <h2>List of Orders</h2>
+                <h2>Delivery Report</h2>
 
                 <div className="filter-bar d-flex mb-3">
                   <select className="form-select me-2" value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)}>
@@ -387,11 +399,14 @@
                    
                   </select>
                   <select className="form-select me-2" value={transportationFilter} onChange={(e) => setTransportationFilter(e.target.value)}>
-                    <option value="">All Transport</option>
+                    {/* <option value="">All Transport</option>
                     <option value="Truck">Truck</option>
                     <option value="Van">Van</option>
                     <option value="car">Car</option>
-                    
+                     */}
+                    <option value= "">Method Transport</option>
+                    <option value= "Giao hàng khẩn cấp">Express Delivery</option>
+                    <option value= "Giao hàng tiêu chuẩn">Regular Delivery</option>
                   </select>
 
                   
@@ -409,12 +424,12 @@
                   <thead>
                     <tr>
                     <th>OrderId</th>
-                    <th>Destination</th>
-                    <th>Freight</th>
                     <th>OrderDate</th>
+                    <th>Destination</th>
                     <th>ShipDate</th>
-                    <th>TotalPrice</th>
+                    {/* <th>TotalPrice</th> */}
                     <th>Origin</th>
+                    <th>Freight</th>
                     <th>Status</th>
                     <th></th>
                     </tr>
@@ -424,12 +439,12 @@
                     currentOrders.map((order) => (
                       <tr key={order.orderId}>
                         <td>{order.orderId}</td>
+                        <td>{new Date(order.orderDate).toLocaleDateString()}</td>
                         <td>{order.destination}</td>
-                        <td>{order.freight}</td>
-                        <td>{order.orderDate}</td>
-                        <td>{order.shippedDate}</td>
-                        <td>{order.totalPrice}</td>
+                        <td>{new Date(order.shippedDate).toLocaleDateString() }</td>
+                        {/* <td>{order.totalPrice}</td> */}
                         <td>{order.origin}</td>
+                        <td>{order.freight}</td>
                         <td>{order.status}</td>
                         <td>
                           <button onClick={() => handleViewOrder(order.orderId)}>View</button>
