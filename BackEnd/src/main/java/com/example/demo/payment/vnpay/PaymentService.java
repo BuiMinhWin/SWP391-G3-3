@@ -31,7 +31,7 @@ public class PaymentService {
             }
 
             // Lấy thông tin đơn hàng
-            OrderDTO orderDTO = orderService.getOrderByIdV2(orderId); // Đảm bảo phương thức này đã được sửa đúng cách
+            OrderDTO orderDTO = orderService.getOrderByIdV2(orderId);
             log.info("Total price for orderId {}: {} VND", orderId, orderDTO.getTotalPrice());
 
             // Tính toán số tiền
@@ -46,6 +46,9 @@ public class PaymentService {
             }
 
             vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
+
+            // Use the fixed return URL
+            vnpParamsMap.put("vnp_ReturnUrl", "http://localhost:3000/payment-outcome");
 
             // Tạo vnp_TxnRef mới bằng UUID
             String vnpTxnRef = UUID.randomUUID().toString();
@@ -71,18 +74,6 @@ public class PaymentService {
                     .message("Payment URL created successfully")
                     .paymentUrl(paymentUrl)
                     .build();
-        } catch (NumberFormatException e) {
-            log.error("Invalid amount format for orderId {}: {}", orderId, e.getMessage());
-            return PaymentDTO.VNPayResponse.builder()
-                    .code("400")
-                    .message("Invalid amount format")
-                    .build();
-        } catch (OrderNotFoundException e) {
-            log.error("Order not found for orderId {}: {}", orderId, e.getMessage());
-            return PaymentDTO.VNPayResponse.builder()
-                    .code("404")
-                    .message(e.getMessage())
-                    .build();
         } catch (Exception e) {
             log.error("Error while creating VNPay payment for orderId {}: {}", orderId, e.getMessage());
             return PaymentDTO.VNPayResponse.builder()
@@ -105,7 +96,7 @@ public class PaymentService {
             if ("00".equals(status)) {
                 orderService.updatePaymentStatus(orderDTO.getOrderId(), true);
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 1);
-                return new PaymentDTO.VNPayResponse("00", "Success", "http://localhost:3000/checkout");
+                return new PaymentDTO.VNPayResponse("00", "Success", "http://localhost:3000/payment-outcome");
             } else {
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 0);
                 return new PaymentDTO.VNPayResponse("01", "Failed", null);

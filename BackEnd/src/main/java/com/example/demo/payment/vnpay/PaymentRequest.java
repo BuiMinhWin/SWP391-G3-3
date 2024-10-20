@@ -8,4 +8,5 @@ import lombok.Setter;
 public class PaymentRequest {
     private String orderId;
     private String bankCode;
+    private String returnURL;
 }
