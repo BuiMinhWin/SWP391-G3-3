@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Divider,
-  Grid,
-  InputAdornment,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Box, Grid, InputAdornment, Paper, Typography } from "@mui/material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import TextFieldWrapper from "../FromUI/Textfield";
@@ -15,13 +8,10 @@ import countries from "../../data/countries.json";
 import ButtonWrapper from "../FromUI/Button";
 import koi_type from "../../data/koiTypes.json";
 import koi_name from "../../data/koiVarieties.json";
-import { createOrder } from "../../services/CustomerService";
-import {
-  createDocument,
-  createOrderDetail,
-} from "../../services/CustomerService";
-import SideBar from "../SideBar/SideBar";
-import HeaderBar from "../Header/Header/Nguyen";
+import { createOrder, order, uploadDocument } from "../../services/CustomerService";
+import { createOrderDetail } from "../../services/CustomerService";
+// import SideBar from "../SideBar/SideBar";
+// import HeaderBar from "../Header/Header/Nguyen";
 import RadioGroupWrapper from "../FromUI/RadioGroup";
 import CustomRadioGroup from "../FromUI/CustomRadioGroup";
 import AccessibleIcon from "@mui/icons-material/Accessible";
@@ -29,21 +19,25 @@ import AccessibleForwardIcon from "@mui/icons-material/AccessibleForward";
 import FileUpload from "../FromUI/FileUpload";
 import CheckboxWrapper from "../FromUI/Checkbox";
 import { useNavigate } from "react-router-dom";
+import 'mapbox-gl/dist/mapbox-gl.css';
+import axios from "axios";
+
 
 // Initial Form State
 const INITIAL_FORM_STATE = {
   origin: "",
-  cityS: "", //
-  cityR: "", //
+  cityS: "",
+  cityR: "",
   destination: "",
+  distance: "",
   receiverName: "",
   senderName: "",
   receiverAddress: "",
   senderAddress: "",
   receiverPhone: "",
   senderPhone: "",
-  postalCodeS: "", // Use string for postal codes
-  postalCodeR: "", // Use string for postal codes
+  postalCodeS: "",
+  postalCodeR: "",
   receiverNote: "",
   senderNote: "",
   orderNote: "",
@@ -56,6 +50,7 @@ const INITIAL_FORM_STATE = {
   weight: 0.0,
   freight: "",
   additional_service: "",
+  
 };
 
 // Validation Schema with Yup
@@ -92,37 +87,60 @@ const FORM_VALIDATION = Yup.object().shape({
     .required("Vui lòng nhập cân nặng"),
   freight: Yup.string().required("Vui lòng chọn phương thức vận chuyển"),
   additional_service: Yup.string().nullable(),
-  document_file: Yup.mixed()
-    .required("A PDF file is required")
-    .test("fileType", "Only PDF files are allowed", (value) => {
-      return value && value.type === "application/pdf";
-    })
-    .test("fileSize", "File size is too large", (value) => {
-      return value && value.size <= 8 * 1024 * 1024; // 8 MB limit
-    }),
   termsOfService: Yup.boolean()
     .oneOf([true], "The terms and conditions must be accepted.")
     .required("The terms and conditions must be accepted."),
+  document_file: Yup.mixed()
+    .required("A file is required")
+    .test(
+      "fileSize",
+      "File size must be less than 8MB",
+      (value) => value && value.size <= 8 * 1024 * 1024
+    )
+    .test(
+      "fileFormat",
+      "Only PDF file are allowed",
+      (value) => value && value.type === "application/pdf"
+    ),
 });
 
+
+
 const OrderForm = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
   return (
     <Formik
       initialValues={INITIAL_FORM_STATE}
       validationSchema={FORM_VALIDATION}
       onSubmit={async (values, { setSubmitting, setErrors }) => {
-        console.log("Form values before submission:", values); // Debugging log
-
-        const accountId = localStorage.getItem("accountId");
-        console.log("Account ID:", accountId);
-
         try {
+          const accountId = localStorage.getItem("accountId");
+          const senderAddress = `${values.origin}`;
+          const receiverAddress = `${values.destination}`;
+
+          const senderCoordinatesResponse = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(senderAddress)}.json?access_token=pk.eyJ1IjoiYm10aGFuZzIwMDQiLCJhIjoiY20xdWJsYTV2MGF4bDJybXlmdHVnZ2k3cyJ9.08eXbVTzmWjVZp4NhGnoVw`);
+          const senderCoordinates = senderCoordinatesResponse.data.features[0].center;
+
+          const receiverCoordinatesResponse = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(receiverAddress)}.json?access_token=pk.eyJ1IjoiYm10aGFuZzIwMDQiLCJhIjoiY20xdWJsYTV2MGF4bDJybXlmdHVnZ2k3cyJ9.08eXbVTzmWjVZp4NhGnoVw`);
+          const receiverCoordinates = receiverCoordinatesResponse.data.features[0].center;
+
           const orderData = {
             ...values,
             accountId,
             origin: `${values.origin}, ${values.cityS}, ${values.postalCodeS}`,
-            destination: `${values.destinations}, ${values.cityR}, ${values.postalCodeR}`,
+            destination: `${values.destination}, ${values.cityR}, ${values.postalCodeR}`,
             freight: values.freight,
             receiverName: values.receiverName,
             senderName: values.senderName,
@@ -131,20 +149,23 @@ const OrderForm = () => {
             receiverNote: values.receiverNote,
             senderNote: values.senderNote,
             orderNote: values.orderNote,
+            distance : calculateDistance(senderCoordinates[1], senderCoordinates[0], receiverCoordinates[1], receiverCoordinates[0]),
           };
+          
+          const orderResponse = await createOrder(orderData);
+          if (!orderResponse?.orderId) {
+            throw new Error("Order ID not found in the response");
+          }
 
-          console.log("Order data ready for submission:", orderData); // Debugging log
-          const response = await createOrder(orderData);
-          const newOrderId = response.orderId;
+          const newOrderId = orderResponse.orderId;
+          console.log("Order created with ID:", newOrderId);
 
-          // document
-          const documentData = {
-            orderId: newOrderId,
-            document_file: [values.document_file],
-          };
-          const documentResponse = await createDocument(documentData);
+          const uploadResponse = await uploadDocument(values.document_file, newOrderId);
+          console.log('File uploaded successfully:', uploadResponse);
 
-          //order detail
+          const orderDetails = await order(newOrderId);
+          console.log("Order Details:", orderDetails);
+
           const orderDetailData = {
             orderId: newOrderId,
             quantity: Number(values.quantity),
@@ -154,14 +175,15 @@ const OrderForm = () => {
             koiType: values.koi_type,
           };
           const orderDetailResponse = await createOrderDetail(orderDetailData);
+          console.log(
+            "Order detail created successfully:",
+            orderDetailResponse
+          );
 
-          //check log
           console.log("Order created successfully with ID:", newOrderId);
-          console.log("Order created successfully");
-
           navigate("/checkout", { state: { orderId: newOrderId } });
-          // Navigate on success
         } catch (error) {
+          alert("Upload failed, please try again");
           console.error("Error creating order:", error);
           setErrors({ submit: error.message });
         } finally {
@@ -170,35 +192,14 @@ const OrderForm = () => {
       }}
       validateOnMount={true}
     >
-      {({ handleSubmit, isValid, errors }) => {
+      {({ handleSubmit, errors }) => {
         console.log("Validation errors:", errors); // Log validation errors
 
         return (
           <Form onSubmit={handleSubmit}>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
-              component={"body"}
-            >
-              <Box
-                sx={{
-                  height: "64px",
-                  bgcolor: "primary.main",
-                  display: "flex",
-                  alignItems: "center",
-                  p: 2,
-                }}
-              >
-                <HeaderBar />
-              </Box>
-
-              {/* Sidebar + Content Container */}
-              <Box sx={{ display: "flex", flex: 1 }}>
-                <Box>
-                  <SideBar />
-                </Box>
-
                 {/* Content */}
-                <Box sx={{ flex: 1, p: 3, bgcolor: "#eeeeee" }}>
+                <>
+                <Box sx={{ p: 4, bgcolor: "#eeeeee" }}>
                   {/* Paper 1: Receiver Information */}
                   <Paper elevation={4} sx={{ padding: "20px" }}>
                     <Typography variant="h6" gutterBottom>
@@ -415,12 +416,9 @@ const OrderForm = () => {
                     legend="Terms Of Service"
                     label="I agree"
                   />
-                  <ButtonWrapper disabled={!isValid}>
-                    Submit Order
-                  </ButtonWrapper>
+                  <ButtonWrapper>Submit Order</ButtonWrapper>
                 </Box>
-              </Box>
-            </Box>
+                </>
           </Form>
         );
       }}

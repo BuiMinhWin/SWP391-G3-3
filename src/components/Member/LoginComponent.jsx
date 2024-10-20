@@ -5,11 +5,11 @@
   import { loginAccount, googleLogin } from '../../services/EmployeeService';  
   import * as jwtJsDecode from 'jwt-js-decode';
 
-  const LoginComponent = ({ handleLogin }) => {
+  const LoginComponent = () => {
     const [userName, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
-    const [roleId, setRoleId] = useState('');
+    // const [roleId, setRoleId] = useState('');
     
     const navigate = useNavigate();
 
@@ -21,10 +21,7 @@
         const response = await loginAccount(loginData);
         console.log("API Response:", response);
         
-
         const result = response.data;
-        localStorage.setItem('accountId', result.accountId);
-        console.log("Account ID: ", localStorage.getItem('accountId'));
         localStorage.setItem('roleId', result.roleId);
         console.log("Role ID:", result.roleId);
 
@@ -84,11 +81,11 @@
             createAt = result.createAt || new Date().toISOString();
             localStorage.setItem('createAt', createAt);
           }
-    
-          console.log("Role ID:", result.roleId);
-          localStorage.setItem('accountId', result.accountId);
-          console.log("Account ID: ", localStorage.getItem('accountId'));
+          
           localStorage.setItem('userRole', result.roleId);
+          console.log("Role ID:", result.roleId);
+        
+          
           if (result.roleId === 'Customer') {
             navigate('/customer');
           } else {

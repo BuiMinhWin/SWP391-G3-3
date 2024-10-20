@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const ListOrderComponent = () => {
   const [orders, setOrders] = useState([]);
   const [editedStatuses, setEditedStatuses] = useState({});
-  const [orderDetail, setOrderDetail] = useState(null); // Lưu chi tiết đơn hàng ở đây
+  // const [orderDetail, setOrderDetail] = useState(null); // Lưu chi tiết đơn hàng ở đây
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,11 +55,23 @@ const ListOrderComponent = () => {
     navigate(`/order/${orderId}`);
   };
 
+  const roleId = localStorage.getItem('roleId'); 
+
+  const handleBackClick = () => {
+    if (roleId === 'Manager') {
+      navigate('/manager'); // Điều hướng cho manager
+    }  else if (roleId === 'Delivery') {
+      navigate('/delivery'); // Điều hướng cho delivery
+    } else {
+      navigate('/'); // Điều hướng về homepage
+    }
+  };
+
   return (
     <div className="container">
        <button
         type="button"
-        onClick={() => navigate('/delivery')}
+        onClick={handleBackClick}
         style={{
           background: 'none',
           border: 'none',

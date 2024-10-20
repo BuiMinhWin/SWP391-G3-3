@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Line,Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler  } from 'chart.js';
-import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Manager.css';
 import { FiHome, FiUsers } from "react-icons/fi";
@@ -15,11 +14,15 @@ import { useNavigate } from 'react-router-dom';
 // import ProfileComponent from '../Member/ProfileComponent';
 import { listOrder } from '../../services/DeliveryService';
 import { listAccount } from '../../services/EmployeeService';
+import { CiLogout } from "react-icons/ci";
+import { IoIosNotificationsOutline } from "react-icons/io";
+  
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler );
 const ManagerComponent = () => {
   const [orders, setOrders] = useState([]);
   const [stats, setStats] = useState({
+    
     totalCustomers: 0,
     totalEmployees: 0,
     totalOrders: 0,
@@ -29,6 +32,10 @@ const ManagerComponent = () => {
     logout(); 
     navigate('/'); 
   };
+  const [isDropdownOpen, setDropdownOpen] = useState(true); 
+  const toggleDropdown = () => {
+    setDropdownOpen(!isDropdownOpen);
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,42 +90,43 @@ const ManagerComponent = () => {
 
   
     return [
-      // statusCounts[0] || 0,
+      statusCounts[0] || 0,
       statusCounts[1] || 0,
       statusCounts[2] || 0,
       statusCounts[3] || 0,
       statusCounts[4] || 0,
-      // statusCounts[5] || 0,
+      statusCounts[5] || 0,
     ];
   };
-  const ordersByStatusChartData = {
-    labels: ['Status 1', 'Status 2', 'Status 3', 'Status 4'], 
-    datasets: [
-      {
-        label: 'Number of Orders by Status', 
-        data: getStatusCounts(), 
-        backgroundColor: 'rgba(75, 192, 192, 0.2)', 
-        borderColor: 'rgba(75, 192, 192, 1)', 
-        borderWidth: 2, 
-        fill: true, 
-      },
-    ],
-  };
+
+ const ordersByStatusChartData = {
+      labels: ['Status 1', 'Status 2', 'Status 3', 'Status 4','Status 5'], 
+      datasets: [
+        {
+          label: 'Number of Orders by Status', 
+          data: getStatusCounts(), 
+          backgroundColor: 'rgba(75, 192, 192, 0.2)', 
+          borderColor: 'rgba(75, 192, 192, 1)', 
+          borderWidth: 2, 
+          fill: true, 
+        },
+      ],
+    };
 
   const chartOptions = {
     scales: {
-      y: {
-        ticks: {
-          stepSize: 1, 
-          beginAtZero: true, 
+          y: {
+            ticks: {
+              stepSize: 1,
+              beginAtZero: true,
+            },
+            min: 0,
+            max: Math.max(...getStatusCounts()) + 1, 
+          },
         },
-        min: 0, 
-        max: 6, 
-      },
-    },
   };
   const ordersByStatusPieData = {
-    labels: ['Status 1', 'Status 2', 'Status 3', 'Status 4'],
+    labels: ['Status 1', 'Status 2', 'Status 3', 'Status 4','Status 5'],
     datasets: [
       {
         label: 'Orders by Status',
@@ -127,13 +135,15 @@ const ManagerComponent = () => {
           'rgba(255, 99, 132, 0.2)',
           'rgba(54, 162, 235, 0.2)',
           'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
+          'rgba(255, 69, 0, 0.2)',
+          'rgba(25, 171, 90, 0.2)',
         ],
         borderColor: [
           'rgba(255, 99, 132, 1)',
           'rgba(54, 162, 235, 1)',
           'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
+          'rgba(255, 69, 0, 1)',
+          'rgba(25, 192, 172, 1)',
         ],
         borderWidth: 1,
       },
@@ -143,7 +153,7 @@ const ManagerComponent = () => {
   return (
     <div className="container-fluid">
       <div className="row">
-         <aside className="sidebar col-2 p-3 border-end">
+         <aside className="sidebar col-2 p-3">
           <div className='manager-sidebar'>
           <div className="profile-container text-center mb-4">
             <div className="SideKoi d-flex align-items-center justify-content-between">
@@ -152,8 +162,7 @@ const ManagerComponent = () => {
                 <p className="KoiDeli mb-0">Koi Deli</p>
               </div>
             </div>
-            <hr className="logo-separator" />
-            
+          
           </div>
           <nav>
       <ul className="list-unstyled">
@@ -180,7 +189,7 @@ const ManagerComponent = () => {
           </li>
 
           <li>
-            <a href="/accounts"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Orders</a>
+            <a href="/orders"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Orders</a>
           </li>
 
         </div>
@@ -215,63 +224,68 @@ const ManagerComponent = () => {
         </aside>
 
         <main className="dashboard col-10 p-4">
-        <header className="admin d-flex justify-content-between align-items-center mb-4 border-bottom pb-5">
+        <header className="admin d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
             <h1>Admin page</h1>
             
-            <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-            <div className="d-flex align-items-center search-container" style={{ flex: 1 }}>
-              <input type="text" className="form-control me-2" placeholder="Search..." style={{ width: '100%' }} />
+            <header className="d-flex justify-content-between align-items-center mb-4  pb-2">
+            <div className="d-flex align-items-center search-container">
+              <input 
+              className="form-control me-5"
+              type="text"  
+              placeholder="Search..." 
+              style={{ width: '100%' }} 
+              />
             </div>
-            <div className="d-flex align-items-center">
-              {/* <select className="form-select me-2">
-                <option>ENG</option>
-                <option>FR</option>
-                <option>ES</option>
-              </select> */}
-              <Dropdown>
-                <Dropdown.Toggle variant="secondary" id="dropdown-basic" className="profile-dropdown">
-                  <img src="/Delivery/User.png" alt="Profile" className="profile-img rounded-circle" style={{ width: '40px', height: '40px' }} />
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item href="user-page">View Profile</Dropdown.Item>
-                  <Dropdown.Item href="#">Update Profile</Dropdown.Item>
-                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
+
+            <div className="navbar-cus-right">
+                  <div className="dropdown" onClick={toggleDropdown}>
+                    <img src="/Delivery/User.png" alt="Avatar" className="avatar" />
+                    {isDropdownOpen && ( 
+                      <div className="dropdown-content">
+                        <a  href="user-page"><CgProfile /> View Profile</a>
+                        <a  onClick={handleLogout}><CiLogout /> Logout</a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="notification-icon m-4">
+                  <IoIosNotificationsOutline />
+                  {/* <span className="notification-text">somethinghere</span> */}
+                </div>
+              
           </header>
           </header>
 
           <section className="overview">
-            <div className="card total-shipments">
+            <div className="card total-employee">
               <h3>Total Employee</h3>
               <p>{stats.totalEmployees}</p>
               
              
             </div>
-            <div className="card total-orders">
+            <div className="card total-customers">
               <h3>Total Customers</h3>
               <p>{stats.totalCustomers}</p>
               
             </div>
-            <div className="card total-shipments">
+            <div className="card card total-orders">
               <h3>Total Orders</h3>
               <p>{stats.totalOrders}</p>
               
              
             </div>
-            <div className="card delivered">
-              <h3>Total Revenue</h3>
+            <div className="card revenue">
+              <h3>Orders Issue</h3>
               <p>Not available yet</p> 
             </div>
           </section>
 
-          <section className="ongoing-delivery mt-4 d-flex border-top pt-3">
+          <section className="ongoing-employee mt-4 d-flex border-top pt-3">
             <div className="delivery-list col-6">
               <h2>Top Delivery Staff</h2>
            
             </div>
-            <div className="delivery-map col-6">
+            <div className="sales-list col-6">
             <h2>Top Sales Staff</h2>
               
             </div>
