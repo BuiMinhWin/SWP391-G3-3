@@ -152,6 +152,25 @@ public class OrderService {
         return orderMapper.mapToOrderDTO(order);
     }
 
+    public List<OrderDTO> getOrdersByAccountId(String accountId) {
+        logger.info("Fetching orders for accountId: {}", accountId);
+
+        List<Order> orders = orderRepository.findByAccount_AccountId(accountId);
+
+        if (orders.isEmpty()) {
+            throw new ResourceNotFoundException("No orders found for accountId: " + accountId);
+        }
+
+        List<OrderDTO> orderDTOs = orders.stream()
+                .map(orderMapper::mapToOrderDTO)
+                .collect(Collectors.toList());
+
+        logger.info("Fetched {} orders for accountId: {}", orderDTOs.size(), accountId);
+
+        return orderDTOs;
+    }
+
+
     public void deleteOrder(String orderId) {
         logger.info("Deleting Order and related entities with ID: {}", orderId);
 

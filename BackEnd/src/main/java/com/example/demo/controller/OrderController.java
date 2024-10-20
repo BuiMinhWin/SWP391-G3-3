@@ -34,18 +34,18 @@ public class OrderController {
         return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
     }
 
-
-
     @PatchMapping("/cancel/{orderId}")
     public ResponseEntity<OrderDTO> cancelOrder(@PathVariable String orderId) {
         OrderDTO canceledOrder = orderService.cancelOrder(orderId);
         return new ResponseEntity<>(canceledOrder, HttpStatus.OK);
     }
+
     @PatchMapping("/update/{orderId}")
     public ResponseEntity<OrderDTO> updateOrderWhenCanceled(@PathVariable String orderId, @RequestBody OrderDTO orderDTO) {
         OrderDTO updatedOrder = orderService.updateOrderWhenCanceled(orderId, orderDTO);
         return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
     }
+
     @GetMapping
     public ResponseEntity<List<OrderDTO>> getAllOrders() {
         List<OrderDTO> orders = orderService.getAllOrders();
@@ -57,6 +57,13 @@ public class OrderController {
         OrderDTO order = orderService.getOrderById(orderId);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
+
+    @GetMapping("/account/{accountId}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByAccountId(@PathVariable String accountId) {
+        List<OrderDTO> orders = orderService.getOrdersByAccountId(accountId);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
     @PatchMapping("/updateStatus/{orderId}")
     public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable String orderId, @RequestBody UpdateStatusDTO updateStatusDTO) {
         OrderDTO updatedOrder = orderService.updateOrderStatus(orderId, updateStatusDTO.getNewStatus());
