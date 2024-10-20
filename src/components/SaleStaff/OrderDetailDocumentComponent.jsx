@@ -7,15 +7,15 @@ import { useNavigate } from 'react-router-dom';
 const OrderDetailDocumentComponent = () => {
   const { orderId } = useParams();
   const [orders, setOrders] = useState([]);
-  const [orderDetail, setOrderDetail] = useState([]); // Dùng để lưu danh sách orderDetail
+  const [orderDetail, setOrderDetail] = useState([]);
   const [editedStatuses, setEditedStatuses] = useState({});
 
   useEffect(() => {
     if (orderId) {
-      getOrderDetail(orderId) // Gọi API với orderId
+      getOrderDetail(orderId)
         .then(response => {
-          console.log(response.data); // In kết quả trả về để kiểm tra
-          setOrderDetail(response.data); // Lưu lại danh sách chi tiết đơn hàng
+          console.log(response.data);
+          setOrderDetail(response.data);
         })
         .catch(error => console.error('Error fetching order details:', error));
     } else {
@@ -27,7 +27,7 @@ const OrderDetailDocumentComponent = () => {
   useEffect(() => {
     getAllOrders();
   }, []);
-  
+
   const getAllOrders = () => {
     listOrder()
       .then((response) => {
@@ -42,23 +42,23 @@ const OrderDetailDocumentComponent = () => {
         console.error("Error fetching orders: ", error);
       });
   };
-  
+
   const handleStatusChange = (orderId, newStatus) => {
     const updatedStatuses = {
-      ...editedStatuses,  
-      [orderId]: newStatus,  
+      ...editedStatuses,
+      [orderId]: newStatus,
     };
-    setEditedStatuses(updatedStatuses); 
+    setEditedStatuses(updatedStatuses);
   };
 
   const updateOrderStatus = (orderId) => {
     const newStatus = editedStatuses[orderId] ?? orders.status;
     if (newStatus) {
       console.log('New status to update:', newStatus);
-      updateStatus(orderId, newStatus)  
+      updateStatus(orderId, newStatus)
         .then((response) => {
           console.log('Status updated successfully:', response);
-          getAllOrders();  
+          getAllOrders();
         })
         .catch((error) => {
           console.error('Error updating status:', error);
@@ -66,14 +66,14 @@ const OrderDetailDocumentComponent = () => {
     }
   };
 
-  // Lọc danh sách orders để chỉ lấy đơn hàng với orderId hiện tại
-  const currentOrder = orders.filter(order => order.orderId === orderId);
+  const currentOrder = orders.find(order => order.orderId === orderId);
 
   return (
     <div className="order-detail">
       <h2>Order Details for Order ID: {orderId}</h2>
-      
-      {orderDetail.length > 0 ? (
+
+      {/* Hiển thị thông tin kết hợp từ orderDetail và orders */}
+      {orderDetail.length > 0 && currentOrder ? (
         <table className="table table-striped">
           <thead>
             <tr>
@@ -83,70 +83,39 @@ const OrderDetailDocumentComponent = () => {
               <th>Quantity</th>
               <th>Weight</th>
               <th>Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {orderDetail.map((order) => (
-              <tr key={order.orderDetailId}>
-                <td>{order.createdAt || "N/A"}</td>
-                <td>{order.koiName || "N/A"}</td>
-                <td>{order.koiType || "N/A"}</td>
-                <td>{order.quantity || "N/A"}</td>
-                <td>{order.weight || "N/A"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <div className="order-detail-item">
-          <p>CreatedAt: N/A</p>
-          <p>KoiName: N/A</p>
-          <p>KoiType: N/A</p>
-          <p>Quantity: N/A</p>
-          <p>Weight: N/A</p>
-          <p>Status: N/A</p>
-        </div>
-      )}
-
-      {/* Hiển thị chỉ đơn hàng có orderId khớp với orderId hiện tại */}
-      <table className="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentOrder.length > 0 ? (
-            currentOrder.map(order => (
-              <tr key={order.orderId}>
-                <td>{order.orderId}</td>
-                <td>{order.status}</td>
+            {orderDetail.map((detail) => (
+              <tr key={detail.orderDetailId}>
+                <td>{detail.createdAt || "N/A"}</td>
+                <td>{detail.koiName || "N/A"}</td>
+                <td>{detail.koiType || "N/A"}</td>
+                <td>{detail.quantity || "N/A"}</td>
+                <td>{detail.weight || "N/A"}</td>
                 <td>
                   <input
                     type="text"
-                    value={editedStatuses[order.orderId] ?? order.status}
-                    onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
+                    value={editedStatuses[currentOrder.orderId] ?? currentOrder.status}
+                    onChange={(e) => handleStatusChange(currentOrder.orderId, e.target.value)}
                   />
                 </td>
                 <td>
                   <button
                     className="btn btn-info"
-                    onClick={() => updateOrderStatus(order.orderId)}
+                    onClick={() => updateOrderStatus(currentOrder.orderId)}
                   >
                     Update Status
                   </button>
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3" className="text-center">No Orders Found</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>No order details available</p>
+      )}
     </div>
   );
 };
