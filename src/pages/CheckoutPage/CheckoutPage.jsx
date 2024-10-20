@@ -94,7 +94,7 @@ const CheckoutPage = () => {
       // Accessing nested paymentUrl correctly
       const paymentUrl = response.data.data?.paymentUrl;
       console.log("Payment URL:", paymentUrl);
-      
+
       if (paymentUrl) {
         window.location.href = paymentUrl;
       } else {
@@ -200,8 +200,9 @@ const CheckoutPage = () => {
             )}
           </Grid>
 
-     
-          {(orderData.status === 0 ||  orderData.status=== 1) && (
+          {/* Actions: Cancel and Proceed to Payment */}
+          {orderData.status === 1 && (
+            <Grid item xs={12} sx={{ mt: 2 }}>
               <Button
                 variant="contained"
                 color="error"
@@ -210,8 +211,6 @@ const CheckoutPage = () => {
               >
                 Cancel Order
               </Button>
-          )}
-            {orderData.status === 1 && (
               <Button
                 variant="contained"
                 color="primary"
@@ -219,9 +218,8 @@ const CheckoutPage = () => {
               >
                 Proceed to Payment
               </Button>
-            )}
-
-          
+            </Grid>
+          )}
         </Grid>
       </Paper>
     </Box>
