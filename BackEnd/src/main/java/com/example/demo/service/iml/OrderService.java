@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +26,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OrderService {
 
+    @Autowired
+    private JavaMailSender mailSender;
+
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
@@ -31,6 +37,7 @@ public class OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final TransactionRepository transactionRepository;
     private final OrderMapper orderMapper;
+    private final MailService mailService;
 
     private static final int STATUS_CANCELLED = 0;
     private static final int STATUS_PENDING = 1;
@@ -210,6 +217,7 @@ public class OrderService {
                 break;
             case STATUS_PROCESSING:
                 logger.info("Order status updated to Processing.");
+                sendEmailNotification(order);
                 break;
             case STATUS_READY_FOR_PICKUP:
                 logger.info("Order status updated to Ready for Pickup.");
@@ -275,4 +283,23 @@ public class OrderService {
         orderRepository.save(order);
     }
 
+    private void sendEmailNotification(Order order) {
+        Account account = order.getAccount();
+        String recipientEmail = account.getEmail();
+        String subject = "Your Order is Now Processing!";
+        String message = String.format("Dear %s,\n\nYour order with ID %s is now being processed.\n\nThank you for shopping with us!",
+                account.getUserName(), order.getOrderId());
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(recipientEmail);
+        mailMessage.setSubject(subject);
+        mailMessage.setText(message);
+
+        try {
+            mailSender.send(mailMessage);
+            logger.info("Email sent to {} for Order ID: {}", recipientEmail, order.getOrderId());
+        } catch (Exception e) {
+            logger.error("Failed to send email to {} for Order ID: {}: {}", recipientEmail, order.getOrderId(), e.getMessage());
+        }
+    }
 }
