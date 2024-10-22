@@ -26,6 +26,7 @@ public class OrderDTO {
     private String senderPhone;
     private Integer postalCode;
     private String senderNote;
+    private String receiverNote;
     private String orderNote;
     private int totalPrice;
     private int status;

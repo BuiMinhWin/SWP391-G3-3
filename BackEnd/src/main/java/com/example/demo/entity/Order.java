@@ -62,6 +62,9 @@ public class Order {
     @Column(name = "sender_note")
     private String senderNote;
 
+    @Column(name = "receiver_note")
+    private String receiverNote;
+
     @Column(name = "order_note")
     private String orderNote;
 

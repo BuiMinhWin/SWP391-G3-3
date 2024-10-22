@@ -26,6 +26,7 @@ public class OrderMapper {
                 order.getSenderPhone(),
                 order.getPostalCode(),
                 order.getSenderNote(),
+                order.getReceiverNote(),
                 order.getOrderNote(),
                 order.getTotalPrice(),
                 order.getStatus(),
@@ -55,6 +56,7 @@ public class OrderMapper {
         order.setSenderPhone(orderDTO.getSenderPhone());
         order.setPostalCode(orderDTO.getPostalCode() != null ? orderDTO.getPostalCode() : 0);
         order.setSenderNote(orderDTO.getSenderNote());
+        order.setReceiverNote(orderDTO.getReceiverNote());
         order.setOrderNote(orderDTO.getOrderNote());
 
 //        double distance = DistanceCalculator.calculateDistance(
