@@ -74,6 +74,7 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Transaction> transactions;
 
+
     @Column(name = "status")
     private int status;
 

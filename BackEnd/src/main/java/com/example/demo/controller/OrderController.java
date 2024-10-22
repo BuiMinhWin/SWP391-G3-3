@@ -69,4 +69,11 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping("/deliver/{deliver}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByDeliver(@PathVariable String deliver) {
+        List<OrderDTO> orders = orderService.getOrderByDeliver(deliver);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
+
 }

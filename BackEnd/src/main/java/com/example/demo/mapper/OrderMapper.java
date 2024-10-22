@@ -27,11 +27,14 @@ public class OrderMapper {
                 order.getSenderNote(),
                 order.getReceiverNote(),
                 order.getOrderNote(),
+                order.getProvince(),
                 order.getTotalPrice(),
                 order.getStatus(),
                 order.isPaymentStatus(),
+
                 order.getSale(),
                 order.getDeliver(),
+
 //                order.getOriginLatitude(),
 //                order.getOriginLongitude(),
 //                order.getDestinationLatitude(),
@@ -55,6 +58,7 @@ public class OrderMapper {
         order.setSenderPhone(orderDTO.getSenderPhone());
         order.setSenderNote(orderDTO.getSenderNote());
         order.setReceiverNote(orderDTO.getReceiverNote());
+        order.setProvince(orderDTO.getProvince());
         order.setOrderNote(orderDTO.getOrderNote());
         order.setDeliver(orderDTO.getDeliver());
         order.setSale(orderDTO.getSale());

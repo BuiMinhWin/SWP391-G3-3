@@ -27,6 +27,7 @@ public class OrderDTO {
     private String senderNote;
     private String receiverNote;
     private String orderNote;
+    private String province;
     private int totalPrice;
     private int status;
     private boolean paymentStatus;

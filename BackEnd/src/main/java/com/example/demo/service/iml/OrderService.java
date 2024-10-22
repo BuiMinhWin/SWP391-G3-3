@@ -315,4 +315,22 @@ public class OrderService {
         }
     }
 
+    public List<OrderDTO> getOrderByDeliver(String deliver) {
+        logger.info("Fetching orders for deliver: {}", deliver);
+
+        List<Order> orders = orderRepository.findByOrderByDeliver(deliver);
+
+        if (orders.isEmpty()) {
+            throw new ResourceNotFoundException("No orders found for deliver: " + deliver);
+        }
+
+        List<OrderDTO> orderDTOs = orders.stream()
+                .map(orderMapper::mapToOrderDTO)
+                .collect(Collectors.toList());
+
+        logger.info("Fetched {} orders for deliver: {}", orderDTOs.size(), deliver);
+
+        return orderDTOs;
+    }
+
 }
