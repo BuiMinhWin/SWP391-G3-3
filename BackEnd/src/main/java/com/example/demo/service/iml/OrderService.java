@@ -236,10 +236,10 @@ public class OrderService {
                 break;
             case STATUS_PROCESSING:
                 logger.info("Order status updated to Processing.");
-                sendEmailNotification(order);
                 break;
             case STATUS_READY_FOR_PICKUP:
                 logger.info("Order status updated to Ready for Pickup.");
+                sendEmailNotification(order);
                 break;
             case STATUS_IN_TRANSIT:
                 logger.info("Order status updated to In Transit.");
@@ -321,4 +321,23 @@ public class OrderService {
             logger.error("Failed to send email to {} for Order ID: {}: {}", recipientEmail, order.getOrderId(), e.getMessage());
         }
     }
+
+    public List<OrderDTO> getOrderByProvince(String province) {
+        logger.info("Fetching orders for province: {}", province);
+
+        List<Order> orders = orderRepository.findByProvince(province);
+
+        if (orders.isEmpty()) {
+            throw new ResourceNotFoundException("No orders found for province: " + province);
+        }
+
+        List<OrderDTO> orderDTOs = orders.stream()
+                .map(orderMapper::mapToOrderDTO)
+                .collect(Collectors.toList());
+
+        logger.info("Fetched {} orders for province: {}", orderDTOs.size(), province);
+
+        return orderDTOs;
+    }
+
 }

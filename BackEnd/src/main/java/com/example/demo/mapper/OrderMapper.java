@@ -39,7 +39,8 @@ public class OrderMapper {
 //                order.getDestinationLatitude(),
 //                order.getDestinationLongitude()
                 order.getDistance(),
-                order.getVnpTxnRef()
+                order.getVnpTxnRef(),
+                order.getProvince()
         );
     }
 
@@ -76,6 +77,7 @@ public class OrderMapper {
         order.setStatus(orderDTO.getStatus());
         order.setPaymentStatus(orderDTO.isPaymentStatus());
         order.setVnpTxnRef(orderDTO.getVnpTxnRef());
+        order.setProvince(orderDTO.getProvince());
 
 //        order.setOriginLatitude(orderDTO.getOriginLatitude());
 //        order.setOriginLongitude(orderDTO.getOriginLongitude());

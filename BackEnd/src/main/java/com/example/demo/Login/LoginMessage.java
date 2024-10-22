@@ -14,5 +14,6 @@ public class LoginMessage {
     private Boolean status;
     private String roleId;
     private String accountId;
+    private String province;
 
 }

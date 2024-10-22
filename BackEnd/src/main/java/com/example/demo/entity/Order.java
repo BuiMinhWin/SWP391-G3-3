@@ -106,4 +106,7 @@ public class Order {
 
     @Column(name = "vnp_txn_ref", unique = true)
     private String vnpTxnRef;
+
+    @Column(name = "province")
+    private String province;
 }

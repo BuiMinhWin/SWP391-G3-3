@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, String> {
     Optional<Order> findByVnpTxnRef(String vnpTxnRef);
     List<Order> findByAccount_AccountId(String accountId);
+    List<Order> findByProvince(String province);
 }

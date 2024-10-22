@@ -40,6 +40,7 @@ public class OrderDTO {
 //    private double destinationLongitude;
     private double distance;
     private String vnpTxnRef;
+    private String province;
 
     public OrderDTO(int totalPrice) {
         this.totalPrice = totalPrice;
