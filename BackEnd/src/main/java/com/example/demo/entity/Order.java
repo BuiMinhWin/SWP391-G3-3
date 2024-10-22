@@ -100,4 +100,10 @@ public class Order {
 
     @Column(name = "province")
     private String province;
+
+    @Column(name = "deliver")
+    private String deliver;
+
+    @Column(name = "sale")
+    private String sale;
 }

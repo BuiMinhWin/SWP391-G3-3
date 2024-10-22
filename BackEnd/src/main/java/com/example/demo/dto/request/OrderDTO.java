@@ -30,6 +30,8 @@ public class OrderDTO {
     private int totalPrice;
     private int status;
     private boolean paymentStatus;
+    private String sale;
+    private String deliver;
 
 //    private double originLatitude;
 //    private double originLongitude;
@@ -38,12 +40,4 @@ public class OrderDTO {
     private double distance;
     private String vnpTxnRef;
 
-    public OrderDTO(int totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public OrderDTO(int totalPrice, String vnpTxnRef) {
-        this.totalPrice = totalPrice;
-        this.vnpTxnRef = vnpTxnRef;
-    }
 }

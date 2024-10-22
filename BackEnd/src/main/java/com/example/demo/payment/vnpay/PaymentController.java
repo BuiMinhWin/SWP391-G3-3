@@ -39,7 +39,6 @@ public class PaymentController {
 
         log.debug("Received payment request for orderId: {}", paymentRequest.getOrderId());
 
-        // Call the createVnPayPayment without returnURL parameter
         PaymentDTO.VNPayResponse response = paymentService.createVnPayPayment(
                 request, paymentRequest.getOrderId(), paymentRequest.getBankCode());
 

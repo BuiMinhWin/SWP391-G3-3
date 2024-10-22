@@ -30,7 +30,8 @@ public class OrderMapper {
                 order.getTotalPrice(),
                 order.getStatus(),
                 order.isPaymentStatus(),
-
+                order.getSale(),
+                order.getDeliver(),
 //                order.getOriginLatitude(),
 //                order.getOriginLongitude(),
 //                order.getDestinationLatitude(),
@@ -55,6 +56,8 @@ public class OrderMapper {
         order.setSenderNote(orderDTO.getSenderNote());
         order.setReceiverNote(orderDTO.getReceiverNote());
         order.setOrderNote(orderDTO.getOrderNote());
+        order.setDeliver(orderDTO.getDeliver());
+        order.setSale(orderDTO.getSale());
 
 //        double distance = DistanceCalculator.calculateDistance(
 //                orderDTO.getOriginLatitude(),

@@ -20,16 +20,10 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private ServicesService servicesService;
 
     @PostMapping("/create")
     public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
         OrderDTO savedOrder = orderService.createOrder(orderDTO);
-
-        ServicesDTO servicesDTO = new ServicesDTO();
-        servicesDTO.setOrderId(savedOrder.getOrderId());
-        servicesService.createServicesForOrder(servicesDTO);
 
         return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
     }

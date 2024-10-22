@@ -19,8 +19,8 @@ public class Services {
     private int servicesId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    @JoinColumn(name = "order_detail_id", nullable = false)
+    private OrderDetail orderDetail;
 
     @Column(name = "services_name")
     private String servicesName;

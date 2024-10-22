@@ -1,11 +1,11 @@
 package com.example.demo.service.iml;
 
 import com.example.demo.dto.request.ServicesDTO;
-import com.example.demo.entity.Order;
+import com.example.demo.entity.OrderDetail;
 import com.example.demo.entity.Services;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.ServicesMapper;
-import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.repository.ServiceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,18 +25,18 @@ public class ServicesService {
     private ServiceRepository serviceRepository;
 
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderDetailRepository orderDetailRepository;
 
     public List<ServicesDTO> createServicesForOrder(ServicesDTO servicesDTO) {
 
-        Order order = orderRepository.findById(servicesDTO.getOrderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + servicesDTO.getOrderId()));
+        OrderDetail orderDetail = orderDetailRepository.findById(servicesDTO.getOrderDetailId())
+                .orElseThrow(() -> new ResourceNotFoundException("OrderDetail not found with id " + servicesDTO.getOrderDetailId()));
 
         List<ServicesDTO> servicesDTOList = new ArrayList<>();
 
         for (int serviceId = 1; serviceId <= 3; serviceId++) {
             ServicesDTO newServiceDTO = new ServicesDTO();
-            newServiceDTO.setOrderId(servicesDTO.getOrderId());
+            newServiceDTO.setOrderDetailId(servicesDTO.getOrderDetailId());
             newServiceDTO.setServiceId(serviceId);
             newServiceDTO.setServiceStatus("No");
             newServiceDTO.setPrice(0.0);
@@ -58,7 +58,7 @@ public class ServicesService {
             }
             newServiceDTO.setServiceName(serviceName);
 
-            Services service = ServicesMapper.mapToServices(newServiceDTO, order);
+            Services service = ServicesMapper.mapToServices(newServiceDTO, orderDetail);
             Services savedService = serviceRepository.save(service);
 
             servicesDTOList.add(ServicesMapper.maptoServicesDTO(savedService));
@@ -69,23 +69,23 @@ public class ServicesService {
 
 
 
-    public List<ServicesDTO> getServices(String orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+    public List<ServicesDTO> getServices(String orderDetailId) {
+        OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
+                .orElseThrow(() -> new ResourceNotFoundException("OrderDetail not found with id: " + orderDetailId));
 
-        List<Services> services = serviceRepository.findByOrder(order);
+        List<Services> services = serviceRepository.findByOrderDetail(orderDetail);
         return services.stream()
                 .map(ServicesMapper::maptoServicesDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public ServicesDTO updateServiceStatusByOrderIdAndServiceId(String orderId, Integer servicesId, String newStatus) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+    public ServicesDTO updateServiceStatusByOrderIdAndServiceId(String orderDetailId, Integer servicesId, String newStatus) {
+        OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
+                .orElseThrow(() -> new ResourceNotFoundException("OrderDetail not found with id: " + orderDetailId));
 
-        Services service = serviceRepository.findByOrderAndServicesId(order, servicesId)
-                .orElseThrow(() -> new ResourceNotFoundException("Service not found with orderId: " + orderId + " and serviceId: " + servicesId));
+        Services service = serviceRepository.findByOrderDetailAndServicesId(orderDetail, servicesId)
+                .orElseThrow(() -> new ResourceNotFoundException("Service not found with orderId: " + orderDetailId + " and serviceId: " + servicesId));
 
         if ("Yes".equalsIgnoreCase(newStatus) || "No".equalsIgnoreCase(newStatus)) {
             service.setServiceStatus(newStatus);

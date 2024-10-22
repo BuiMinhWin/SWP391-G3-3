@@ -13,7 +13,7 @@ import lombok.Setter;
 public class ServicesDTO {
 
     private int serviceId;
-    private String orderId;
+    private String orderDetailId;
     private double price;
     private String serviceStatus;
     private String serviceName;

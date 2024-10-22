@@ -19,18 +19,18 @@ public class ServicesController {
     @Autowired
     private ServicesService servicesService;
 
-    @GetMapping("/getServices/{orderId}")
+    @GetMapping("/getServices/{orderDetailId}")
     public ResponseEntity<List<ServicesDTO>> getServices(@PathVariable String orderId) {
         List<ServicesDTO> services = servicesService.getServices(orderId);
         return new ResponseEntity<>(services, HttpStatus.OK);
     }
 
-    @PatchMapping("/updateService/{orderId}/service/{serviceId}")
+    @PatchMapping("/updateService/{orderDetailId}/service/{serviceId}")
     public ResponseEntity<ServicesDTO> updateServiceStatusByOrderIdAndServiceId(
-            @PathVariable String orderId,
+            @PathVariable String orderDetailId,
             @PathVariable Integer serviceId,
             @RequestParam String newStatus) {
-        ServicesDTO updatedService = servicesService.updateServiceStatusByOrderIdAndServiceId(orderId, serviceId, newStatus);
+        ServicesDTO updatedService = servicesService.updateServiceStatusByOrderIdAndServiceId(orderDetailId, serviceId, newStatus);
         return ResponseEntity.ok(updatedService);
     }
 }

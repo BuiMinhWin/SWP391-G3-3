@@ -30,14 +30,11 @@ public class PaymentService {
                 throw new IllegalArgumentException("orderId cannot be null or empty");
             }
 
-            // Lấy thông tin đơn hàng
             OrderDTO orderDTO = orderService.getOrderByIdV2(orderId);
             log.info("Total price for orderId {}: {} VND", orderId, orderDTO.getTotalPrice());
 
-            // Tính toán số tiền
             BigDecimal amount = BigDecimal.valueOf(orderDTO.getTotalPrice()).multiply(new BigDecimal(100));
 
-            // Lấy cấu hình VNPay
             Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
             vnpParamsMap.put("vnp_Amount", amount.toPlainString());
 
@@ -47,17 +44,13 @@ public class PaymentService {
 
             vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
 
-            // Use the fixed return URL
             vnpParamsMap.put("vnp_ReturnUrl", "http://localhost:3000/payment-outcome");
 
-            // Tạo vnp_TxnRef mới bằng UUID
             String vnpTxnRef = UUID.randomUUID().toString();
             vnpParamsMap.put("vnp_TxnRef", vnpTxnRef);
 
-            // Set vnp_OrderInfo với thông tin đơn hàng
             vnpParamsMap.put("vnp_OrderInfo", "Thanh toan don hang: " + orderId);
 
-            // Tạo URL thanh toán và secure hash
             String queryUrl = VNPayUtil.getPaymentURL(vnpParamsMap, true);
             String hashData = VNPayUtil.getPaymentURL(vnpParamsMap, false);
             String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
@@ -66,7 +59,6 @@ public class PaymentService {
             String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
             log.info("Payment URL generated: {}", paymentUrl);
 
-            // Lưu vnpTxnRef vào đơn hàng
             orderService.updateVnpTxnRef(orderId, vnpTxnRef);
 
             return PaymentDTO.VNPayResponse.builder()
