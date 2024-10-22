@@ -325,7 +325,7 @@ public class OrderService {
     public List<OrderDTO> getOrderByProvince(String province) {
         logger.info("Fetching orders for province: {}", province);
 
-        List<Order> orders = orderRepository.findByProvince(province);
+        List<Order> orders = orderRepository.findByProvinceIgnoreCase(province);
 
         if (orders.isEmpty()) {
             throw new ResourceNotFoundException("No orders found for province: " + province);
