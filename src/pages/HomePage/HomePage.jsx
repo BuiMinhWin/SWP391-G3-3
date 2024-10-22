@@ -18,8 +18,8 @@ const Homepage = () => {
 
   const roleId = localStorage.getItem('roleId'); 
   console.log('Role ID:', roleId);
-  const accountId = localStorage.getItem('accountId');
-  console.log("Stored Account ID:", accountId);
+  // const accountId = localStorage.getItem('accountId');
+  // console.log("Stored Account ID:", accountId);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);

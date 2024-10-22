@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from "react";
 import "./CustomerHomePage.css";
 import FAQs from "../FAQs/FAQs";
-import logo from "../../assets/Logo.png";
-import blog from "../../assets/Blog.jpg";
-import avatar from "../../assets/Avatar.jpg";
-import { useNavigate } from "react-router-dom";
-import { getOrder } from "../../services/CustomerService";
-import { logout } from "../Member/auth";
+import logo from '../../assets/Logo.png';
+import blog from '../../assets/Blog.jpg';
+import avatar from '../../assets/Avatar.jpg';
+import { useNavigate } from 'react-router-dom';
+import { getOrder } from '../../services/CustomerService';
+import { logout } from '../Member/auth'; 
+
+
 
 const Homepage = () => {
   const [activeTab, setActiveTab] = useState("tracking"); // State để quản lý tab
@@ -46,6 +48,7 @@ const Homepage = () => {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false); // Quản lý trạng thái mở dropdown
 
+
   return (
     <div className="homepage-container">
       {/* Navbar */}
@@ -81,12 +84,10 @@ const Homepage = () => {
             <img src={avatar} alt="Avatar" className="avatar" />
             <div className="dropdown-content-avatar ">
               <a href="#">Tài khoản của tôi</a>
-              <button className="logout-btn" onClick={handleLogout}>
-              Đăng xuất
-              </button>
-            </div>
-          </div>
-        </div>
+              <a  onClick={handleLogout}>Đăng xuất</a>
+            </div>  
+      </div>
+    </div>
       </nav>
 
       {/* Welcome section */}

@@ -23,16 +23,23 @@ import OrderDetailDocumentComponent from "../components/SaleStaff/OrderDetailDoc
 import ListOfConfirmOrder from "../components/SaleStaff/ListOfConfirmOrder";
 import OrderReport from "../pages/Order/OrderReport";
 import Authenticate from "../components/Member/Authenticate";
-import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
+import ResetPasswordComponent from "../components/Member/ResetPasswordComponent";
+import Map from "../components/Map";
+// import DistanceCalculator from "../components/DistanceCalculator";
 
 function index() {
   return (
+
     <Routes>
       {/* Member */}
       <Route path="/" element={<Homepage />} />
       <Route path="/login" element={<LoginComponent />} />
       <Route path="/user-page" element={<UserPage />} />
       <Route path="/register" element={<RegisterComponent />} />
+      <Route path="/register" element={<RegisterComponent />} />
+      <Route path="/reset" element={<ResetPasswordComponent />} />
+      <Route path="/map" element={< Map />} />
+      {/* <Route path="/calculate" element={< DistanceCalculator />} /> */}
 
       <Route path="/" element={<Layout />}>
         <Route

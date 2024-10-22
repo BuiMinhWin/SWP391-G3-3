@@ -1,10 +1,10 @@
-import React from "react";
-import { Box, Grid, InputAdornment, Paper, Typography } from "@mui/material";
+import React, { useState,useEffect } from 'react';
+import { Box, Grid, InputAdornment, Paper, Typography,FormControl, InputLabel, Select,MenuItem } from "@mui/material";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import TextFieldWrapper from "../FromUI/Textfield";
 import SelectWrapper from "../FromUI/Select";
-import countries from "../../data/countries.json";
+// import countries from "../../data/countries.json";
 import ButtonWrapper from "../FromUI/Button";
 import koi_type from "../../data/koiTypes.json";
 import koi_name from "../../data/koiVarieties.json";
@@ -23,7 +23,6 @@ import AccessibleForwardIcon from "@mui/icons-material/AccessibleForward";
 import FileUpload from "../FromUI/FileUpload";
 import CheckboxWrapper from "../FromUI/Checkbox";
 import { useNavigate } from "react-router-dom";
-import "mapbox-gl/dist/mapbox-gl.css";
 import axios from "axios";
 
 // Initial Form State
@@ -107,47 +106,103 @@ const FORM_VALIDATION = Yup.object().shape({
 });
 
 const OrderForm = () => {
-  const navigate = useNavigate();
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * (Math.PI / 180)) *
-        Math.cos(lat2 * (Math.PI / 180)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
+  const navigate = useNavigate();  
+  const [provinces, setProvinces] = useState([]);
+  const [selectedProvinceS, setSelectedProvinceS] = useState(''); // Tỉnh người gửi
+  const [selectedProvinceR, setSelectedProvinceR] = useState('');
+
+  // const [distanceData, setDistanceData] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  
+  const API_KEY =import.meta.env.VITE_GOONG_API_KEY; // Thay bằng API Key của bạn
+
+  const geocodeAddress = async (address) => {
+    console.log(address);
+    try {
+      const response = await axios.get(
+        `https://rsapi.goong.io/geocode?address=${encodeURIComponent(address)}&api_key=${API_KEY}`
+      );
+      const data = response.data;
+  
+      if (data.results && data.results.length > 0) {
+        const location = data.results[0].geometry.location;
+        return { lat: location.lat, lng: location.lng };
+      } else {
+        throw new Error('No results found for the address.');
+      }
+    } catch (error) {
+      console.error('Error fetching geocode:', error);
+      throw new Error('Failed to fetch geocode.');
+    }
+  };
+
+  const GHN_API_KEY=import.meta.env.VITE_GHN_API_KEY
+  useEffect(() => {
+      
+    const fetchProvinces = async () => {
+      try {
+        const response = await fetch('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Token': GHN_API_KEY,
+          },
+        });
+        const data = await response.json();
+        console.log(data); 
+        const provinceOptions = data.data.map((province) => ({
+          label: province.ProvinceName,
+          value: province.ProvinceID,
+        }));
+        setProvinces(provinceOptions);
+      } catch (error) {
+        console.error('Error fetching provinces:', error);
+      }
+    };
+
+    fetchProvinces();
+    
+  }, []);
+
+  const fetchDistanceData = async (origins, destinations) => {
+    try {
+      console.log(origins);
+      console.log(destinations);
+      const response = await axios.get(
+        `https://rsapi.goong.io/distancematrix?origins=${origins}&destinations=${destinations}&vehicle=car&api_key=${API_KEY}`
+      );
+      
+      const data = response.data;
+      if (data?.rows[0]?.elements[0]?.distance) {
+        
+        const distanceInKm = data.rows[0].elements[0].distance.value / 1000;
+        return distanceInKm; 
+      } else {
+        throw new Error('Invalid distance data');
+      }
+    } catch (error) {
+      console.error('Error fetching distance matrix:', error);
+      setErrorMessage('Có lỗi xảy ra khi lấy dữ liệu.');
+      return null;
+    }
   };
 
   return (
     <Formik
-      initialValues={INITIAL_FORM_STATE}
+      initialValues={{INITIAL_FORM_STATE, cityS: selectedProvinceS, cityR: selectedProvinceR}}
       validationSchema={FORM_VALIDATION}
       onSubmit={async (values, { setSubmitting, setErrors }) => {
         try {
           const accountId = localStorage.getItem("accountId");
-          console.log("account ID:",accountId);
-          const senderAddress = `${values.origin}`;
-          const receiverAddress = `${values.destination}`;
+          
+          const originCoordinates = await geocodeAddress(`${values.origin}`);
+          const destinationCoordinates = await geocodeAddress(`${values.destination}`);
 
-          const senderCoordinatesResponse = await axios.get(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-              senderAddress
-            )}.json?access_token=pk.eyJ1IjoiYm10aGFuZzIwMDQiLCJhIjoiY20xdWJsYTV2MGF4bDJybXlmdHVnZ2k3cyJ9.08eXbVTzmWjVZp4NhGnoVw`
-          );
-          const senderCoordinates =
-            senderCoordinatesResponse.data.features[0].center;
+          const origins = `${originCoordinates.lat},${originCoordinates.lng}`;
+          const destinations = `${destinationCoordinates.lat},${destinationCoordinates.lng}`;
 
-          const receiverCoordinatesResponse = await axios.get(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-              receiverAddress
-            )}.json?access_token=pk.eyJ1IjoiYm10aGFuZzIwMDQiLCJhIjoiY20xdWJsYTV2MGF4bDJybXlmdHVnZ2k3cyJ9.08eXbVTzmWjVZp4NhGnoVw`
-          );
-          const receiverCoordinates =
-            receiverCoordinatesResponse.data.features[0].center;
+          const distance = await fetchDistanceData(origins, destinations);
+          console.log(distance);
 
           const orderData = {
             ...values,
@@ -162,14 +217,10 @@ const OrderForm = () => {
             receiverNote: values.receiverNote,
             senderNote: values.senderNote,
             orderNote: values.orderNote,
-            distance: calculateDistance(
-              senderCoordinates[1],
-              senderCoordinates[0],
-              receiverCoordinates[1],
-              receiverCoordinates[0]
-            ),
+            distance: distance,
           };
-
+          console.log(orderData);
+          
           const orderResponse = await createOrder(orderData);
           if (!orderResponse?.orderId) {
             throw new Error("Order ID not found in the response");
@@ -213,106 +264,141 @@ const OrderForm = () => {
       }}
       validateOnMount={true}
     >
-      {({ handleSubmit, errors }) => {
+      {({ handleSubmit, errors,setFieldValue }) => {
         console.log("Validation errors:", errors); // Log validation errors
+        const handleSenderProvinceChange = (event) => {
+          const value = event.target.value;
+          setSelectedProvinceS(value); // Cập nhật state địa phương người gửi
+          setFieldValue('cityS', value);
+        };
+      
+        // Hàm thay đổi giá trị tỉnh của người nhận
+        const handleReceiverProvinceChange = (event) => {
+          const value = event.target.value;
+            setSelectedProvinceR(value); // Cập nhật state địa phương người nhận
+            setFieldValue('cityR', value);
+        };
 
         return (
           <Form onSubmit={handleSubmit}>
-            {/* Content */}
-            <>
-              <Box sx={{ p: 4, bgcolor: "#eeeeee" }}>
-                {/* Paper 1: Receiver Information */}
-                <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
-                    Địa chỉ lấy hàng *
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="senderName"
-                        label="Tên người gửi"
-                      />
+                {/* Content */}
+                <>
+                <Box sx={{ p: 4, bgcolor: "#eeeeee" }}>
+                  {/* Paper 1: Receiver Information */}
+                  <Paper elevation={4} sx={{ padding: "20px" }}>
+                    <Typography variant="h6" gutterBottom>
+                      Địa chỉ lấy hàng *
+                    </Typography>
+                    <Grid container spacing={3}>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderName"
+                          label="Tên người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderPhone"
+                          label="Điện thoại"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                      <FormControl fullWidth>
+                        <InputLabel>Thành phố người gửi</InputLabel>
+                        <Select
+                          name="cityS"
+                          value={selectedProvinceS}
+                          onChange={handleSenderProvinceChange}
+                          label="Tỉnh"
+                        >
+                          {provinces.map((province) => (
+                            <MenuItem key={province.value} value={province.value}>
+                              {province.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper name="senderPhone" label="Điện thoại" />
+                                    <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="postalCodeS"
+                          label="Postal Code"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="origin"
+                          label="Địa chỉ người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderNote"
+                          label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6}>
-                      <SelectWrapper
-                        name="cityS"
-                        label="Thành phố"
-                        options={countries}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="postalCodeS"
-                        label="Postal Code"
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="origin"
-                        label="Địa chỉ người gửi"
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="senderNote"
-                        label="Hướng dẫn giao hàng"
-                        multiline
-                        rows={3}
-                      />
-                    </Grid>
-                  </Grid>
-                </Paper>
+                  </Paper>
 
-                {/* Paper 2: Receiver Information */}
-                <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
-                    Địa chỉ người nhận
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="receiverName"
-                        label="Tên người nhận"
-                      />
+                  {/* Paper 2: Receiver Information */}
+                  <Paper elevation={4} sx={{ padding: "20px" }}>
+                    <Typography variant="h6" gutterBottom>
+                      Địa chỉ người nhận
+                    </Typography>
+                    <Grid container spacing={3}>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="receiverName"
+                          label="Tên người nhận"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="receiverPhone"
+                          label="Điện thoại"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                      <FormControl fullWidth>
+                        <InputLabel>Thành phố người nhận</InputLabel>
+                        <Select
+                          name="cityR"
+                          value={selectedProvinceR}
+                          onChange={handleReceiverProvinceChange}
+                          label="Tỉnh"
+                        >
+                          {provinces.map((province) => (
+                            <MenuItem key={province.value} value={province.value}>
+                              {province.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="receiverPhone"
-                        label="Điện thoại"
-                      />
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="postalCodeR"
+                          label="Postal Code"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="destination"
+                          label="Địa chỉ người nhận"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="receiverNote"
+                          label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6}>
-                      <SelectWrapper
-                        name="cityR"
-                        label="Thành phố"
-                        options={countries}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="postalCodeR"
-                        label="Postal Code"
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="destination"
-                        label="Địa chỉ người nhận"
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="receiverNote"
-                        label="Hướng dẫn giao hàng"
-                        multiline
-                        rows={3}
-                      />
-                    </Grid>
-                  </Grid>
-                </Paper>
+                  </Paper>
 
                 {/* Paper 3: Order Information */}
                 <Paper elevation={4} sx={{ padding: "20px" }}>
@@ -369,73 +455,76 @@ const OrderForm = () => {
                       />
                     </Grid>
 
-                    <Grid item xs={12}>
-                      <CustomRadioGroup
-                        name="freight"
-                        options={[
-                          {
-                            value: "Dịch vụ tiêu chuẩn",
-                            label: "Dịch vụ tiêu chuẩn",
-                            description:
-                              "Giao theo tiêu chuẩn dịch vụ 1-4 ngày",
-                            icon: <AccessibleIcon fontSize="large" />,
-                            helpText:
-                              "Phí vận chuyển ước tính sẽ bao gồm phụ phí và trừ đi các khoản chiến khấu/giảm giá bởi khuyến mãi.",
-                          },
-                          {
-                            value: "Dịch vụ hỏa tốc",
-                            label: "Dịch vụ hỏa tốc",
-                            description: "Giao theo tiêu chuẩn dịch vụ 1-3 giờ",
-                            icon: <AccessibleForwardIcon fontSize="large" />,
-                            helpText:
-                              "Phí vận chuyển ước tính sẽ bao gồm phụ phí và trừ đi các khoản chiến khấu/giảm giá bởi khuyến mãi.",
-                          },
-                        ]}
-                      />
+                      <Grid item xs={12}>
+                        <CustomRadioGroup
+                          name="freight"
+                          options={[
+                            {
+                              value: "Dịch vụ tiêu chuẩn",
+                              label: "Dịch vụ tiêu chuẩn",
+                              description:
+                                "Giao theo tiêu chuẩn dịch vụ 1-4 ngày",
+                              icon: <AccessibleIcon fontSize="large" />,
+                              helpText:
+                                "Phí vận chuyển ước tính sẽ bao gồm phụ phí và trừ đi các khoản chiến khấu/giảm giá bởi khuyến mãi.",
+                            },
+                            {
+                              value: "Dịch vụ hỏa tốc",
+                              label: "Dịch vụ hỏa tốc",
+                              description:
+                                "Giao theo tiêu chuẩn dịch vụ 1-3 giờ",
+                              icon: <AccessibleForwardIcon fontSize="large" />,
+                              helpText:
+                                "Phí vận chuyển ước tính sẽ bao gồm phụ phí và trừ đi các khoản chiến khấu/giảm giá bởi khuyến mãi.",
+                            },
+                          ]}
+                        />
+                      </Grid>
+                      <Grid item xs={3}>
+                        <TextFieldWrapper
+                          name="discount"
+                          label="Mã giảm giá"
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">%</InputAdornment>
+                            ),
+                          }}
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={3}
+                        justifyContent="center" // Center horizontally
+                        alignItems="center"
+                      >
+                        <RadioGroupWrapper
+                          name="additional_service"
+                          legend="Bảo hiểm sự cố"
+                          defaultValue="No"
+                          options={[
+                            {
+                              value: "Yes",
+                              label: "Có",
+                            },
+                            {
+                              value: "No",
+                              label: "Không",
+                            },
+                          ]}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={3}>
-                      <TextFieldWrapper
-                        name="discount"
-                        label="Mã giảm giá"
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">%</InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid
-                      item
-                      xs={3}
-                      justifyContent="center" // Center horizontally
-                      alignItems="center"
-                    >
-                      <RadioGroupWrapper
-                        name="additional_service"
-                        legend="Bảo hiểm sự cố"
-                        defaultValue="No"
-                        options={[
-                          {
-                            value: "Yes",
-                            label: "Có",
-                          },
-                          {
-                            value: "No",
-                            label: "Không",
-                          },
-                        ]}
-                      />
-                    </Grid>
-                  </Grid>
-                </Paper>
-                <CheckboxWrapper
-                  name="termsOfService"
-                  legend="Terms Of Service"
-                  label="I agree"
-                />
-                <ButtonWrapper>Submit Order</ButtonWrapper>
-              </Box>
-            </>
+                  </Paper>
+                  <CheckboxWrapper
+                    name="termsOfService"
+                    legend="Terms Of Service"
+                    label="I agree"
+                  />
+
+                  <ButtonWrapper>Submit Order</ButtonWrapper>
+               
+                </Box>
+                </>
           </Form>
         );
       }}
