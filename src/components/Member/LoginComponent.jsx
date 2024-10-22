@@ -24,6 +24,8 @@
         const result = response.data;
         localStorage.setItem('roleId', result.roleId);
         console.log("Role ID:", result.roleId);
+        localStorage.setItem('accountId',result.accountId)
+        console.log("Account ID:", result.accountId);
 
       if (result.roleId === 'Manager') {
         navigate('/manager');
