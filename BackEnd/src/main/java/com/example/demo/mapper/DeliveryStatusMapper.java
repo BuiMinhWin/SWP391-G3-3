@@ -22,7 +22,7 @@ public class DeliveryStatusMapper {
         deliveryStatus.setOrder(order);
         deliveryStatus.setTimeTracking(deliveryStatusDTO.getTimeTracking());
         deliveryStatus.setCurrentLocate(deliveryStatusDTO.getCurrentLocate());
-        deliveryStatus.setStatus(deliveryStatusDTO.getStatus());
+        deliveryStatus.setStatus(order.getStatus());
         return deliveryStatus;
     }
 }

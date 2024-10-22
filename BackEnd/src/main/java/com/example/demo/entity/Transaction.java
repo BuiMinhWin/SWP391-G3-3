@@ -28,11 +28,15 @@ public class Transaction {
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate;
 
-    @Column(name = "status", nullable = false)
-    private int status;
+    @Column(name = "vnp_txn_ref", unique = true)
+    private String vnpTxnRef;
+
+    @Column(name = "total_price")
+    private int totalPrice;
 
     public void setOrder(Order order) {
         this.order = order;
-        this.status = order.getStatus();
+        this.vnpTxnRef = order.getVnpTxnRef();
+        this.totalPrice = order.getTotalPrice();
     }
 }

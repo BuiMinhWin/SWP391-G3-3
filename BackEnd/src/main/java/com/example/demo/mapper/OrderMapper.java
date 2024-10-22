@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderMapper {
 
-    private static final int RATE_PER_KM = 15000;
+    private static final int RATE_PER_KM = 14000;
 
     public OrderDTO mapToOrderDTO(Order order) {
         return new OrderDTO(
@@ -22,12 +22,9 @@ public class OrderMapper {
                 order.getFreight(),
                 order.getReceiverName(),
                 order.getSenderName(),
-                order.getReceiverAddress(),
-                order.getSenderAddress(),
                 order.getReceiverPhone(),
                 order.getSenderPhone(),
                 order.getPostalCode(),
-                order.getReceiverNote(),
                 order.getSenderNote(),
                 order.getOrderNote(),
                 order.getTotalPrice(),
@@ -46,7 +43,6 @@ public class OrderMapper {
 
     public Order mapToOrder(OrderDTO orderDTO, Account account) {
         Order order = new Order();
-//        order.setOrderId(orderDTO.getOrderId());
         order.setAccount(account);
         order.setOrderDate(orderDTO.getOrderDate());
         order.setShippedDate(orderDTO.getShippedDate());
@@ -55,12 +51,9 @@ public class OrderMapper {
         order.setFreight(orderDTO.getFreight());
         order.setReceiverName(orderDTO.getReceiverName());
         order.setSenderName(orderDTO.getSenderName());
-        order.setReceiverAddress(orderDTO.getReceiverAddress());
-        order.setSenderAddress(orderDTO.getSenderAddress());
         order.setReceiverPhone(orderDTO.getReceiverPhone());
         order.setSenderPhone(orderDTO.getSenderPhone());
         order.setPostalCode(orderDTO.getPostalCode() != null ? orderDTO.getPostalCode() : 0);
-        order.setReceiverNote(orderDTO.getReceiverNote());
         order.setSenderNote(orderDTO.getSenderNote());
         order.setOrderNote(orderDTO.getOrderNote());
 

@@ -63,21 +63,28 @@ public class DeliveryStatusService {
     }
 
     public DeliveryStatusDTO updateDeliveryStatus(String deliveryStatusId, DeliveryStatusDTO updatedStatusDTO) {
-        DeliveryStatus deliveryStatus = deliveryStatusRepository.findById(deliveryStatusId)
+        DeliveryStatus originalDeliveryStatus = deliveryStatusRepository.findById(deliveryStatusId)
                 .orElseThrow(() -> new ResourceNotFoundException("DeliveryStatus not found with id " + deliveryStatusId));
 
-        deliveryStatus.setStatus(updatedStatusDTO.getStatus());
+        DeliveryStatus newDeliveryStatus = new DeliveryStatus();
+        newDeliveryStatus.setOrder(originalDeliveryStatus.getOrder());
+        newDeliveryStatus.setStatus(updatedStatusDTO.getStatus());
 
         if (updatedStatusDTO.getCurrentLocate() != null) {
-            deliveryStatus.setCurrentLocate(updatedStatusDTO.getCurrentLocate());
+            newDeliveryStatus.setCurrentLocate(updatedStatusDTO.getCurrentLocate());
+        } else {
+            newDeliveryStatus.setCurrentLocate(originalDeliveryStatus.getCurrentLocate());
         }
 
         if (updatedStatusDTO.getTimeTracking() == null) {
-            deliveryStatus.setTimeTracking(LocalDateTime.now());
+            newDeliveryStatus.setTimeTracking(LocalDateTime.now());
+        } else {
+            newDeliveryStatus.setTimeTracking(updatedStatusDTO.getTimeTracking());
         }
 
-        DeliveryStatus updatedDeliveryStatus = deliveryStatusRepository.save(deliveryStatus);
-        return DeliveryStatusMapper.maptoDeliveryStatusDTO(updatedDeliveryStatus);
+        DeliveryStatus savedNewDeliveryStatus = deliveryStatusRepository.save(newDeliveryStatus);
+
+        return DeliveryStatusMapper.maptoDeliveryStatusDTO(savedNewDeliveryStatus);
     }
 
 }

@@ -15,6 +15,17 @@ public class DistanceCalculator {
 //    }
 
     public static int calculateTotalPrice(double distance, int ratePerKm) {
-        return (int) (distance * ratePerKm);
+        int totalPrice;
+
+        if (distance <= 10) {
+            totalPrice = (int) (distance * ratePerKm);
+        } else if (distance <= 50) {
+            totalPrice = (int) (distance * ratePerKm * 0.8);
+        } else {
+            totalPrice = (int) (distance * ratePerKm * 1.2);
+        }
+
+        return totalPrice;
     }
+
 }

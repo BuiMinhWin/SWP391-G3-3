@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/transaction")
 public class TransactionController {
@@ -25,10 +28,9 @@ public class TransactionController {
         return new ResponseEntity<>(savedTransactionDTO, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/update/{transactionId}")
-    public ResponseEntity<TransactionDTO> updateTransactionStatus(@PathVariable String transactionId, @RequestBody UpdateStatusDTO updateStatusDTO) {
-        Transaction updatedTransaction = transactionService.updateTransactionStatus(transactionId, updateStatusDTO.getNewStatus());
-        TransactionDTO transactionDTO = TransactionMapper.mapToTransactionDTO(updatedTransaction);
-        return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<List<Transaction>> getTransactionsByOrderId(@PathVariable String orderId) {
+        List<Transaction> transactions = transactionService.getTransactionsByOrderId(orderId);
+        return ResponseEntity.ok(transactions);
     }
 }

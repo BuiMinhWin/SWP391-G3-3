@@ -34,4 +34,9 @@ public class DeliveryStatus {
 
     @Column(name = "status")
     private int status;
+
+    public void setOrder(Order order) {
+        this.order = order;
+        this.status = order.getStatus();
+    }
 }

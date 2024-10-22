@@ -11,7 +11,8 @@ public class TransactionMapper {
                 transaction.getTransactionId(),
                 transaction.getOrder().getOrderId(),
                 transaction.getTransactionDate(),
-                transaction.getStatus()
+                transaction.getVnpTxnRef(),
+                transaction.getTotalPrice()
         );
     }
 

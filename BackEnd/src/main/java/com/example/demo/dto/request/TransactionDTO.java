@@ -15,5 +15,6 @@ public class TransactionDTO {
     private String transactionId;
     private String orderId;
     private LocalDateTime transactionDate;
-    private int status;
+    private String vnpTxnRef;
+    private int totalPrice;
 }

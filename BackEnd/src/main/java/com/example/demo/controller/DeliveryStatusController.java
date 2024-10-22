@@ -28,7 +28,7 @@ public class DeliveryStatusController {
         return new ResponseEntity<>(deliveryStatus, HttpStatus.OK);
     }
 
-    @PutMapping("/{deliveryStatusId}")
+    @PatchMapping("/{deliveryStatusId}")
     public ResponseEntity<DeliveryStatusDTO> updateDeliveryStatus(
             @PathVariable String deliveryStatusId,
             @RequestBody DeliveryStatusDTO updatedStatusDTO) {

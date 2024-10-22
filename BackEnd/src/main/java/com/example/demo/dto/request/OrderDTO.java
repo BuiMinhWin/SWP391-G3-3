@@ -22,12 +22,9 @@ public class OrderDTO {
     private String freight;
     private String receiverName;
     private String senderName;
-    private String receiverAddress;
-    private String senderAddress;
     private String receiverPhone;
     private String senderPhone;
     private Integer postalCode;
-    private String receiverNote;
     private String senderNote;
     private String orderNote;
     private int totalPrice;

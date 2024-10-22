@@ -50,12 +50,6 @@ public class Order {
     @Column(name = "sender_name")
     private String senderName;
 
-    @Column(name = "receiver_address")
-    private String receiverAddress;
-
-    @Column(name = "sender_address")
-    private String senderAddress;
-
     @Column(name = "receiver_phone")
     private String receiverPhone;
 
@@ -64,9 +58,6 @@ public class Order {
 
     @Column(name = "postal_code")
     private Integer postalCode;
-
-    @Column(name = "receiver_note")
-    private String receiverNote;
 
     @Column(name = "sender_note")
     private String senderNote;
@@ -78,10 +69,10 @@ public class Order {
     private Set<Document> documents;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<OrderDetail> orderDetails; // Relationship with OrderDetail
+    private Set<OrderDetail> orderDetails;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Transaction> transactions; // Relationship with Transaction
+    private Set<Transaction> transactions;
 
     @Column(name = "status")
     private int status;

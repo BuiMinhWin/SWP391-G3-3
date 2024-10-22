@@ -59,7 +59,6 @@ public class OrderService {
 
         if (order.getOrderDate() == null) {
             order.setOrderDate(LocalDateTime.now());
-            logger.debug("Order date was null, set to current time: {}", order.getOrderDate());
         }
 
         if (order.getStatus() < 0 || order.getStatus() > 1) {
@@ -174,29 +173,24 @@ public class OrderService {
     public void deleteOrder(String orderId) {
         logger.info("Deleting Order and related entities with ID: {}", orderId);
 
-        // Fetch the order from the repository
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
-        // Delete documents associated with the order
         if (order.getDocuments() != null && !order.getDocuments().isEmpty()) {
             documentRepository.deleteAll(order.getDocuments());
             logger.info("Deleted {} documents associated with Order ID: {}", order.getDocuments().size(), orderId);
         }
 
-        // Delete order details associated with the order
         if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
             orderDetailRepository.deleteAll(order.getOrderDetails());
             logger.info("Deleted {} order details associated with Order ID: {}", order.getOrderDetails().size(), orderId);
         }
 
-        // Delete transactions associated with the order
         if (order.getTransactions() != null && !order.getTransactions().isEmpty()) {
             transactionRepository.deleteAll(order.getTransactions());
             logger.info("Deleted {} transactions associated with Order ID: {}", order.getTransactions().size(), orderId);
         }
 
-        // Finally, delete the order
         orderRepository.delete(order);
         logger.info("Order with ID: {} and its related entities have been deleted.", orderId);
     }
