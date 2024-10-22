@@ -24,6 +24,10 @@
         const result = response.data;
         localStorage.setItem('roleId', result.roleId);
         console.log("Role ID:", result.roleId);
+        localStorage.setItem('accountId', result.accountId);
+        console.log("accountId:", result.accountId);
+        localStorage.setItem('province', result.province);
+        console.log("province:", result.province);
 
       if (result.roleId === 'Manager') {
         navigate('/manager');
@@ -82,7 +86,7 @@
             localStorage.setItem('createAt', createAt);
           }
           
-          localStorage.setItem('userRole', result.roleId);
+          localStorage.setItem('roleId', result.roleId);
           console.log("Role ID:", result.roleId);
         
           
@@ -143,7 +147,7 @@
                     <input type="checkbox" id="remember" />
                     <label htmlFor="remember">Remember me</label>
                   </div>
-                  <a href="#">Forgot password?</a>
+                  <a href="/reset">Forgot password?</a>
                 </div>
                 <button type="submit">Sign In</button>
               </form>
