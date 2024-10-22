@@ -24,7 +24,6 @@ public class OrderDTO {
     private String senderName;
     private String receiverPhone;
     private String senderPhone;
-    private Integer postalCode;
     private String senderNote;
     private String receiverNote;
     private String orderNote;
@@ -38,7 +37,6 @@ public class OrderDTO {
 //    private double destinationLongitude;
     private double distance;
     private String vnpTxnRef;
-    private String province;
 
     public OrderDTO(int totalPrice) {
         this.totalPrice = totalPrice;

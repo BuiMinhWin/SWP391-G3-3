@@ -18,7 +18,6 @@ public class AccountMapper {
                 account.getRoleId(),
                 account.getAvatar(),
                 account.getStatus(),
-                account.getProvince(),
                 account.getCreateAt()
 
         );
@@ -36,7 +35,6 @@ public class AccountMapper {
         account.setRoleId(accountDTO.getRoleId());
         account.setStatus(accountDTO.getStatus());
         account.setAvatar(accountDTO.getAvatar());
-        account.setProvince(accountDTO.getProvince());
         account.setCreateAt(accountDTO.getCreateAt());
         return account;
     }

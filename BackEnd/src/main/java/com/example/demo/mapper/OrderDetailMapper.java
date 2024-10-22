@@ -16,7 +16,6 @@ public class OrderDetailMapper {
                 orderDetail.getKoiType(),
                 orderDetail.getCreatedAt(),
                 orderDetail.getKoiName(),
-                orderDetail.getKoiImage(),
                 orderDetail.getStatus()
         );
     }
@@ -31,7 +30,6 @@ public class OrderDetailMapper {
         orderDetail.setKoiType(orderDetailDTO.getKoiType());
         orderDetail.setCreatedAt(orderDetailDTO.getCreatedAt());
         orderDetail.setKoiName(orderDetailDTO.getKoiName());
-        orderDetail.setKoiImage(orderDetailDTO.getKoiImage());
         orderDetail.setStatus(orderDetailDTO.getStatus());
         return orderDetail;
     }

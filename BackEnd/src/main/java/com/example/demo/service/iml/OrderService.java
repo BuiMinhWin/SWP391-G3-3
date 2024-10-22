@@ -130,7 +130,6 @@ public class OrderService {
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + accountId));
             order.setAccount(account);
         });
-        Optional.ofNullable(orderDTO.getPostalCode()).ifPresent(order::setPostalCode);
     }
 
 
@@ -314,24 +313,6 @@ public class OrderService {
         } catch (Exception e) {
             logger.error("Failed to send email to {} for Order ID: {}: {}", recipientEmail, order.getOrderId(), e.getMessage());
         }
-    }
-
-    public List<OrderDTO> getOrderByProvince(String province) {
-        logger.info("Fetching orders for province: {}", province);
-
-        List<Order> orders = orderRepository.findByProvinceIgnoreCase(province);
-
-        if (orders.isEmpty()) {
-            throw new ResourceNotFoundException("No orders found for province: " + province);
-        }
-
-        List<OrderDTO> orderDTOs = orders.stream()
-                .map(orderMapper::mapToOrderDTO)
-                .collect(Collectors.toList());
-
-        logger.info("Fetched {} orders for province: {}", orderDTOs.size(), province);
-
-        return orderDTOs;
     }
 
 }

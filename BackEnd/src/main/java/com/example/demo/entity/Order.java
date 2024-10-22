@@ -56,9 +56,6 @@ public class Order {
     @Column(name = "sender_phone")
     private String senderPhone;
 
-    @Column(name = "postal_code")
-    private Integer postalCode;
-
     @Column(name = "sender_note")
     private String senderNote;
 

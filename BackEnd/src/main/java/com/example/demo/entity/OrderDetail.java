@@ -44,12 +44,7 @@ public class OrderDetail {
     @Column(name = "koi_name")
     private String koiName;
 
-    @Column(name = "koi_image")
-    private String koiImage;
-
     @Column(name = "status")
     private int status;
 
-    @Column(name = "additional_service")
-    private String additional_service;
 }

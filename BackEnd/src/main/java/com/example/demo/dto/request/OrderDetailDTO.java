@@ -20,6 +20,5 @@ public class OrderDetailDTO {
     private String koiType;
     private LocalDateTime createdAt;
     private String koiName;
-    private String koiImage;
     private int status;
 }

@@ -75,10 +75,4 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/province/{province}")
-    public ResponseEntity<List<OrderDTO>> getOrdersByProvince(@PathVariable String province) {
-        List<OrderDTO> orders = orderService.getOrderByProvince(province);
-        return new ResponseEntity<>(orders, HttpStatus.OK);
-    }
-
 }

@@ -24,7 +24,6 @@ public class OrderMapper {
                 order.getSenderName(),
                 order.getReceiverPhone(),
                 order.getSenderPhone(),
-                order.getPostalCode(),
                 order.getSenderNote(),
                 order.getReceiverNote(),
                 order.getOrderNote(),
@@ -37,8 +36,7 @@ public class OrderMapper {
 //                order.getDestinationLatitude(),
 //                order.getDestinationLongitude()
                 order.getDistance(),
-                order.getVnpTxnRef(),
-                order.getProvince()
+                order.getVnpTxnRef()
         );
     }
 
@@ -54,7 +52,6 @@ public class OrderMapper {
         order.setSenderName(orderDTO.getSenderName());
         order.setReceiverPhone(orderDTO.getReceiverPhone());
         order.setSenderPhone(orderDTO.getSenderPhone());
-        order.setPostalCode(orderDTO.getPostalCode() != null ? orderDTO.getPostalCode() : 0);
         order.setSenderNote(orderDTO.getSenderNote());
         order.setReceiverNote(orderDTO.getReceiverNote());
         order.setOrderNote(orderDTO.getOrderNote());
@@ -72,7 +69,6 @@ public class OrderMapper {
         order.setStatus(orderDTO.getStatus());
         order.setPaymentStatus(orderDTO.isPaymentStatus());
         order.setVnpTxnRef(orderDTO.getVnpTxnRef());
-        order.setProvince(orderDTO.getProvince());
 
 //        order.setOriginLatitude(orderDTO.getOriginLatitude());
 //        order.setOriginLongitude(orderDTO.getOriginLongitude());

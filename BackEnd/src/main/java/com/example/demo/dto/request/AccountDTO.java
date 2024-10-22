@@ -23,6 +23,5 @@ public class AccountDTO {
     private String roleId;
     private String avatar;
     private int status;
-    private String province;
     private LocalDateTime createAt;
 }

@@ -34,19 +34,19 @@ public class LoginService {
 
                 if (accountOptional.isPresent()) {
                     return ResponseEntity.ok(
-                            new LoginMessage("Login Success", true, account.getRoleId(), account.getAccountId(), account.getProvince())
+                            new LoginMessage("Login Success", true, account.getRoleId(), account.getAccountId())
                     );
                 } else {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body(new LoginMessage("Login Failed", false, account.getRoleId(), null, null));
+                            .body(new LoginMessage("Login Failed", false, account.getRoleId(), null));
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new LoginMessage("Password Not Match", false, account.getRoleId(), null, null));
+                        .body(new LoginMessage("Password Not Match", false, account.getRoleId(), null));
             }
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new LoginMessage("User Name or Email not exists", false, null, null, null));
+                    .body(new LoginMessage("User Name or Email not exists", false, null, null));
         }
     }
 }

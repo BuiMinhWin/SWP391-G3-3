@@ -91,9 +91,6 @@ public class AccountService {
             account.setAvatar(updatedAccountDTO.getAvatar());
         }
 
-        if (updatedAccountDTO.getProvince() != null) {
-            account.setProvince(updatedAccountDTO.getProvince());
-        }
 
         Account updatedAccount = accountRepository.save(account);
         return AccountMapper.maptoAccountDTO(updatedAccount);

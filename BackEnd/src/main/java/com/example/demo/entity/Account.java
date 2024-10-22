@@ -47,9 +47,6 @@ public class Account {
     @Column(name = "status")
     private int status;
 
-    @Column(name = "province")
-    private String province;
-
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createAt;
