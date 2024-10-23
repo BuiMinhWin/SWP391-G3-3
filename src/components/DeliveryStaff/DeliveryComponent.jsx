@@ -74,7 +74,7 @@
 
     const { totalOrders, delivering, approving, fail } = getOrderCounts();
     
-
+    const GHN_API_KEY=import.meta.env.VITE_MAPTILES_KEY;
     useEffect(() => {
       
       const fetchProvinces = async () => {
@@ -83,7 +83,7 @@
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              'Token': 'ba986de0-8bd6-11ef-9db4-127d7400f642',
+              'Token': GHN_API_KEY,
             },
           });
           const data = await response.json();
@@ -427,7 +427,7 @@
                     <th>OrderDate</th>
                     <th>Destination</th>
                     <th>ShipDate</th>
-                    {/* <th>TotalPrice</th> */}
+                    <th>Province</th>
                     <th>Origin</th>
                     <th>Freight</th>
                     <th>Status</th>
@@ -442,7 +442,7 @@
                         <td>{new Date(order.orderDate).toLocaleDateString()}</td>
                         <td>{order.destination}</td>
                         <td>{new Date(order.shippedDate).toLocaleDateString() }</td>
-                        {/* <td>{order.totalPrice}</td> */}
+                        <td>{order.province}</td>
                         <td>{order.origin}</td>
                         <td>{order.freight}</td>
                         <td>{order.status}</td>

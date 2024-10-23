@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { listOrder, updateStatus, getOrderDetail } from '../../services/DeliveryService';
+import { listOrder, updateStatus, getOrderDetail,getOrderByProvince } from '../../services/DeliveryService';
 import { FaLongArrowAltLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
@@ -8,10 +8,15 @@ const ListOrderComponent = () => {
   const [editedStatuses, setEditedStatuses] = useState({});
   // const [orderDetail, setOrderDetail] = useState(null); // Lưu chi tiết đơn hàng ở đây
   const navigate = useNavigate();
+  const province = localStorage.getItem('province'); 
+  console.log(province);
 
   useEffect(() => {
     getAllOrders();
-  }, []);
+    if (province) {
+      getAllOrdersByProvince(province); // Gọi API lấy đơn hàng theo tỉnh
+    }
+  }, [province]);
 
   const getAllOrders = () => {
     listOrder()
@@ -56,6 +61,7 @@ const ListOrderComponent = () => {
   };
 
   const roleId = localStorage.getItem('roleId'); 
+  
 
   const handleBackClick = () => {
     if (roleId === 'Manager') {
@@ -65,6 +71,21 @@ const ListOrderComponent = () => {
     } else {
       navigate('/'); // Điều hướng về homepage
     }
+  };
+
+  const getAllOrdersByProvince = (province) => {
+    getOrderByProvince(province)
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          setOrders(response.data);
+        } else {
+          console.error("API response is not an array", response.data);
+          setOrders([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching orders by province: ", error);
+      });
   };
 
   return (
@@ -107,7 +128,9 @@ const ListOrderComponent = () => {
         </thead>
         <tbody>
           {orders.length > 0 ? (
-            orders.map(order => (
+            orders
+            .filter(order => order.province === province) // Lọc các đơn hàng có tỉnh trùng với localStorage
+            .map(order => (
               <tr key={order.orderId}>
                 <td>{order.orderId}</td>
                 <td>{order.destination}</td>
