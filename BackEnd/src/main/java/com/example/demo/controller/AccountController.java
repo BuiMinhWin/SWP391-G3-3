@@ -33,15 +33,15 @@ public class AccountController {
         return ResponseEntity.ok(accounts);
     }
 
-    @PatchMapping("{accountId}")
+    @PatchMapping("/update/{accountId}")
     public ResponseEntity<AccountDTO> updateAccount(@PathVariable("accountId") String accountId, @RequestBody AccountDTO updatedAccountDTO) {
         AccountDTO accountDTO = accountService.updateAccount(accountId, updatedAccountDTO);
         return ResponseEntity.ok(accountDTO);
     }
 
 
-    @PatchMapping("{accountId}")
-    public ResponseEntity<String> deleteAccount(@PathVariable String accountId) {
+    @PatchMapping("/deActive/{accountId}")
+    public ResponseEntity<String> deactivateAccount(@PathVariable String accountId) {
         accountService.deactivateAccount(accountId);
         return ResponseEntity.ok("Account status set to inactive (soft delete) successfully.");
     }
