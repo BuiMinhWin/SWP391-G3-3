@@ -278,7 +278,7 @@ public class OrderService {
         log.debug("Updating vnpTxnRef for orderId: {} with vnpTxnRef: {}", orderId, vnpTxnRef);
         orderRepository.findById(orderId).ifPresentOrElse(order -> {
             log.debug("Order found: {}", order);
-            order.setVnpTxnRef(vnpTxnRef); // Sửa lỗi ở đây: set vnpTxnRef đúng cách
+            order.setVnpTxnRef(vnpTxnRef);
             orderRepository.save(order);
             log.debug("vnpTxnRef updated and order saved: {}", order);
         }, () -> {

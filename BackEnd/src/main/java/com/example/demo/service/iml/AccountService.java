@@ -96,7 +96,7 @@ public class AccountService {
         return AccountMapper.maptoAccountDTO(updatedAccount);
     }
 
-    public void deleteAccount(String accountId) {
+    public void deactivateAccount(String accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
         account.setStatus(0);
