@@ -318,7 +318,7 @@ public class OrderService {
     public List<OrderDTO> getOrderByDeliver(String deliver) {
         logger.info("Fetching orders for deliver: {}", deliver);
 
-        List<Order> orders = orderRepository.findByOrderByDeliver(deliver);
+        List<Order> orders = orderRepository.findByDeliver(deliver);
 
         if (orders.isEmpty()) {
             throw new ResourceNotFoundException("No orders found for deliver: " + deliver);
