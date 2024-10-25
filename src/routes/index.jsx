@@ -25,11 +25,21 @@ import OrderReport from "../pages/Order/OrderReport";
 import Authenticate from "../components/Member/Authenticate";
 import ResetPasswordComponent from "../components/Member/ResetPasswordComponent";
 import Map from "../components/Map";
+import { SnackbarProvider } from 'notistack';
 // import DistanceCalculator from "../components/DistanceCalculator";
 
 function index() {
   return (
+    <SnackbarProvider
+    maxSnack={3}
+    anchorOrigin={{
+    vertical: 'top',     
+    horizontal: 'center' 
+    }}
+    >
+      
 
+  
     <Routes>
       {/* Member */}
       <Route path="/" element={<Homepage />} />
@@ -206,6 +216,7 @@ function index() {
       />
     
     </Routes>
+    </SnackbarProvider>
   );
 }
 

@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { listOrder, updateStatus} from '../../services/DeliveryService';
 import { FaLongArrowAltLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+
+
 
 const ListOrderComponent = () => {
   const [orders, setOrders] = useState([]);
   const [editedStatuses, setEditedStatuses] = useState({});
   // const [orderDetail, setOrderDetail] = useState(null); // Lưu chi tiết đơn hàng ở đây
   const navigate = useNavigate();
-  const province = localStorage.getItem('province'); 
-  console.log(province);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   useEffect(() => {
     getAllOrders();
@@ -42,14 +44,16 @@ const ListOrderComponent = () => {
   const updateOrderStatus = (orderId) => {
     const newStatus = editedStatuses[orderId] ?? orders.find(order => order.orderId === orderId)?.status;
     if (newStatus) {
-      console.log('New status to update:', newStatus);
+      // console.log('New status to update:', newStatus);
       updateStatus(orderId, newStatus)
         .then((response) => {
-          console.log('Status updated successfully:', response);
+          // console.log('Status updated successfully:', response);
+          enqueueSnackbar('Update successful', { variant: 'success',autoHideDuration: 1000 });
           getAllOrders();
         })
         .catch((error) => {
-          console.error('Error updating status:', error);
+          // console.error('Error updating status:', error);
+          enqueueSnackbar('Update failed. Please try again.', { variant: 'error',autoHideDuration: 1000 });
         });
     }
   };
@@ -115,7 +119,7 @@ const ListOrderComponent = () => {
         <tbody>
           {orders.length > 0 ? (
             orders
-            .filter(order => order.deliver ===accountId) // Lọc các đơn hàng có tỉnh trùng với localStorage
+            .filter(order => order.deliver ===accountId) 
             .map(order => (
               <tr key={order.orderId}>
                 <td>{order.orderId}</td>
