@@ -43,7 +43,11 @@ public class DeliveryStatusService {
             deliveryStatus.setTimeTracking(LocalDateTime.now());
         }
 
-        deliveryStatus.setStatus(1);
+        int status = deliveryStatusDTO.getStatus();
+        if (status < 0 || status > 5) {
+            throw new IllegalArgumentException("Status must be between 0 and 5.");
+        }
+        deliveryStatus.setStatus(status);
 
         System.out.println("Creating DeliveryStatus with Order ID: " + deliveryStatus.getOrder().getOrderId());
 
