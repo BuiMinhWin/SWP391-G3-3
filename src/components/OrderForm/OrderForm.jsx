@@ -8,7 +8,11 @@ import SelectWrapper from "../FromUI/Select";
 import ButtonWrapper from "../FromUI/Button";
 import koi_type from "../../data/koiTypes.json";
 import koi_name from "../../data/koiVarieties.json";
-import { createOrder, order, uploadDocument } from "../../services/CustomerService";
+import {
+  createOrder,
+  order,
+  uploadDocument,
+} from "../../services/CustomerService";
 import { createOrderDetail } from "../../services/CustomerService";
 // import SideBar from "../SideBar/SideBar";
 // import HeaderBar from "../Header/Header/Nguyen";
@@ -18,7 +22,7 @@ import AccessibleIcon from "@mui/icons-material/Accessible";
 import AccessibleForwardIcon from "@mui/icons-material/AccessibleForward";
 import FileUpload from "../FromUI/FileUpload";
 import CheckboxWrapper from "../FromUI/Checkbox";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import axios from "axios";
 
 
@@ -49,7 +53,6 @@ const INITIAL_FORM_STATE = {
   weight: 0.0,
   freight: "",
   additional_service: "",
-  
 };
 
 // Validation Schema with Yup
@@ -103,9 +106,10 @@ const FORM_VALIDATION = Yup.object().shape({
     ),
 });
 
-
-
 const OrderForm = () => {
+  const {testaccId, accountData} = useOutletContext();
+  console.log("accId: ", testaccId,"accData: ", "accountData: ", accountData  )
+
   const navigate = useNavigate();  
   const [provinces, setProvinces] = useState([]);
   const [selectedProvinceS, setSelectedProvinceS] = useState(''); // Tỉnh người gửi
@@ -229,8 +233,11 @@ const OrderForm = () => {
           const newOrderId = orderResponse.orderId;
           console.log("Order created with ID:", newOrderId);
 
-          const uploadResponse = await uploadDocument(values.document_file, newOrderId);
-          console.log('File uploaded successfully:', uploadResponse);
+          const uploadResponse = await uploadDocument(
+            values.document_file,
+            newOrderId
+          );
+          console.log("File uploaded successfully:", uploadResponse);
 
           const orderDetails = await order(newOrderId);
           console.log("Order Details:", orderDetails);
@@ -397,60 +404,60 @@ const OrderForm = () => {
                     </Grid>
                   </Paper>
 
-                  {/* Paper 3: Order Information */}
-                  <Paper elevation={4} sx={{ padding: "20px" }}>
-                    <Typography variant="h6" gutterBottom>
-                      Thông tin bưu gửi
-                    </Typography>
-                    <Grid container spacing={3}>
-                      <Grid item xs={6}>
-                        <SelectWrapper
-                          name="koi_type"
-                          label="Koi Type"
-                          options={koi_type}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <SelectWrapper
-                          name="koi_name"
-                          label="Koi Variant"
-                          options={koi_name}
-                        />
-                      </Grid>
-                      <Grid item xs={3}>
-                        <TextFieldWrapper
-                          name="weight"
-                          label="Cân nặng trung bình"
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">kg</InputAdornment>
-                            ),
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={3}>
-                        <TextFieldWrapper
-                          name="quantity"
-                          label="Số lượng"
-                          type="number"
-                          slotProps={{
-                            inputLabel: {
-                              shrink: true,
-                            },
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <FileUpload name="document_file" />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextFieldWrapper
-                          name="description"
-                          label="Ghi chú"
-                          multiline
-                          rows={4}
-                        />
-                      </Grid>
+                {/* Paper 3: Order Information */}
+                <Paper elevation={4} sx={{ padding: "20px" }}>
+                  <Typography variant="h6" gutterBottom>
+                    Thông tin bưu gửi
+                  </Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={6}>
+                      <SelectWrapper
+                        name="koi_type"
+                        label="Koi Type"
+                        options={koi_type}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <SelectWrapper
+                        name="koi_name"
+                        label="Koi Variant"
+                        options={koi_name}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <TextFieldWrapper
+                        name="weight"
+                        label="Cân nặng trung bình"
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">kg</InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <TextFieldWrapper
+                        name="quantity"
+                        label="Số lượng"
+                        type="number"
+                        slotProps={{
+                          inputLabel: {
+                            shrink: true,
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <FileUpload name="document_file" />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextFieldWrapper
+                        name="description"
+                        label="Ghi chú"
+                        multiline
+                        rows={4}
+                      />
+                    </Grid>
 
                       <Grid item xs={12}>
                         <CustomRadioGroup
