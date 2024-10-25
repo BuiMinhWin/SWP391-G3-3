@@ -71,12 +71,12 @@ const Homepage = () => {
         <a href="#" className="nav-link support-link">
             <i className="fas fa-question-circle"></i>Hỗ Trợ
           </a>
-          {!roleId ? (
+          {/* {!roleId ? ( */}
             <>
               <button className="register-btn" onClick={() => navigate('/register')}>Đăng Ký</button>
               <button className="login-btn" onClick={() => navigate('/login')}>Đăng Nhập</button>
             </>
-          ) : (
+          {/* ) : (
             <>
               {roleId === 'Manager' ? (
                 <button onClick={() => navigate('/manager')}>Back</button>
@@ -89,7 +89,7 @@ const Homepage = () => {
               ):null
               }
             </>
-          )}
+          )} */}
         
       </div>
 

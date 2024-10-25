@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { listOrder, updateStatus, getOrderDetail } from '../../services/DeliveryService';
+import { listOrder, updateStatus } from '../../services/DeliveryService';
 import { FaLongArrowAltLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
 const ListOrderComponent = () => {
   const [orders, setOrders] = useState([]);
-  const [editedStatuses, setEditedStatuses] = useState({});
-  const [orderDetail, setOrderDetail] = useState(null); // Lưu chi tiết đơn hàng ở đây
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,12 +26,18 @@ const ListOrderComponent = () => {
       });
   };
 
-  const handleStatusChange = (orderId, newStatus) => {
-    const updatedStatuses = {
-      ...editedStatuses,
-      [orderId]: newStatus,
-    };
-    setEditedStatuses(updatedStatuses);
+  const handleUpdateStatus = (orderId, currentStatus) => {
+    // Only allow update if the current status is 0
+    if (currentStatus === 0) {
+      const newStatus = 1; // Update to 'Đơn đã được duyệt'
+      updateStatus(orderId, newStatus)
+        .then(() => {
+          getAllOrders(); // Refresh order list after update
+        })
+        .catch((error) => {
+          console.error("Error updating order status: ", error);
+        });
+    }
   };
 
   const handleViewOrder = (orderId) => {
@@ -42,7 +46,7 @@ const ListOrderComponent = () => {
 
   return (
     <div className="container">
-       <button
+      <button
         type="button"
         onClick={() => navigate('/delivery')}
         style={{
@@ -74,6 +78,7 @@ const ListOrderComponent = () => {
             <th>TotalPrice</th>
             <th>Origin</th>
             <th>Status</th>
+            <th>Update Status</th>
             <th>View</th>
           </tr>
         </thead>
@@ -88,7 +93,23 @@ const ListOrderComponent = () => {
                 <td>{order.shippedDate}</td>
                 <td>{order.totalPrice}</td>
                 <td>{order.origin}</td>
-                <td>{order.status}</td>
+                <td>
+                  {order.status === 0 ? "Đang chờ xét duyệt" : "Đơn đã được duyệt"}
+                </td>
+                <td>
+                  {order.status === 0 ? (
+                    <button
+                      className="btn btn-success"
+                      onClick={() => handleUpdateStatus(order.orderId, order.status)}
+                    >
+                      Update
+                    </button>
+                  ) : (
+                    <button className="btn btn-secondary" disabled>
+                      Already Approved
+                    </button>
+                  )}
+                </td>
                 <td>
                   <button
                     className="btn btn-primary"
@@ -101,7 +122,7 @@ const ListOrderComponent = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="9" className="text-center">No Orders Found</td>
+              <td colSpan="10" className="text-center">No Orders Found</td>
             </tr>
           )}
         </tbody>
