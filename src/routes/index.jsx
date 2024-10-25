@@ -25,6 +25,7 @@ import OrderReport from "../pages/Order/OrderReport";
 import Authenticate from "../components/Member/Authenticate";
 import ResetPasswordComponent from "../components/Member/ResetPasswordComponent";
 import Map from "../components/Map";
+import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
 // import DistanceCalculator from "../components/DistanceCalculator";
 
 function index() {

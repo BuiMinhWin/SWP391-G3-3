@@ -22,8 +22,9 @@ import AccessibleIcon from "@mui/icons-material/Accessible";
 import AccessibleForwardIcon from "@mui/icons-material/AccessibleForward";
 import FileUpload from "../FromUI/FileUpload";
 import CheckboxWrapper from "../FromUI/Checkbox";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import axios from "axios";
+
 
 // Initial Form State
 const INITIAL_FORM_STATE = {
@@ -106,6 +107,9 @@ const FORM_VALIDATION = Yup.object().shape({
 });
 
 const OrderForm = () => {
+  const {testaccId, accountData} = useOutletContext();
+  console.log("accId: ", testaccId,"accData: ", "accountData: ", accountData  )
+
   const navigate = useNavigate();  
   const [provinces, setProvinces] = useState([]);
   const [selectedProvinceS, setSelectedProvinceS] = useState(''); // Tỉnh người gửi
