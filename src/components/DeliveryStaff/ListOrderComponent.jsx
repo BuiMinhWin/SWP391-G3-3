@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { listOrder, updateStatus, getOrderDetail,getOrderByProvince } from '../../services/DeliveryService';
+import { listOrder, updateStatus} from '../../services/DeliveryService';
 import { FaLongArrowAltLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
@@ -13,10 +13,8 @@ const ListOrderComponent = () => {
 
   useEffect(() => {
     getAllOrders();
-    if (province) {
-      getAllOrdersByProvince(province); // Gọi API lấy đơn hàng theo tỉnh
-    }
-  }, [province]);
+    
+  }, []);
 
   const getAllOrders = () => {
     listOrder()
@@ -61,7 +59,8 @@ const ListOrderComponent = () => {
   };
 
   const roleId = localStorage.getItem('roleId'); 
-  
+  const accountId = localStorage.getItem("accountId");
+  console.log("accountId:", accountId);
 
   const handleBackClick = () => {
     if (roleId === 'Manager') {
@@ -73,20 +72,7 @@ const ListOrderComponent = () => {
     }
   };
 
-  const getAllOrdersByProvince = (province) => {
-    getOrderByProvince(province)
-      .then((response) => {
-        if (Array.isArray(response.data)) {
-          setOrders(response.data);
-        } else {
-          console.error("API response is not an array", response.data);
-          setOrders([]);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching orders by province: ", error);
-      });
-  };
+
 
   return (
     <div className="container">
@@ -129,7 +115,7 @@ const ListOrderComponent = () => {
         <tbody>
           {orders.length > 0 ? (
             orders
-            .filter(order => order.province === province) // Lọc các đơn hàng có tỉnh trùng với localStorage
+            .filter(order => order.deliver ===accountId) // Lọc các đơn hàng có tỉnh trùng với localStorage
             .map(order => (
               <tr key={order.orderId}>
                 <td>{order.orderId}</td>
