@@ -3,6 +3,7 @@ import { listOrder, updateStatus} from '../../services/DeliveryService';
 import { FaLongArrowAltLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import axios from "axios";
 
 
 
@@ -41,20 +42,69 @@ const ListOrderComponent = () => {
     setEditedStatuses(updatedStatuses);
   };
 
-  const updateOrderStatus = (orderId) => {
+  const API_KEY =import.meta.env.VITE_GOONG_API_KEY; // Thay bằng API Key của bạn
+
+  const reverseGeocodeAddress = async (lat, long) => {
+    try {
+      const response = await axios.get(
+        `https://rsapi.goong.io/Geocode?latlng=${lat},${long}&api_key=${API_KEY}`
+      );
+      const data = response.data;
+      if (data.results && data.results.length > 0) {
+        const address = data.results[0].formatted_address; // Get the formatted address
+        return address; // Return the full address
+      } else {
+        throw new Error('No results found for the address.');
+      }
+    } catch (error) {
+      console.error('Error fetching geocode:', error);
+      throw new Error('Failed to fetch geocode.');
+    }
+  };
+
+  const updateOrderStatus = async (orderId) => {
     const newStatus = editedStatuses[orderId] ?? orders.find(order => order.orderId === orderId)?.status;
+    
     if (newStatus) {
-      // console.log('New status to update:', newStatus);
-      updateStatus(orderId, newStatus)
-        .then((response) => {
-          // console.log('Status updated successfully:', response);
-          enqueueSnackbar('Update successful', { variant: 'success',autoHideDuration: 1000 });
-          getAllOrders();
-        })
-        .catch((error) => {
-          // console.error('Error updating status:', error);
-          enqueueSnackbar('Update failed. Please try again.', { variant: 'error',autoHideDuration: 1000 });
+      updateStatus(orderId, newStatus);
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          const currentLocate = await reverseGeocodeAddress(latitude, longitude);
+          console.log(currentLocate);
+          // const currentLocate = `${latitude},${longitude}`;
+          const data = {
+            orderId: orderId,
+            timeTracking: new Date().toISOString(),
+            currentLocate: currentLocate,
+            status: newStatus, 
+          };
+          console.log(data.status);
+
+          fetch("http://koideliverysystem.id.vn:8080/api/deliveryStatus/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response.json())
+            .then(() => {
+              enqueueSnackbar("Cập nhật trạng thái thành công", { variant: "success", autoHideDuration: 1000 });
+              getAllOrders(); 
+            })
+            .catch(() => {
+              
+              enqueueSnackbar("Cập nhật thất bại. Vui lòng thử lại.", { variant: "error", autoHideDuration: 1000 });
+            });
+        }, () => {
+          
+          enqueueSnackbar("Không thể lấy vị trí hiện tại.", { variant: "error", autoHideDuration: 1000 });
         });
+      } else {
+        alert("Geolocation không được hỗ trợ trên trình duyệt của bạn.");
+      }
     }
   };
 
@@ -64,7 +114,7 @@ const ListOrderComponent = () => {
 
   const roleId = localStorage.getItem('roleId'); 
   const accountId = localStorage.getItem("accountId");
-  console.log("accountId:", accountId);
+  // console.log("accountId:", accountId);
 
   const handleBackClick = () => {
     if (roleId === 'Manager') {
@@ -75,6 +125,7 @@ const ListOrderComponent = () => {
       navigate('/'); // Điều hướng về homepage
     }
   };
+
 
 
 
