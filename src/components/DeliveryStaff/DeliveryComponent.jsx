@@ -56,6 +56,9 @@
     const ordersPerPage = 10; 
   
     const [isDropdownOpen, setDropdownOpen] = useState(true); //drop down
+
+    const accountId = localStorage.getItem("accountId");
+        console.log("accountId:", accountId);
   
     
     const getOrderCounts = () => {
@@ -74,7 +77,7 @@
 
     const { totalOrders, delivering, approving, fail } = getOrderCounts();
     
-    const GHN_API_KEY=import.meta.env.VITE_MAPTILES_KEY;
+    const GHN_API_KEY=import.meta.env.VVITE_GHN_API_KEY;
     useEffect(() => {
       
       const fetchProvinces = async () => {
@@ -436,7 +439,9 @@
                   </thead>
                   <tbody>
                   {currentOrders.length > 0 ? (
-                    currentOrders.map((order) => (
+                    currentOrders
+                    .filter(order => order.deliver ===accountId) 
+                    .map((order) => (
                       <tr key={order.orderId}>
                         <td>{order.orderId}</td>
                         <td>{new Date(order.orderDate).toLocaleDateString()}</td>
