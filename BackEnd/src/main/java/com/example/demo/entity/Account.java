@@ -41,8 +41,9 @@ public class Account {
     @Column(name = "role_id", nullable = false)
     private String roleId;
 
-    @Column(name = "avatar")
-    private String avatar;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] avatar;
 
     @Column(name = "status")
     private int status;

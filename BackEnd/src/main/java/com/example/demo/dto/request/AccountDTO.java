@@ -21,7 +21,7 @@ public class AccountDTO {
     private String email;
     private String phone;
     private String roleId;
-    private String avatar;
+    private byte[] avatar;
     private int status;
     private LocalDateTime createAt;
 }
