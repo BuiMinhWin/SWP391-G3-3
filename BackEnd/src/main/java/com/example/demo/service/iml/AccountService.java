@@ -38,9 +38,6 @@ public class AccountService {
 
         account.setStatus(1);
 
-        if (accountDTO.getAvatar() == null || accountDTO.getAvatar().isEmpty()) {
-            account.setAvatar("");
-        }
         Account savedAccount = accountRepository.save(account);
         return AccountMapper.maptoAccountDTO(savedAccount);
     }
