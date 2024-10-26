@@ -103,7 +103,7 @@ const ListOrderComponent = () => {
           enqueueSnackbar("Không thể lấy vị trí hiện tại.", { variant: "error", autoHideDuration: 1000 });
         });
       } else {
-        alert("Geolocation không được hỗ trợ trên trình duyệt của bạn.");
+        alert("Geolocation fail.");
       }
     }
   };

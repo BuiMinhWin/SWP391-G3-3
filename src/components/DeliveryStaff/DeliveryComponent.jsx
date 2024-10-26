@@ -440,7 +440,7 @@
                   <tbody>
                   {currentOrders.length > 0 ? (
                     currentOrders
-                    .filter(order => order.deliver ===accountId) 
+                    .filter(order => order.deliver ===accountId && order.paymentStatus) 
                     .map((order) => (
                       <tr key={order.orderId}>
                         <td>{order.orderId}</td>
