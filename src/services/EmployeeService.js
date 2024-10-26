@@ -27,6 +27,10 @@ export const deleteAccount = (accountId) => {
   return axios.delete(REST_API_BASE_URL + '/' + accountId);
 };
 
+export const updateAvatar = (accountId, avatar) => {
+  return axios.post(`${REST_API_BASE_URL}/${accountId}`, { avatar });
+};
+
 
 export const loginAccount = (loginData) => {
   return axios.post(REST_API_BASE_URL + '/login', loginData, {

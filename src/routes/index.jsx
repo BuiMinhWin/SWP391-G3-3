@@ -35,7 +35,7 @@ function index() {
     maxSnack={3}
     anchorOrigin={{
     vertical: 'top',     
-    horizontal: 'center' 
+    horizontal: 'right' 
     }}
     >
       
