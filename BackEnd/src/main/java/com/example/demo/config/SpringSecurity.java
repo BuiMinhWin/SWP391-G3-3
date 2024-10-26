@@ -31,8 +31,8 @@ public class SpringSecurity {
                 .logout(logout -> logout
                         .logoutSuccessUrl("/").permitAll()
                 )
-                .csrf(csrf -> csrf.disable())  // Vô hiệu hóa CSRF
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));  // Cấu hình CORS
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         return http.build();
     }
@@ -40,7 +40,7 @@ public class SpringSecurity {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://koideliverysystem.id.vn", "http://koideliverysystem.id.vn:8080/api/accounts/google-login", "https://koi-delivery-system.vercel.app"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://koideliverysystem.id.vn", "http://koideliverysystem.id.vn:8080/api/Google/loginGG", "https://koi-delivery-system.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

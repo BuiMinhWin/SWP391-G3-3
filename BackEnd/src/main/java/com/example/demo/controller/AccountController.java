@@ -1,11 +1,19 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.request.AccountDTO;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.service.iml.AccountService;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -47,5 +55,23 @@ public class AccountController {
     }
 
 
+    @PostMapping(value = "/{accountId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadAvatar(
+            @Parameter(description = "File to upload", required = true)
+            @RequestPart("avatar") MultipartFile file,
+            @PathVariable("accountId") String accountId) throws IOException {
+
+        String uploadAvatar = accountService.updateAvatar(file, accountId);
+        return ResponseEntity.status(HttpStatus.OK).body(uploadAvatar);
+    }
+
+    @GetMapping("/{accountId}/avatar")
+    public ResponseEntity<ByteArrayResource> getAvatar(@PathVariable String accountId) {
+        byte[] imageData = accountService.getAvatar(accountId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(new ByteArrayResource(imageData));
+    }
 
 }

@@ -2,14 +2,23 @@ package com.example.demo.service.iml;
 
 import com.example.demo.dto.request.AccountDTO;
 import com.example.demo.entity.Account;
+import com.example.demo.entity.Document;
 import com.example.demo.entity.IdGenerator;
+import com.example.demo.entity.Order;
 import com.example.demo.exception.DuplicateEmailException;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
+import com.example.demo.util.ImageUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import com.example.demo.exception.ResourceNotFoundException;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +36,10 @@ public class AccountService {
             throw new DuplicateEmailException("This email address '" + accountDTO.getEmail() + "' is already in use." );
         }
 
+        if (accountRepository.existsByPhone(accountDTO.getPhone())) {
+            throw new DuplicateEmailException("This phone number '" + accountDTO.getPhone() + "' is already in use." );
+        }
+
         Account account = AccountMapper.mapToAccount(accountDTO);
         account.setAccountId(IdGenerator.generateId());
         if (accountDTO.getRoleId() == null || accountDTO.getRoleId().isEmpty()) {
@@ -36,17 +49,41 @@ public class AccountService {
             account.setCreateAt(LocalDateTime.now());
         }
 
+        if (accountDTO.getAvatar() == null) {
+            try {
+                account.setAvatar(loadDefaultAvatar());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load default avatar.", e);
+            }
+        }
+
         account.setStatus(1);
 
         Account savedAccount = accountRepository.save(account);
         return AccountMapper.maptoAccountDTO(savedAccount);
     }
 
+    private byte[] loadDefaultAvatar() throws IOException {
+        ClassPathResource resource = new ClassPathResource("static/Avatar.jpg");
+        try (InputStream inputStream = resource.getInputStream()) {
+            return ImageUtils.compressImage(inputStream.readAllBytes());
+        }
+    }
+
+
     public AccountDTO getAccountById(String accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
-        return AccountMapper.maptoAccountDTO(account);
+
+        AccountDTO accountDTO = AccountMapper.maptoAccountDTO(account);
+
+        if (account.getAvatar() != null) {
+            accountDTO.setAvatar(ImageUtils.decompressImage(account.getAvatar()));
+        }
+
+        return accountDTO;
     }
+
 
     public List<AccountDTO> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
@@ -71,23 +108,21 @@ public class AccountService {
             }
             account.setEmail(updatedAccountDTO.getEmail());
         }
-        if (updatedAccountDTO.getRoleId() != null) {
-            account.setRoleId(updatedAccountDTO.getRoleId());
+
+        if (updatedAccountDTO.getPhone() != null) {
+            if (!account.getPhone().equals(updatedAccountDTO.getPhone()) &&
+                    accountRepository.existsByPhone(updatedAccountDTO.getPhone())) {
+                throw new DuplicateEmailException("This phone number '" + updatedAccountDTO.getPhone() + "' is already in use.");
+            }
+            account.setPhone(updatedAccountDTO.getPhone());
         }
+
         if (updatedAccountDTO.getUserName() != null) {
             account.setUserName(updatedAccountDTO.getUserName());
         }
         if (updatedAccountDTO.getPassword() != null) {
             account.setPassword(updatedAccountDTO.getPassword());
         }
-        if (updatedAccountDTO.getAvatar() != null) {
-            account.setAvatar(updatedAccountDTO.getAvatar());
-        }
-
-        if (updatedAccountDTO.getAvatar() != null) {
-            account.setAvatar(updatedAccountDTO.getAvatar());
-        }
-
 
         Account updatedAccount = accountRepository.save(account);
         return AccountMapper.maptoAccountDTO(updatedAccount);
@@ -110,16 +145,39 @@ public class AccountService {
             existingAccountDTO.setEmail(existingAccount.getEmail());
             existingAccountDTO.setCreateAt(existingAccount.getCreateAt());
             existingAccountDTO.setRoleId(existingAccount.getRoleId());
+            existingAccountDTO.setAvatar(existingAccount.getAvatar());
             return existingAccountDTO;
         }
 
         Account account = AccountMapper.mapToAccount(accountDTO);
         account.setAccountId(IdGenerator.generateId());
-        if (accountDTO.getRoleId() == null || accountDTO.getRoleId().isEmpty()) {
-            account.setRoleId("Customer");
+
+        if (accountDTO.getCreateAt() == null) {
+            account.setCreateAt(LocalDateTime.now());
         }
+
+        account.setStatus(1);
+
         Account savedAccount = accountRepository.save(account);
         return AccountMapper.maptoAccountDTO(savedAccount);
+    }
+
+    public String updateAvatar(MultipartFile file, String accountId) throws IOException {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
+
+        account.setAvatar(ImageUtils.compressImage(file.getBytes()));
+
+        accountRepository.save(account);
+
+        return "Avatar uploaded successfully.";
+    }
+
+    public byte[] getAvatar(String accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
+
+        return ImageUtils.decompressImage(account.getAvatar());
     }
 
 }
