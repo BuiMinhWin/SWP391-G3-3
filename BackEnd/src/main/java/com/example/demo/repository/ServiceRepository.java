@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface ServiceRepository extends JpaRepository<Services, Integer> {
     List<Services> findByOrderDetail(OrderDetail orderDetail);
     Optional<Services> findByOrderDetailAndServicesId(OrderDetail orderDetail, Integer servicesId);
-
 }

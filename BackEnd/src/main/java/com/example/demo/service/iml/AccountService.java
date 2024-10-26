@@ -7,6 +7,7 @@ import com.example.demo.exception.DuplicateEmailException;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.util.ImageUtils;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -20,6 +21,13 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import javax.imageio.ImageIO;
 
 @Service
 @AllArgsConstructor
@@ -31,11 +39,11 @@ public class AccountService {
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
         if (accountRepository.existsByEmail(accountDTO.getEmail())) {
-            throw new DuplicateEmailException("This email address '" + accountDTO.getEmail() + "' is already in use." );
+            throw new DuplicateEmailException("This email address '" + accountDTO.getEmail() + "' is already in use.");
         }
 
         if (accountRepository.existsByPhone(accountDTO.getPhone())) {
-            throw new DuplicateEmailException("This phone number '" + accountDTO.getPhone() + "' is already in use." );
+            throw new DuplicateEmailException("This phone number '" + accountDTO.getPhone() + "' is already in use.");
         }
 
         Account account = AccountMapper.mapToAccount(accountDTO);
@@ -133,6 +141,7 @@ public class AccountService {
         accountRepository.save(account);
     }
 
+    @Transactional
     public AccountDTO createAccountGG(AccountDTO accountDTO) {
         Account existingAccount = accountRepository.findByEmail(accountDTO.getEmail());
         if (existingAccount != null) {
@@ -146,10 +155,12 @@ public class AccountService {
             account.setCreateAt(LocalDateTime.now());
         }
 
-        if (accountDTO.getAvatar() != null && accountDTO.getAvatar().length > 0) {
-            String avatarBase64 = new String(accountDTO.getAvatar());
-            byte[] avatarBytes = decodeBase64ToBytes(avatarBase64);
-            account.setAvatar(avatarBytes);
+        if (accountDTO.getAvatar() == null) {
+            try {
+                account.setAvatar(loadDefaultAvatar());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load default avatar.", e);
+            }
         }
 
         account.setStatus(1);
@@ -159,12 +170,6 @@ public class AccountService {
     }
 
 
-    private byte[] decodeBase64ToBytes(String base64String) {
-        if (base64String.contains(",")) {
-            base64String = base64String.split(",")[1];
-        }
-        return Base64.getDecoder().decode(base64String);
-    }
 
     public String updateAvatar(MultipartFile file, String accountId) throws IOException {
         Account account = accountRepository.findById(accountId)

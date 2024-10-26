@@ -243,10 +243,10 @@ public class OrderService {
                 break;
             case STATUS_PROCESSING:
                 logger.info("Order status updated to Processing.");
+                sendEmailNotification(order);
                 break;
             case STATUS_READY_FOR_PICKUP:
                 logger.info("Order status updated to Ready for Pickup.");
-                sendEmailNotification(order);
                 break;
             case STATUS_IN_TRANSIT:
                 logger.info("Order status updated to In Transit.");
