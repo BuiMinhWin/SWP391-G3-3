@@ -22,7 +22,7 @@ import axios from "axios";
 const REST_API_BANK_URL =
   "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
 
-const steps = ["Pending", "Confirmed", "Completed", "Delivered"];
+const steps = ["Đang xử lí", "Thanh toán", "Đang vận chuyển", "Đã hoàn thành"];
 
 const CheckoutPage = () => {
   const location = useLocation();
@@ -86,16 +86,19 @@ const CheckoutPage = () => {
       const response = await axios.post(REST_API_BANK_URL, {
         orderId,
         bankCode: "NCB",
-        returnUrl: "http://localhost:3000/checkout",
+        returnUrl: "http://localhost:3000/payment-outcome",
       });
 
       console.log("Payment API Response:", response.data);
 
-      // Accessing nested paymentUrl correctly
       const paymentUrl = response.data.data?.paymentUrl;
       console.log("Payment URL:", paymentUrl);
 
       if (paymentUrl) {
+        // Store a flag in state to indicate payment status
+        navigate("/payment-outcome", {
+          state: { orderId, paymentStatus: "pending" },
+        });
         window.location.href = paymentUrl;
       } else {
         throw new Error("Payment URL not found.");
@@ -103,24 +106,30 @@ const CheckoutPage = () => {
     } catch (error) {
       if (error.response) {
         console.error("API Error:", error.response.data);
+        // If the payment fails
+        navigate("/payment-outcome", {
+          state: { orderId, paymentStatus: "failed" },
+        });
       } else if (error.request) {
         console.error("No Response from API:", error.request);
+        alert("Failed to proceed to payment.");
       } else {
         console.error("Unexpected Error:", error.message);
+        alert("Failed to proceed to payment.");
       }
-      alert("Failed to proceed to payment.");
     }
   };
 
   if (!orderId) return <Navigate to="/" />;
   if (error) return <Typography color="error">Error: {error}</Typography>;
-  if (!orderData) return <Typography>Loading...</Typography>;
+  if (!orderData) return <Typography>Đang tải...</Typography>;
 
+  
   return (
     <Box sx={{ p: 4, bgcolor: "#f5f5f5", minHeight: "100vh" }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" align="center" gutterBottom>
-          Order Confirmation
+          Xác nhận đơn hàng
         </Typography>
 
         {/* Stepper for Order Status */}
@@ -136,21 +145,22 @@ const CheckoutPage = () => {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Typography variant="h6" gutterBottom>
-              Order Information
+             Thông tin đơn hàng
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            <Typography>Order ID: {orderData.orderId}</Typography>
+            <Typography>Mã đơn: {orderData.orderId}</Typography>
             <Typography>
-              Order Date: {new Date(orderData.orderDate).toLocaleString()}
+              Ngày đặt đơn: {new Date(orderData.orderDate).toLocaleString()}
             </Typography>
-            <Typography>Total Price: {orderData.totalPrice} VND</Typography>
-            <Typography>Status: {steps[orderData.status]}</Typography>
+            <Typography>Tổng giá: {orderData.totalPrice} VND</Typography>
+            <Typography>Tình trạng đơn hàng: {steps[orderData.status]}</Typography>
+            <Typography>Tình trạng thanh toán: {orderData.paymentStatus? "Đã thanh toán" : "Chưa thanh toán"} </Typography>
           </Grid>
 
           {/* PDF Preview */}
           <Grid item xs={12} md={6}>
             <Typography variant="h6" gutterBottom>
-              Order PDF Preview
+              Xem trước PDF
             </Typography>
             <Divider sx={{ mb: 2 }} />
             {pdfUrl ? (
@@ -162,14 +172,14 @@ const CheckoutPage = () => {
                 title="Order PDF Preview"
               />
             ) : (
-              <Typography>Loading PDF...</Typography>
+              <Typography>PDF đang được tải...</Typography>
             )}
           </Grid>
 
           {/* Order Details */}
           <Grid item xs={12}>
             <Typography variant="h6" gutterBottom>
-              Order Details
+              Chi tiết đơn hàng
             </Typography>
             <Divider sx={{ mb: 2 }} />
             {orderDetailData.length > 0 ? (
@@ -184,25 +194,24 @@ const CheckoutPage = () => {
               >
                 {orderDetailData.map((detail) => (
                   <Paper key={detail.orderDetailId} sx={{ mb: 2, p: 2 }}>
-                    <Typography>Koi Type: {detail.koiType}</Typography>
-                    <Typography>Koi Name: {detail.koiName}</Typography>
-                    <Typography>Quantity: {detail.quantity}</Typography>
-                    <Typography>Weight: {detail.weight} kg</Typography>
-                    <Typography>Discount: {detail.discount}</Typography>
+                    <Typography>Loại cá: {detail.koiType}</Typography>
+                    <Typography>Biến thể: {detail.koiName}</Typography>
+                    <Typography>Số lượng: {detail.quantity}</Typography>
+                    <Typography>Cân nặng: {detail.weight} kg</Typography>
+                    <Typography>Mã giảm giá: {detail.discount}</Typography>
                     <Typography>
-                      Status: {detail.status === 0 ? "Pending" : "Completed"}
+                      Tình trạng cá: {detail.status === 0 ? "Khỏe mạnh" : "Bất thường"}
                     </Typography>
                   </Paper>
                 ))}
               </Box>
             ) : (
-              <Typography>No order details found.</Typography>
+              <Typography>Không có đơn nào được tìm thấy.</Typography>
             )}
           </Grid>
 
-          {/* Actions: Cancel and Proceed to Payment */}
-          {orderData.status === 1 && (
-            <Grid item xs={12} sx={{ mt: 2 }}>
+     
+          {(orderData.status === 0 ||  orderData.status=== 1) && (
               <Button
                 variant="contained"
                 color="error"
@@ -211,6 +220,8 @@ const CheckoutPage = () => {
               >
                 Cancel Order
               </Button>
+          )}
+            {orderData.status === 1 && (
               <Button
                 variant="contained"
                 color="primary"
@@ -218,8 +229,9 @@ const CheckoutPage = () => {
               >
                 Proceed to Payment
               </Button>
-            </Grid>
-          )}
+            )}
+
+          
         </Grid>
       </Paper>
     </Box>
