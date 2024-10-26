@@ -2,9 +2,7 @@ package com.example.demo.service.iml;
 
 import com.example.demo.dto.request.AccountDTO;
 import com.example.demo.entity.Account;
-import com.example.demo.entity.Document;
 import com.example.demo.entity.IdGenerator;
-import com.example.demo.entity.Order;
 import com.example.demo.exception.DuplicateEmailException;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
@@ -18,8 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -138,15 +136,7 @@ public class AccountService {
     public AccountDTO createAccountGG(AccountDTO accountDTO) {
         Account existingAccount = accountRepository.findByEmail(accountDTO.getEmail());
         if (existingAccount != null) {
-            AccountDTO existingAccountDTO = new AccountDTO();
-            existingAccountDTO.setAccountId(existingAccount.getAccountId());
-            existingAccountDTO.setFirstName(existingAccount.getFirstName());
-            existingAccountDTO.setLastName(existingAccount.getLastName());
-            existingAccountDTO.setEmail(existingAccount.getEmail());
-            existingAccountDTO.setCreateAt(existingAccount.getCreateAt());
-            existingAccountDTO.setRoleId(existingAccount.getRoleId());
-            existingAccountDTO.setAvatar(existingAccount.getAvatar());
-            return existingAccountDTO;
+            return AccountMapper.maptoAccountDTO(existingAccount);
         }
 
         Account account = AccountMapper.mapToAccount(accountDTO);
@@ -156,10 +146,24 @@ public class AccountService {
             account.setCreateAt(LocalDateTime.now());
         }
 
-        account.setStatus(1);
+        if (accountDTO.getAvatar() != null && accountDTO.getAvatar().length > 0) {
+            String avatarBase64 = new String(accountDTO.getAvatar());
+            byte[] avatarBytes = decodeBase64ToBytes(avatarBase64);
+            account.setAvatar(avatarBytes);
+        }
 
+        account.setStatus(1);
         Account savedAccount = accountRepository.save(account);
+
         return AccountMapper.maptoAccountDTO(savedAccount);
+    }
+
+
+    private byte[] decodeBase64ToBytes(String base64String) {
+        if (base64String.contains(",")) {
+            base64String = base64String.split(",")[1];
+        }
+        return Base64.getDecoder().decode(base64String);
     }
 
     public String updateAvatar(MultipartFile file, String accountId) throws IOException {
