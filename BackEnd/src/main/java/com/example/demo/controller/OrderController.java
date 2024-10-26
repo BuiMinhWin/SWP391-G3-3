@@ -58,6 +58,12 @@ public class OrderController {
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
+    @GetMapping("/deliverers")
+    public ResponseEntity<List<String>> getDeliverers() {
+        List<String> deliverers = orderService.getAllDeliverers();
+        return ResponseEntity.ok(deliverers);
+    }
+
     @PatchMapping("/updateStatus/{orderId}")
     public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable String orderId, @RequestBody UpdateStatusDTO updateStatusDTO) {
         OrderDTO updatedOrder = orderService.updateOrderStatus(orderId, updateStatusDTO.getNewStatus());

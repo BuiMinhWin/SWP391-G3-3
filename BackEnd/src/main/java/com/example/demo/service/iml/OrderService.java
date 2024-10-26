@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -167,6 +168,14 @@ public class OrderService {
         logger.info("Fetched {} orders for accountId: {}", orderDTOs.size(), accountId);
 
         return orderDTOs;
+    }
+
+    public List<String> getAllDeliverers() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(Order::getDeliver)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
 
