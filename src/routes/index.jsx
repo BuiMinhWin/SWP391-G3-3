@@ -25,12 +25,22 @@ import OrderReport from "../pages/Order/OrderReport";
 import Authenticate from "../components/Member/Authenticate";
 import ResetPasswordComponent from "../components/Member/ResetPasswordComponent";
 import Map from "../components/Map";
+import { SnackbarProvider } from 'notistack';
 import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
 // import DistanceCalculator from "../components/DistanceCalculator";
 
 function index() {
   return (
+    <SnackbarProvider
+    maxSnack={3}
+    anchorOrigin={{
+    vertical: 'top',     
+    horizontal: 'center' 
+    }}
+    >
+      
 
+  
     <Routes>
       {/* Member */}
       <Route path="/" element={<Homepage />} />
@@ -54,9 +64,10 @@ function index() {
         <Route
           path="/form"
           element={
-            <Authenticate allowedRoles={["Customer"]}>
-              <OrderForm />
-            </Authenticate>
+            // <Authenticate allowedRoles={["Customer"]}>
+            //   <OrderForm />
+            // </Authenticate>
+            <OrderForm />
           }
         />
         <Route
@@ -200,6 +211,7 @@ function index() {
         }
       />
     </Routes>
+    </SnackbarProvider>
   );
 }
 
