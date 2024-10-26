@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { listOrder, updateStatus } from '../../services/DeliveryService';
+import { listOrder, updateStatus, updateSale } from '../../services/SaleStaffService';
 import { FaLongArrowAltLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
 const ListOrderComponent = () => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
+  const accountId = localStorage.getItem("accountId");
 
   useEffect(() => {
     getAllOrders();
@@ -21,28 +22,20 @@ const ListOrderComponent = () => {
           setOrders([]);
         }
       })
-      .catch((error) => {
-        console.error("Error fetching orders: ", error);
-      });
+      .catch((error) => console.error("Error fetching orders: ", error));
   };
 
   const handleUpdateStatus = (orderId, currentStatus) => {
-    // Only allow update if the current status is 0
     if (currentStatus === 0) {
-      const newStatus = 1; // Update to 'Đơn đã được duyệt'
+      const newStatus = 1;
       updateStatus(orderId, newStatus)
-        .then(() => {
-          getAllOrders(); // Refresh order list after update
-        })
-        .catch((error) => {
-          console.error("Error updating order status: ", error);
-        });
+        .then(() => updateSale(orderId, accountId)) 
+        .then(getAllOrders) // Refresh list
+        .catch((error) => console.error("Error updating order: ", error));
     }
   };
 
-  const handleViewOrder = (orderId) => {
-    navigate(`/confirmDetail/${orderId}`);
-  };
+  const handleViewOrder = (orderId) => navigate(`/confirmDetail/${orderId}`);
 
   return (
     <div className="container">
@@ -66,7 +59,7 @@ const ListOrderComponent = () => {
         <span style={{ marginLeft: '15px' }}>Back</span>
       </button>
 
-      <h2 className="text-center">List of Orders</h2>
+      <h2 className="text-center">List of Confirm Orders</h2>
       <table className="table table-striped table-bordered">
         <thead>
           <tr>
@@ -77,6 +70,7 @@ const ListOrderComponent = () => {
             <th>ShipDate</th>
             <th>TotalPrice</th>
             <th>Origin</th>
+            <th>Sale</th>
             <th>Status</th>
             <th>Update Status</th>
             <th>View</th>
@@ -93,6 +87,7 @@ const ListOrderComponent = () => {
                 <td>{order.shippedDate}</td>
                 <td>{order.totalPrice}</td>
                 <td>{order.origin}</td>
+                <td>{order.sale}</td>
                 <td>
                   {order.status === 0 ? "Đang chờ xét duyệt" : "Đơn đã được duyệt"}
                 </td>
