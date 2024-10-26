@@ -29,23 +29,18 @@ public class TransactionService {
 
     @Autowired
     private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
 
-    public Transaction createTransaction(String orderId) {
-        Optional<Order> orderOptional = orderRepository.findById(orderId);
+    public void createTransaction(String orderId, String vnpTxnRef, int totalPrice) {
+        Order order = orderService.findOrderById(orderId);
+        Transaction transaction = new Transaction();
+        transaction.setOrder(order);
+        transaction.setVnpTxnRef(vnpTxnRef);
+        transaction.setTotalPrice(totalPrice);
+        transaction.setTransactionDate(LocalDateTime.now());
 
-        if (orderOptional.isPresent()) {
-            Order order = orderOptional.get();
-            Transaction transaction = new Transaction();
-            transaction.setOrder(order);
-            transaction.setTransactionDate(LocalDateTime.now());
-            transaction.setVnpTxnRef(order.getVnpTxnRef());
-            transaction.setTotalPrice(order.getTotalPrice());
-
-            return transactionRepository.save(transaction);
-        } else {
-            throw new IllegalArgumentException("Order not found with ID: " + orderId);
-        }
+        transactionRepository.save(transaction);
     }
 
 

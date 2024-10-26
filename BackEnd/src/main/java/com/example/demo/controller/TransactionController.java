@@ -20,13 +20,13 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @PostMapping("/create")
-    public ResponseEntity<TransactionDTO> createTransaction(@RequestBody TransactionDTO transactionDTO) {
-        Transaction transaction = transactionService.createTransaction(transactionDTO.getOrderId());
-        TransactionDTO savedTransactionDTO = TransactionMapper.mapToTransactionDTO(transaction);
-
-        return new ResponseEntity<>(savedTransactionDTO, HttpStatus.CREATED);
-    }
+//    @PostMapping("/create")
+//    public ResponseEntity<TransactionDTO> createTransaction(@RequestBody TransactionDTO transactionDTO) {
+//        Transaction transaction = transactionService.createTransaction(transactionDTO.getOrderId());
+//        TransactionDTO savedTransactionDTO = TransactionMapper.mapToTransactionDTO(transaction);
+//
+//        return new ResponseEntity<>(savedTransactionDTO, HttpStatus.CREATED);
+//    }
 
     @GetMapping("/order/{orderId}")
     public ResponseEntity<List<Transaction>> getTransactionsByOrderId(@PathVariable String orderId) {

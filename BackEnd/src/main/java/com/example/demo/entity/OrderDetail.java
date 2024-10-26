@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 
+import jakarta.mail.Service;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -46,5 +48,8 @@ public class OrderDetail {
 
     @Column(name = "status")
     private int status;
+
+    @OneToMany(mappedBy = "orderDetail", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Services> koiServices;
 
 }

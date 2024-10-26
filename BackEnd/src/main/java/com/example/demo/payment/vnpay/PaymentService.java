@@ -4,6 +4,7 @@ import com.example.demo.config.VNPAYConfig;
 import com.example.demo.dto.request.OrderDTO;
 import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.service.iml.OrderService;
+import com.example.demo.service.iml.TransactionService;
 import com.example.demo.util.VNPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class PaymentService {
     private final VNPAYConfig vnPayConfig;
     private final OrderService orderService;
+    private final TransactionService transactionService;
 
     public PaymentDTO.VNPayResponse createVnPayPayment(HttpServletRequest request, String orderId, String bankCode) {
         try {
@@ -88,6 +90,7 @@ public class PaymentService {
             if ("00".equals(status)) {
                 orderService.updatePaymentStatus(orderDTO.getOrderId(), true);
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 1);
+                transactionService.createTransaction(orderDTO.getOrderId(), vnpTxnRef, orderDTO.getTotalPrice());
                 return new PaymentDTO.VNPayResponse("00", "Success", "http://localhost:3000/payment-outcome");
             } else {
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 0);
