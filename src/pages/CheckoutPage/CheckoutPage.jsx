@@ -210,28 +210,25 @@ const CheckoutPage = () => {
             )}
           </Grid>
 
-     
-          {(orderData.status === 0 ||  orderData.status=== 1) && (
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleCancelOrder}
-                sx={{ mr: 2 }}
-              >
-                Cancel Order
-              </Button>
+          {(orderData.status === 0 || orderData.status === 1) && (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleCancelOrder}
+              sx={{ mr: 2 }}
+            >
+              Hủy đơn
+            </Button>
           )}
-            {orderData.status === 1 && (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleProceedToPayment}
-              >
-                Proceed to Payment
-              </Button>
-            )}
-
-          
+          {orderData.status === 1 && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleProceedToPayment}
+            >
+              Thanh toán
+            </Button>
+          )}
         </Grid>
       </Paper>
     </Box>
