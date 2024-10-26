@@ -75,7 +75,7 @@ const CheckoutPage = () => {
       navigate("/");
     } catch (error) {
       console.error("Error canceling order:", error);
-      alert("Failed to cancel order.");
+      alert("Failed to cancel order.",{orderId});
     }
   };
 
