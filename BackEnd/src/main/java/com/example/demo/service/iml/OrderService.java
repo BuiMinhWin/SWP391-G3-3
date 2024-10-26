@@ -98,23 +98,26 @@ public class OrderService {
     }
 
     public OrderDTO updateOrderWhenCanceled(String orderId, OrderDTO orderDTO) {
-        logger.info("Updating canceled Order with ID: {}", orderId);
+        logger.info("Updating Order with ID: {}", orderId);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
-        if (order.getStatus() != STATUS_CANCELLED) {
-            logger.warn("Attempted to update an order that is not canceled with ID: {}", orderId);
-            throw new IllegalStateException("Order can only be updated if it is canceled.");
+        if (order.getStatus() == 1) {
+            logger.info("Updating 'sale' information for Pending Order with ID: {}", orderId);
+            Optional.ofNullable(orderDTO.getSale()).ifPresent(order::setSale);
+        } else if (order.getStatus() == 2) {
+            logger.info("Updating 'deliver' information for Processing Order with ID: {}", orderId);
+            Optional.ofNullable(orderDTO.getDeliver()).ifPresent(order::setDeliver);
+        } else {
+            logger.warn("Attempted to update an order with an invalid status for update. ID: {}", orderId);
+            throw new IllegalStateException("Order can only be updated if it is in Pending or Processing status.");
         }
 
         updateOrderFields(order, orderDTO);
-
-        order.setStatus(STATUS_PROCESSING);
         Order updatedOrder = orderRepository.save(order);
 
-        logger.info("Order with ID: {} has been updated and status set to Processing.", orderId);
-
+        logger.info("Order with ID: {} has been updated.", orderId);
         return orderMapper.mapToOrderDTO(updatedOrder);
     }
 
@@ -133,6 +136,7 @@ public class OrderService {
             order.setAccount(account);
         });
     }
+
 
 
     public List<OrderDTO> getAllOrders() {
