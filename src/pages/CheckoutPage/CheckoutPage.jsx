@@ -75,7 +75,7 @@ const CheckoutPage = () => {
       navigate("/");
     } catch (error) {
       console.error("Error canceling order:", error);
-      alert("Failed to cancel order.");
+      alert("Failed to cancel order.",{orderId});
     }
   };
 
@@ -200,7 +200,7 @@ const CheckoutPage = () => {
                     <Typography>Cân nặng: {detail.weight} kg</Typography>
                     <Typography>Mã giảm giá: {detail.discount}</Typography>
                     <Typography>
-                      Tình trạng cá: {detail.status === 0 ? "Khỏe mạnh" : "Bất thường"}
+                      Tình trạng cá: {detail.status === 1 ? "Khỏe mạnh" : "Bất thường"}
                     </Typography>
                   </Paper>
                 ))}
