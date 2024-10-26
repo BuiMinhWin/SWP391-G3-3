@@ -64,9 +64,10 @@ function index() {
         <Route
           path="/form"
           element={
-            <Authenticate allowedRoles={["Customer"]}>
-              <OrderForm />
-            </Authenticate>
+            // <Authenticate allowedRoles={["Customer"]}>
+            //   <OrderForm />
+            // </Authenticate>
+            <OrderForm />
           }
         />
         <Route
