@@ -31,13 +31,7 @@ import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
 
 function index() {
   return (
-    <SnackbarProvider
-    maxSnack={3}
-    anchorOrigin={{
-    vertical: 'top',     
-    horizontal: 'center' 
-    }}
-    >
+
       
 
   
@@ -211,7 +205,6 @@ function index() {
         }
       />
     </Routes>
-    </SnackbarProvider>
   );
 }
 
