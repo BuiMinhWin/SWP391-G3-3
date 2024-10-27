@@ -9,7 +9,7 @@ export const listAccount = () => {
 };
 
 export const createAccount = (account) => {
-  return axios.post(REST_API_BASE_URL + '/register', account);
+  return axios.post(REST_API_BASE_URL +'/register',account);
 };
 
 

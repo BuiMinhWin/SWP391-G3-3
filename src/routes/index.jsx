@@ -42,7 +42,7 @@ function index() {
       <Route path="/login" element={<LoginComponent />} />
       <Route path="/user-page" element={<UserPage />} />
       <Route path="/register" element={<RegisterComponent />} />
-      <Route path="/register" element={<RegisterComponent />} />
+      
       <Route path="/reset" element={<ResetPasswordComponent />} />
       <Route path="/map" element={< Map />} />
       {/* <Route path="/calculate" element={< DistanceCalculator />} /> */}

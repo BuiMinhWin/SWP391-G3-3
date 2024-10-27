@@ -12,8 +12,7 @@ const RegisterComponent = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [gender, setGender] = useState('');
-  const [avatar, setAvatar] = useState('');
+ 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   
@@ -34,7 +33,6 @@ const RegisterComponent = () => {
       email, 
       phone, 
       roleId: 'Customer', 
-      avatar, 
       createAt: new Date().toISOString() 
     };
   
