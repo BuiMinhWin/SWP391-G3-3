@@ -29,7 +29,7 @@ import { SnackbarProvider } from 'notistack';
 import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
 import DriverBooking from "../components/SaleStaff/AssignDriverComponent";
 import ConfirmDriver from "../components/SaleStaff/ConfirmDriver";
-// import DistanceCalculator from "../components/DistanceCalculator";
+import ListOrderManageComponent from "../components/Manager/ListOrderManageComponent";
 
 function index() {
   return (
@@ -42,7 +42,6 @@ function index() {
       <Route path="/login" element={<LoginComponent />} />
       <Route path="/user-page" element={<UserPage />} />
       <Route path="/register" element={<RegisterComponent />} />
-      
       <Route path="/reset" element={<ResetPasswordComponent />} />
       <Route path="/map" element={< Map />} />
       {/* <Route path="/calculate" element={< DistanceCalculator />} /> */}
@@ -131,6 +130,17 @@ function index() {
         }
       />
 
+      <Route
+        path="/ordersM"
+        element={
+          <Authenticate allowedRoles={["Manager"]}>
+            <ListOrderManageComponent />
+          </Authenticate>
+        }
+      />
+
+    
+
       {/*customer*/}
       <Route
         path="/customer"
@@ -154,7 +164,7 @@ function index() {
       <Route
         path="/orders"
         element={
-          <Authenticate allowedRoles={["Delivery", "Manager"]}>
+          <Authenticate allowedRoles={["Delivery"]}>
             <ListOrderComponent />
           </Authenticate>
         }
