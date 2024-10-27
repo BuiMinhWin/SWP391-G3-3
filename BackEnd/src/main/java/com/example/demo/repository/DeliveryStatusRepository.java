@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface DeliveryStatusRepository extends JpaRepository<DeliveryStatus, String> {
     List<DeliveryStatus> findByOrder(Order order);
-
 }

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -35,6 +37,13 @@ public class Feedback {
 
     @Column(name = "comment")
     private String comment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_feedback_id")
+    private Feedback parentFeedback;
+
+    @OneToMany(mappedBy = "parentFeedback", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feedback> responses = new ArrayList<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
