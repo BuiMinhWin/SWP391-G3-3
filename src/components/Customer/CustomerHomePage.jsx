@@ -51,7 +51,7 @@ const Homepage = () => {
        
         const avatarUrl = await getAvatar(accountId);
         setAvatar(avatarUrl);
-        console.log(avatarUrl); 
+        // console.log(avatarUrl); 
       } catch (error) {
         console.error("Error fetching account data:", error);
       } 
