@@ -223,9 +223,8 @@ const OrderForm = () => {
       const response = await fetch(`https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${districtId}`, {
         method: 'GET', 
         headers: {
-          'Token': GHN_API_KEY,
           'Content-Type': 'application/json',
-          
+           'Token': GHN_API_KEY,
         },
       });
       const data = await response.json();
@@ -267,14 +266,18 @@ const OrderForm = () => {
 
   return (
     <Formik
-      initialValues={{INITIAL_FORM_STATE, cityS: selectedProvinceS, cityR: selectedProvinceR}}
+      initialValues={{INITIAL_FORM_STATE, cityS: selectedProvinceS, cityR: selectedProvinceR
+        , districtS: selectedDistrictSId, districtR: selectedDistrictRId
+        , wardS: selectedWardSId, wardR: selectedWardRId
+      }}
       validationSchema={FORM_VALIDATION}
       onSubmit={async (values, { setSubmitting, setErrors }) => {
         try {
           const accountId = localStorage.getItem("accountId");
           
-          const originCoordinates = await geocodeAddress(`${values.origin}`);
-          const destinationCoordinates = await geocodeAddress(`${values.destination}`);
+          const originCoordinates = await geocodeAddress(`${values.origin}, ${values.wardS}, ${values.districtS}, ${values.cityS}`);
+          const destinationCoordinates = await geocodeAddress( `${values.destination}, ${values.wardR}, ${values.districtR},${values.cityR}`);
+          
 
           const origins = `${originCoordinates.lat},${originCoordinates.lng}`;
           const destinations = `${destinationCoordinates.lat},${destinationCoordinates.lng}`;
@@ -285,8 +288,8 @@ const OrderForm = () => {
           const orderData = {
             ...values,
             accountId,
-            origin: `${values.origin}, ${values.cityS}, ${values.postalCodeS}`,
-            destination: `${values.destination}, ${values.cityR}, ${values.postalCodeR}`,
+            origin: `${values.origin}, ${values.wardS || selectedWardSId}, ${values.districtS || selectedDistrictSId}, ${values.cityS || selectedProvinceS}`,
+            destination: `${values.destination}, ${values.wardR || selectedWardRId}, ${values.districtR || selectedDistrictRId}, ${values.cityR || selectedProvinceR}`,
             freight: values.freight,
             receiverName: values.receiverName,
             senderName: values.senderName,
@@ -344,6 +347,7 @@ const OrderForm = () => {
     >
       {({ handleSubmit, errors,setFieldValue }) => {
         console.log("Validation errors:", errors); // Log validation errors
+        
         const handleSenderProvinceChange = (event) => {
           const value = event.target.value;
           setSelectedProvinceS(value); // Cập nhật state địa phương người gửi
@@ -369,7 +373,8 @@ const OrderForm = () => {
 
         const handleSenderDistrictChange = (event) => {
           const value = event.target.value; // bắt districtId
-          setSelectedDistrictSId(value); // 
+          setSelectedDistrictSId(value); //
+          setFieldValue('districtS', value); 
           console.log('Selected District ID:', value); // 
       
           
@@ -381,6 +386,7 @@ const OrderForm = () => {
         const handleReceiverDistrictChange = (event) => {
           const value = event.target.value; 
           setSelectedDistrictRId(value); 
+          setFieldValue('districtR', value);
           console.log('Selected District ID:', value);
    
           fetchWards(value); 
@@ -389,15 +395,17 @@ const OrderForm = () => {
 
         const handleSenderWardChange = (event) => {
           const value = event.target.value;// bắt wardId
-          setSelectedSWard(value); 
-          console.log('Selected District ID:', value); 
+          setSelectedSWard(value);
+          setFieldValue('wardS', value);
+          console.log('Selected Ward Code::', value); 
     
         };
 
         const handleReceiverWardChange = (event) => {
           const value = event.target.value; 
           setSelectedRWard(value);
-          console.log('Selected District ID:', value); 
+          setFieldValue('wardR', value);
+          console.log('Selected Ward Code:', value); 
     
         };
 
