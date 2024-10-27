@@ -7,6 +7,7 @@ const REST_API_ORDER_DETAIL_URL =
 const REST_API_DOCUMENT_URL =
   "http://koideliverysystem.id.vn:8080/api/documents";
 const REST_API_ACCOUNT_URL = "http://koideliverysystem.id.vn:8080/api/accounts";
+const REST_API_FEEDBACK = "http://koideliverysystem.id.vn:8080/api/feedbacks";
 
 export const createOrder = async (orderData) => {
   try {
@@ -16,7 +17,7 @@ export const createOrder = async (orderData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error creating order:", error.message); // Log only the message
+    console.error("Error creating order:", error.message);
     if (error.response) {
       console.error("Response data:", error.response.data);
       console.error("Response status:", error.response.status);
@@ -177,7 +178,7 @@ export const updateServiceStatus = async (
 
     const response = await axios.patch(
       `${REST_API_SERVICE_URL}/updateService/${orderDetailId}/service/${serviceId}`,
-      null, 
+      null,
       {
         params: { newStatus: serviceStatus },
       }
