@@ -7,7 +7,6 @@ import com.example.demo.exception.DuplicateEmailException;
 import com.example.demo.mapper.AccountMapper;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.util.ImageUtils;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -18,16 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import javax.imageio.ImageIO;
 
 @Service
 @AllArgsConstructor
@@ -37,7 +28,6 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
-    @Transactional
     public AccountDTO createAccount(AccountDTO accountDTO) {
         if (accountRepository.existsByEmail(accountDTO.getEmail())) {
             throw new DuplicateEmailException("This email address '" + accountDTO.getEmail() + "' is already in use.");
@@ -45,6 +35,10 @@ public class AccountService {
 
         if (accountRepository.existsByPhone(accountDTO.getPhone())) {
             throw new DuplicateEmailException("This phone number '" + accountDTO.getPhone() + "' is already in use.");
+        }
+
+        if (accountRepository.existsByUserName(accountDTO.getUserName())) {
+            throw new DuplicateEmailException("This user name '" + accountDTO.getUserName() + "' is already in use.");
         }
 
         Account account = AccountMapper.mapToAccount(accountDTO);
@@ -98,7 +92,6 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public AccountDTO updateAccount(String accountId, AccountDTO updatedAccountDTO) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
@@ -136,7 +129,6 @@ public class AccountService {
         return AccountMapper.maptoAccountDTO(updatedAccount);
     }
 
-    @Transactional
     public void deactivateAccount(String accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
@@ -144,7 +136,6 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    @Transactional
     public AccountDTO createAccountGG(AccountDTO accountDTO) {
         Account existingAccount = accountRepository.findByEmail(accountDTO.getEmail());
         if (existingAccount != null) {
@@ -174,7 +165,6 @@ public class AccountService {
 
 
 
-    @Transactional
     public String updateAvatar(MultipartFile file, String accountId) throws IOException {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));

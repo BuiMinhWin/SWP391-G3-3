@@ -18,5 +18,5 @@ public class FeedbackDTO {
     private int rating;
     private String comment;
     private LocalDateTime createdAt;
-    private int status;
+    private String accountId;
 }

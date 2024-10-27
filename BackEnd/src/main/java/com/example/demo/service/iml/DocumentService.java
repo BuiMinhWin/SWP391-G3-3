@@ -20,7 +20,6 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final OrderRepository orderRepository;
 
-    @Transactional
     public String uploadImage(MultipartFile file, String orderId) throws IOException {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));

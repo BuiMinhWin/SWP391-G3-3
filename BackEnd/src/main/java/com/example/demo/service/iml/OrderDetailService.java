@@ -23,7 +23,6 @@ public class OrderDetailService {
     @Autowired
     private OrderRepository orderRepository;
 
-    @Transactional
     public OrderDetailDTO createOrderDetail(OrderDetailDTO orderDetailDTO) {
         System.out.println("Received OrderDetailDTO: " + orderDetailDTO);
 

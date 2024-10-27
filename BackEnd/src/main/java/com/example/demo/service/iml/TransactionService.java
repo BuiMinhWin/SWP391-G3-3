@@ -33,7 +33,6 @@ public class TransactionService {
     private final OrderService orderService;
 
 
-    @Transactional
     public void createTransaction(String orderId, String vnpTxnRef, int totalPrice) {
         Order order = orderService.findOrderById(orderId);
         Transaction transaction = new Transaction();

@@ -26,6 +26,10 @@ public class Feedback {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
     @Column(name = "rating")
     private int rating;
 
