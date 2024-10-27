@@ -33,13 +33,6 @@ import ConfirmDriver from "../components/SaleStaff/ConfirmDriver";
 
 function index() {
   return (
-    <SnackbarProvider
-    maxSnack={3}
-    anchorOrigin={{
-    vertical: 'top',     
-    horizontal: 'right' 
-    }}
-    >
       
 
   
@@ -233,7 +226,6 @@ function index() {
         }
       />
     </Routes>
-    </SnackbarProvider>
   );
 }
 
