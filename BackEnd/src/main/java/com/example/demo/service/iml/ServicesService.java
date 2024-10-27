@@ -27,7 +27,6 @@ public class ServicesService {
     @Autowired
     private OrderDetailRepository orderDetailRepository;
 
-    @Transactional
     public List<ServicesDTO> createServicesForOrder(ServicesDTO servicesDTO) {
 
         OrderDetail orderDetail = orderDetailRepository.findById(servicesDTO.getOrderDetailId())
@@ -35,23 +34,23 @@ public class ServicesService {
 
         List<ServicesDTO> servicesDTOList = new ArrayList<>();
 
-        for (int serviceId = 1; serviceId <= 3; serviceId++) {
+        for (int servicesId = 1; servicesId <= 3; servicesId++) {
             ServicesDTO newServiceDTO = new ServicesDTO();
             newServiceDTO.setOrderDetailId(servicesDTO.getOrderDetailId());
-            newServiceDTO.setServiceId(serviceId);
+            newServiceDTO.setServicesId(servicesId);
             newServiceDTO.setServiceStatus("No");
             newServiceDTO.setPrice(0.0);
 
             String serviceName;
-            switch (serviceId) {
+            switch (servicesId) {
                 case 1:
-                    serviceName = "Service Type A";
+                    serviceName = "Bảo hiểm cho cá";
                     break;
                 case 2:
-                    serviceName = "Service Type B";
+                    serviceName = "Chăm sóc cá";
                     break;
                 case 3:
-                    serviceName = "Service Type C";
+                    serviceName = "Trả sau";
                     break;
                 default:
                     serviceName = "Unknown Service";
@@ -80,7 +79,6 @@ public class ServicesService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public ServicesDTO updateServiceStatusByOrderIdAndServiceId(String orderDetailId, Integer servicesId, String newStatus) {
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("OrderDetail not found with id: " + orderDetailId));
@@ -99,7 +97,7 @@ public class ServicesService {
                     service.setPrice("Yes".equalsIgnoreCase(newStatus) ? 50.0 : 0.0);
                     break;
                 case 3:
-                    service.setPrice("Yes".equalsIgnoreCase(newStatus) ? 70.0 : 0.0);
+                    service.setPrice("Yes".equalsIgnoreCase(newStatus) ? 0 : 0.0);
                     break;
                 default:
                     service.setPrice(0.0);

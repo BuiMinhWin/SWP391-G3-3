@@ -19,7 +19,7 @@ public class ServicesMapper {
 
     public static Services mapToServices(ServicesDTO servicesDTO, OrderDetail orderDetail) {
         Services service = new Services();
-        service.setServicesId(servicesDTO.getServiceId());
+        service.setServicesId(servicesDTO.getServicesId());
         service.setOrderDetail(orderDetail);
         service.setPrice(servicesDTO.getPrice());
         service.setServiceStatus(servicesDTO.getServiceStatus());

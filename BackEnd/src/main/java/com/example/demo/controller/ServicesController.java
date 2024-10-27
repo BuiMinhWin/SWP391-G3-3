@@ -20,8 +20,8 @@ public class ServicesController {
     private ServicesService servicesService;
 
     @GetMapping("/getServices/{orderDetailId}")
-    public ResponseEntity<List<ServicesDTO>> getServices(@PathVariable String orderId) {
-        List<ServicesDTO> services = servicesService.getServices(orderId);
+    public ResponseEntity<List<ServicesDTO>> getServices(@PathVariable String orderDetailId) {
+        List<ServicesDTO> services = servicesService.getServices(orderDetailId);
         return new ResponseEntity<>(services, HttpStatus.OK);
     }
 
