@@ -139,7 +139,7 @@ const OrderForm = () => {
   const API_KEY =import.meta.env.VITE_GOONG_API_KEY; // Thay bằng API Key của bạn
 
   const geocodeAddress = async (address) => {
-    console.log(address);
+    console.log( "địa chỉ để tính", address);
     try {
       const response = await axios.get(
         `https://rsapi.goong.io/geocode?address=${encodeURIComponent(address)}&api_key=${API_KEY}`
@@ -248,10 +248,9 @@ const OrderForm = () => {
       const response = await axios.get(
         `https://rsapi.goong.io/distancematrix?origins=${origins}&destinations=${destinations}&vehicle=car&api_key=${API_KEY}`
       );
-      
+  
       const data = response.data;
-      if (data?.rows[0]?.elements[0]?.distance) {
-        
+      if (data?.rows && data.rows.length > 0 && data.rows[0]?.elements[0]?.distance) {
         const distanceInKm = data.rows[0].elements[0].distance.value / 1000;
         return distanceInKm; 
       } else {
@@ -275,21 +274,20 @@ const OrderForm = () => {
         try {
           const accountId = localStorage.getItem("accountId");
           
-          const originCoordinates = await geocodeAddress(`${values.origin}, ${values.wardS}, ${values.districtS}, ${values.cityS}`);
-          const destinationCoordinates = await geocodeAddress( `${values.destination}, ${values.wardR}, ${values.districtR},${values.cityR}`);
-          
+          const originCoordinates = await geocodeAddress(`${values.origin}, ${values.wardS}, ${values.districtS} ,${values.cityS}`);
+          const destinationCoordinates = await geocodeAddress(`${values.destination}, ${values.wardR}, ${values.districtR} ,${values.cityR}`);
 
           const origins = `${originCoordinates.lat},${originCoordinates.lng}`;
           const destinations = `${destinationCoordinates.lat},${destinationCoordinates.lng}`;
 
           const distance = await fetchDistanceData(origins, destinations);
-          console.log(distance);
+          console.log("Khoảng cách tính được: ",distance);
 
           const orderData = {
             ...values,
             accountId,
-            origin: `${values.origin}, ${values.wardS || selectedWardSId}, ${values.districtS || selectedDistrictSId}, ${values.cityS || selectedProvinceS}`,
-            destination: `${values.destination}, ${values.wardR || selectedWardRId}, ${values.districtR || selectedDistrictRId}, ${values.cityR || selectedProvinceR}`,
+            origin: `${values.origin}, ${values.wardS}, ${values.districtS} ,${values.cityS}`,
+            destination: `${values.destination}, ${values.wardR}, ${values.districtR} ,${values.cityR}`,
             freight: values.freight,
             receiverName: values.receiverName,
             senderName: values.senderName,
@@ -300,9 +298,14 @@ const OrderForm = () => {
             orderNote: values.orderNote,
             distance: distance,
           };
-          console.log(orderData);
+
           
           const orderResponse = await createOrder(orderData);
+          console.log(
+            "Order data created successfully:",
+            orderResponse
+          );
+
           if (!orderResponse?.orderId) {
             throw new Error("Order ID not found in the response");
           }
@@ -349,65 +352,63 @@ const OrderForm = () => {
         console.log("Validation errors:", errors); // Log validation errors
         
         const handleSenderProvinceChange = (event) => {
-          const value = event.target.value;
-          setSelectedProvinceS(value); // Cập nhật state địa phương người gửi
-          setFieldValue('cityS', value);
-          console.log('Selected Province ID:', value)
-          
-          fetchDistricts(value); 
-          
-          
-        };
-      
-        // Hàm thay đổi giá trị tỉnh của người nhận
-        const handleReceiverProvinceChange = (event) => {
-          const value = event.target.value;
-            setSelectedProvinceR(value); 
-            setFieldValue('cityR', value);
-            console.log('Selected Province ID:', value); 
-            
-            fetchDistricts(value); 
-         
-            
-        };
 
-        const handleSenderDistrictChange = (event) => {
-          const value = event.target.value; // bắt districtId
-          setSelectedDistrictSId(value); //
-          setFieldValue('districtS', value); 
-          console.log('Selected District ID:', value); // 
-      
-          
-          fetchWards(value); 
-          
-        };
+  const selectedProvince = provinces.find(province => province.value === event.target.value);
+  if (selectedProvince) {
+    setSelectedProvinceS(selectedProvince.value); // Save the value for state
+    setFieldValue('cityS', selectedProvince.label); // Save the label for the form
+    console.log('Selected Province ID:', selectedProvince.value);
+    fetchDistricts(selectedProvince.value);
+  }
+};
 
-        
-        const handleReceiverDistrictChange = (event) => {
-          const value = event.target.value; 
-          setSelectedDistrictRId(value); 
-          setFieldValue('districtR', value);
-          console.log('Selected District ID:', value);
-   
-          fetchWards(value); 
-          
-        };
+const handleReceiverProvinceChange = (event) => {
+  const selectedProvince = provinces.find(province => province.value === event.target.value);
+  if (selectedProvince) {
+    setSelectedProvinceR(selectedProvince.value);
+    setFieldValue('cityR', selectedProvince.label);
+    console.log('Selected Province ID:', selectedProvince.value);
+    fetchDistricts(selectedProvince.value);
+  }
+};
 
-        const handleSenderWardChange = (event) => {
-          const value = event.target.value;// bắt wardId
-          setSelectedSWard(value);
-          setFieldValue('wardS', value);
-          console.log('Selected Ward Code::', value); 
-    
-        };
+const handleSenderDistrictChange = (event) => {
+  const selectedDistrict = districts.find(district => district.value === event.target.value);
+  if (selectedDistrict) {
+    setSelectedDistrictSId(selectedDistrict.value);
+    setFieldValue('districtS', selectedDistrict.label); // Save the label for the form
+    console.log('Selected District ID:', selectedDistrict.value);
+    fetchWards(selectedDistrict.value);
+  }
+};
 
-        const handleReceiverWardChange = (event) => {
-          const value = event.target.value; 
-          setSelectedRWard(value);
-          setFieldValue('wardR', value);
-          console.log('Selected Ward Code:', value); 
-    
-        };
+const handleReceiverDistrictChange = (event) => {
+  const selectedDistrict = districts.find(district => district.value === event.target.value);
+  if (selectedDistrict) {
+    setSelectedDistrictRId(selectedDistrict.value);
+    setFieldValue('districtR', selectedDistrict.label); // Save the label for the form
+    console.log('Selected District ID:', selectedDistrict.value);
+    fetchWards(selectedDistrict.value);
+  }
+};
+
+const handleSenderWardChange = (event) => {
+  const selectedWard = wards.find(ward => ward.value === event.target.value);
+  if (selectedWard) {
+    setSelectedSWard(selectedWard.value);
+    setFieldValue('wardS', selectedWard.label); // Save the label for the form
+    console.log('Selected Ward ID:', selectedWard.value);
+  }
+};
+
+const handleReceiverWardChange = (event) => {
+  const selectedWard = wards.find(ward => ward.value === event.target.value);
+  if (selectedWard) {
+    setSelectedRWard(selectedWard.value);
+    setFieldValue('wardR', selectedWard.label); // Save the label for the form
+    console.log('Selected Ward ID:', selectedWard.value);
+  }
+};
 
         return (
           <Form onSubmit={handleSubmit}>
@@ -434,12 +435,12 @@ const OrderForm = () => {
                       </Grid>
                       <Grid item xs={6}>
                       <FormControl fullWidth>
-                        <InputLabel>Tỉnh người gửi</InputLabel>
+                        <InputLabel>Tỉnh (người gửi)</InputLabel>
                         <Select
                           name="cityS"
                           value={selectedProvinceS}
                           onChange={handleSenderProvinceChange}
-                          label="Tỉnh"
+                          label="Tỉnh (người gửi)"
                         >
                           {provinces.map((province) => (
                             <MenuItem key={province.value} value={province.value}>
@@ -451,12 +452,12 @@ const OrderForm = () => {
                     </Grid>
                     <Grid item xs={6}>
                         <FormControl fullWidth>
-                          <InputLabel>Quận người gửi</InputLabel>
+                          <InputLabel>Quận (người gửi)</InputLabel>
                           <Select
                             name="districtS"
                             value={selectedDistrictSId}
                             onChange={handleSenderDistrictChange}
-                            label="Quận người nhận"
+                            label="Quận (người gửi)"
                           >
                             {districts.map((district) => (
                               <MenuItem key={district.value} value={district.value}>
@@ -469,10 +470,10 @@ const OrderForm = () => {
 
                       <Grid item xs={6}>
                         <FormControl fullWidth>
-                          <InputLabel>Phường người gửi</InputLabel>
+                          <InputLabel>Phường (người gửi)</InputLabel>
                           <Select
                             name="wards"
-                            label="Phường người gửi"
+                            label="Phường (người gửi)"
                             value={selectedWardSId} // Nếu bạn có state để lưu phường đã chọn
                             onChange={handleSenderWardChange} // Nếu bạn có hàm xử lý cho phường
                           >
@@ -491,7 +492,7 @@ const OrderForm = () => {
                           label="Địa chỉ người gửi"
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid item xs={12}>
                         <TextFieldWrapper
                           name="senderNote"
                           label="Hướng dẫn giao hàng"
@@ -522,12 +523,12 @@ const OrderForm = () => {
                       </Grid>
                       <Grid item xs={6}>
                       <FormControl fullWidth>
-                        <InputLabel>Tỉnh người nhận</InputLabel>
+                        <InputLabel>Tỉnh (người nhận)</InputLabel>
                         <Select
                           name="cityR"
                           value={selectedProvinceR}
                           onChange={handleReceiverProvinceChange}
-                          label="Tỉnh người nhận"
+                          label="Tỉnh (người nhận)"
                         >
                           {provinces.map((province) => (
                             <MenuItem key={province.value} value={province.value}>
@@ -540,12 +541,12 @@ const OrderForm = () => {
 
                       <Grid item xs={6}>
                         <FormControl fullWidth>
-                          <InputLabel>Quận người nhận</InputLabel>
+                          <InputLabel>Quận (người nhận)</InputLabel>
                           <Select
                             name="districtR"
                             value={selectedDistrictRId}
                             onChange={handleReceiverDistrictChange}
-                            label="Quận người nhận"
+                            label="Quận (người nhận)"
                           >
                             {districts.map((district) => (
                               <MenuItem key={district.value} value={district.value}>
@@ -558,10 +559,10 @@ const OrderForm = () => {
 
                       <Grid item xs={6}>
                         <FormControl fullWidth>
-                          <InputLabel>Phường người nhận</InputLabel>
+                          <InputLabel>Phường (người nhận)</InputLabel>
                           <Select
                             name="wardR"
-                            label="Phường người nhận"
+                            label="Phường (người nhận)"
                             value={selectedWardRId} 
                             onChange={handleReceiverWardChange} 
                           >
@@ -580,7 +581,7 @@ const OrderForm = () => {
                           label="Địa chỉ người nhận"
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid item xs={12}>
                         <TextFieldWrapper
                           name="receiverNote"
                           label="Hướng dẫn giao hàng"

@@ -28,6 +28,7 @@ const drawerWidth = 240;
 const Layout = () => {
   const [account, setAccount] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(null); 
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
 
@@ -38,6 +39,9 @@ const Layout = () => {
         try {
           const accountData = await getAccountById(accountId);
           setAccount(accountData);
+
+          const fetchedAvatarUrl = await getAvatar(accountId);
+          setAvatarUrl(fetchedAvatarUrl); // Set the fetched avatar URL
 
           const avatar = await getAvatar(accountId);
           setAvatarUrl(avatar);
@@ -55,6 +59,7 @@ const Layout = () => {
   const handleLogout = () => {
     localStorage.removeItem("accountId");
     setAnchorEl(null);
+    navigate("/");
     navigate("/");
   };
 
