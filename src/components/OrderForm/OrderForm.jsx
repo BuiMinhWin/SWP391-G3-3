@@ -351,64 +351,64 @@ const OrderForm = () => {
       {({ handleSubmit, errors,setFieldValue }) => {
         console.log("Validation errors:", errors); // Log validation errors
         
-        const handleSenderProvinceChange = (event) => {
+      const handleSenderProvinceChange = (event) => {
 
-  const selectedProvince = provinces.find(province => province.value === event.target.value);
-  if (selectedProvince) {
-    setSelectedProvinceS(selectedProvince.value); // Save the value for state
-    setFieldValue('cityS', selectedProvince.label); // Save the label for the form
-    console.log('Selected Province ID:', selectedProvince.value);
-    fetchDistricts(selectedProvince.value);
-  }
-};
+        const selectedProvince = provinces.find(province => province.value === event.target.value);
+        if (selectedProvince) {
+          setSelectedProvinceS(selectedProvince.value); // Save the value for state
+          setFieldValue('cityS', selectedProvince.label); // Save the label for the form
+          console.log('Selected Province ID:', selectedProvince.value);
+          fetchDistricts(selectedProvince.value);
+        }
+      };
 
-const handleReceiverProvinceChange = (event) => {
-  const selectedProvince = provinces.find(province => province.value === event.target.value);
-  if (selectedProvince) {
-    setSelectedProvinceR(selectedProvince.value);
-    setFieldValue('cityR', selectedProvince.label);
-    console.log('Selected Province ID:', selectedProvince.value);
-    fetchDistricts(selectedProvince.value);
-  }
-};
+      const handleReceiverProvinceChange = (event) => {
+        const selectedProvince = provinces.find(province => province.value === event.target.value);
+        if (selectedProvince) {
+          setSelectedProvinceR(selectedProvince.value);
+          setFieldValue('cityR', selectedProvince.label);
+          console.log('Selected Province ID:', selectedProvince.value);
+          fetchDistricts(selectedProvince.value);
+        }
+      };
 
-const handleSenderDistrictChange = (event) => {
-  const selectedDistrict = districts.find(district => district.value === event.target.value);
-  if (selectedDistrict) {
-    setSelectedDistrictSId(selectedDistrict.value);
-    setFieldValue('districtS', selectedDistrict.label); // Save the label for the form
-    console.log('Selected District ID:', selectedDistrict.value);
-    fetchWards(selectedDistrict.value);
-  }
-};
+      const handleSenderDistrictChange = (event) => {
+        const selectedDistrict = districts.find(district => district.value === event.target.value);
+        if (selectedDistrict) {
+          setSelectedDistrictSId(selectedDistrict.value);
+          setFieldValue('districtS', selectedDistrict.label); // Save the label for the form
+          console.log('Selected District ID:', selectedDistrict.value);
+          fetchWards(selectedDistrict.value);
+        }
+      };
 
-const handleReceiverDistrictChange = (event) => {
-  const selectedDistrict = districts.find(district => district.value === event.target.value);
-  if (selectedDistrict) {
-    setSelectedDistrictRId(selectedDistrict.value);
-    setFieldValue('districtR', selectedDistrict.label); // Save the label for the form
-    console.log('Selected District ID:', selectedDistrict.value);
-    fetchWards(selectedDistrict.value);
-  }
-};
+      const handleReceiverDistrictChange = (event) => {
+        const selectedDistrict = districts.find(district => district.value === event.target.value);
+        if (selectedDistrict) {
+          setSelectedDistrictRId(selectedDistrict.value);
+          setFieldValue('districtR', selectedDistrict.label); // Save the label for the form
+          console.log('Selected District ID:', selectedDistrict.value);
+          fetchWards(selectedDistrict.value);
+        }
+      };
 
-const handleSenderWardChange = (event) => {
-  const selectedWard = wards.find(ward => ward.value === event.target.value);
-  if (selectedWard) {
-    setSelectedSWard(selectedWard.value);
-    setFieldValue('wardS', selectedWard.label); // Save the label for the form
-    console.log('Selected Ward ID:', selectedWard.value);
-  }
-};
+      const handleSenderWardChange = (event) => {
+        const selectedWard = wards.find(ward => ward.value === event.target.value);
+        if (selectedWard) {
+          setSelectedSWard(selectedWard.value);
+          setFieldValue('wardS', selectedWard.label); // Save the label for the form
+          console.log('Selected Ward ID:', selectedWard.value);
+        }
+      };
 
-const handleReceiverWardChange = (event) => {
-  const selectedWard = wards.find(ward => ward.value === event.target.value);
-  if (selectedWard) {
-    setSelectedRWard(selectedWard.value);
-    setFieldValue('wardR', selectedWard.label); // Save the label for the form
-    console.log('Selected Ward ID:', selectedWard.value);
-  }
-};
+      const handleReceiverWardChange = (event) => {
+        const selectedWard = wards.find(ward => ward.value === event.target.value);
+        if (selectedWard) {
+          setSelectedRWard(selectedWard.value);
+          setFieldValue('wardR', selectedWard.label); // Save the label for the form
+          console.log('Selected Ward ID:', selectedWard.value);
+        }
+      };
 
         return (
           <Form onSubmit={handleSubmit}>
