@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,10 +42,11 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final MailService mailService;
 
-    private static final int STATUS_CANCELLED = 0;
-    private static final int STATUS_PENDING = 1;
-    private static final int STATUS_PROCESSING = 2;
-    private static final int STATUS_READY_FOR_PICKUP = 3;
+    private static final int STATUS_CANCELLED = 9000;
+    private static final int STATUS_WAITING_APPROVAL = 0;
+    private static final int STATUS_APPROVED = 1;
+    private static final int STATUS_ASSIGNED_TO_CARRIER = 2;
+    private static final int STATUS_PICKED_UP = 3;
     private static final int STATUS_IN_TRANSIT = 4;
     private static final int STATUS_DELIVERED = 5;
 
@@ -67,8 +67,8 @@ public class OrderService {
         }
 
         if (order.getStatus() < 0 || order.getStatus() > 1) {
-            order.setStatus(STATUS_CANCELLED);
-            logger.debug("Order status was invalid, set to: {}", STATUS_CANCELLED);
+            order.setStatus(STATUS_WAITING_APPROVAL);
+            logger.debug("Order status was invalid, set to: {}", STATUS_WAITING_APPROVAL);
         }
 
         order.setPaymentStatus(false);
@@ -232,26 +232,26 @@ public class OrderService {
     }
 
     private int validateStatus(int newStatus) {
-        if (newStatus < STATUS_CANCELLED || newStatus > STATUS_DELIVERED) {
+        if (newStatus < STATUS_WAITING_APPROVAL || newStatus > STATUS_DELIVERED) {
             logger.info("Invalid status provided. Defaulting to Processing.");
-            return STATUS_PROCESSING;
+            return STATUS_ASSIGNED_TO_CARRIER;
         }
         return newStatus;
     }
 
     private void handleStatusSpecificLogic(Order order, int status) {
         switch (status) {
-            case STATUS_CANCELLED:
+            case STATUS_WAITING_APPROVAL:
                 processRefund(order);
                 break;
-            case STATUS_PENDING:
+            case STATUS_APPROVED:
                 logger.info("Order status updated to Pending.");
                 break;
-            case STATUS_PROCESSING:
+            case STATUS_ASSIGNED_TO_CARRIER:
                 logger.info("Order status updated to Processing.");
                 sendEmailNotification(order);
                 break;
-            case STATUS_READY_FOR_PICKUP:
+            case STATUS_PICKED_UP:
                 logger.info("Order status updated to Ready for Pickup.");
                 break;
             case STATUS_IN_TRANSIT:
