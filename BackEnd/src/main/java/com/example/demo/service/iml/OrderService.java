@@ -39,6 +39,7 @@ public class OrderService {
     private final DocumentRepository documentRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final TransactionRepository transactionRepository;
+    private final DeliveryStatusRepository deliveryStatusRepository;
     private final OrderMapper orderMapper;
     private final MailService mailService;
 
@@ -179,13 +180,6 @@ public class OrderService {
         return orderDTOs;
     }
 
-    public List<String> getAllDeliverers() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream()
-                .map(Order::getDeliver)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
 
 
     @Transactional
@@ -208,6 +202,11 @@ public class OrderService {
         if (order.getTransactions() != null && !order.getTransactions().isEmpty()) {
             transactionRepository.deleteAll(order.getTransactions());
             logger.info("Deleted {} transactions associated with Order ID: {}", order.getTransactions().size(), orderId);
+        }
+
+        if (order.getDeliveryStatus() != null && !order.getDeliveryStatus().isEmpty()) {
+            deliveryStatusRepository.deleteAll(order.getDeliveryStatus());
+            logger.info("Deleted {} deliveryStatus associated with Order ID: {}", order.getDeliveryStatus().size(), orderId);
         }
 
         orderRepository.delete(order);

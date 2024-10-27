@@ -20,12 +20,13 @@ public class DistanceCalculator {
         if (distance <= 10) {
             totalPrice = (int) (distance * ratePerKm);
         } else if (distance <= 50) {
-            totalPrice = (int) (distance * ratePerKm * 0.8);
-        } else {
+            totalPrice = (int) (distance * ratePerKm * 0.2);
+        } else if (distance <= 100) {
             totalPrice = (int) (distance * ratePerKm * 1.2);
+        } else {
+            totalPrice = (int) (distance * ratePerKm * 1.5);
         }
 
         return totalPrice;
     }
-
 }
