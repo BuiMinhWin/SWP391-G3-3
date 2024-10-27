@@ -1,18 +1,13 @@
 import axios from "axios";
 
 const REST_API_ORDER_URL = "http://koideliverysystem.id.vn:8080/api/orders";
-const REST_API_ORDER_DETAIL_URL =
-  "http://koideliverysystem.id.vn:8080/api/ordersDetail";
-const REST_API_DOCUMENT_URL =
-  "http://koideliverysystem.id.vn:8080/api/documents";
+const REST_API_ORDER_DETAIL_URL = "http://koideliverysystem.id.vn:8080/api/ordersDetail";
+const REST_API_DOCUMENT_URL = "http://koideliverysystem.id.vn:8080/api/documents";
 const REST_API_ACCOUNT_URL = "http://koideliverysystem.id.vn:8080/api/accounts";
 
 export const createOrder = async (orderData) => {
   try {
-    const response = await axios.post(
-      `${REST_API_ORDER_URL}/create`,
-      orderData
-    );
+    const response = await axios.post(`${REST_API_ORDER_URL}/create`, orderData);
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error.message); // Log only the message
@@ -70,15 +65,14 @@ export const order = async (orderId) => {
 };
 export const orderDetail = async (orderId) => {
   try {
-    const response = await axios.get(
-      `${REST_API_ORDER_DETAIL_URL}/order/${orderId}`
-    );
+    const response = await axios.get(`${REST_API_ORDER_DETAIL_URL}/order/${orderId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching order data:", error);
     throw error;
   }
 };
+
 
 const REST_API_BASE_URL3 = "http://koideliverysystem.id.vn:8080/api/orders";
 
@@ -94,13 +88,12 @@ export const cancelOrder = async (orderId) => {
   if (!response.ok) {
     throw new Error("Failed to cancel order ");
   }
-  return response.status !== 204 ? response.json() : {};
+
+  return response.json();
 };
 
 export const getOrderPDF = async (orderId) => {
-  const response = await fetch(
-    `${REST_API_DOCUMENT_URL}/download/order/${orderId}`
-  );
+  const response = await fetch(`${REST_API_DOCUMENT_URL}/download/order/${orderId}`);
   if (!response.ok) {
     throw new Error("Failed to fetch PDF");
   }
@@ -161,3 +154,4 @@ export const updateAvatar = async (accountId, avatarFile) => {
     return response; // Return raw response if not JSON
   }
 };
+

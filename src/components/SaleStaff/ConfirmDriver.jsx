@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { listOrder, updateStatus, getOrderDetail } from '../../services/DeliveryService';
+import { listOrder, updateStatus, getOrderDetail } from '../../services/SaleStaffService';
+import AssignDriverComponent from './AssignDriverComponent';
 import { FaLongArrowAltLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
-const ListOrderOfSales = () => {
+const Booking = () => {
   const [orders, setOrders] = useState([]);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const navigate = useNavigate();
-  const accountId = localStorage.getItem("accountId");
-  // Define status labels
+  const accountId = localStorage.getItem("accountId"); //lấy accountId của sale
+
   const statusLabels = [
     "Đang chờ xét duyệt",
     "Đơn đã được duyệt",
@@ -25,8 +27,9 @@ const ListOrderOfSales = () => {
     listOrder()
       .then((response) => {
         if (Array.isArray(response.data)) {
-          const filteredOrders = response.data.filter(orders => orders.sale === accountId);
+          const filteredOrders = response.data.filter(order => order.sale === accountId); // loggedInSaleId là accountId của nhân viên sale đang đăng nhập
           setOrders(filteredOrders);
+          console.log(response.data);
         } else {
           console.error("API response is not an array", response.data);
           setOrders([]);
@@ -39,6 +42,19 @@ const ListOrderOfSales = () => {
 
   const handleViewOrder = (orderId) => {
     navigate(`/confirmDetail/${orderId}`);
+  };
+
+  const openAssignDriverModal = (orderId) => {
+    setSelectedOrderId(orderId);
+  };
+
+  const closeAssignDriverModal = () => {
+    setSelectedOrderId(null);
+  };
+
+  const handleDriverAssigned = () => {
+    getAllOrders();
+    closeAssignDriverModal();
   };
 
   return (
@@ -63,7 +79,7 @@ const ListOrderOfSales = () => {
         <span style={{ marginLeft: '15px' }}>Back</span>
       </button>
 
-      <h2 className="text-center">List of Orders</h2>
+      <h2 className="text-center">List of Confirm Drivers</h2>
       <table className="table table-striped table-bordered">
         <thead>
           <tr>
@@ -74,9 +90,9 @@ const ListOrderOfSales = () => {
             <th>ShipDate</th>
             <th>TotalPrice</th>
             <th>Origin</th>
-            <th>Sale</th>
             <th>Delivery</th>
             <th>Status</th>
+            <th>Assign Driver</th>
             <th>View</th>
           </tr>
         </thead>
@@ -91,9 +107,20 @@ const ListOrderOfSales = () => {
                 <td>{order.shippedDate}</td>
                 <td>{order.totalPrice}</td>
                 <td>{order.origin}</td>
-                <td>{order.sale}</td>
-                <td>{order.deliver}</td>
+                <td>{order.deliver}</td> 
                 <td>{statusLabels[order.status]}</td>
+                <td>
+                  {order.status === 1 ? (
+                    <button
+                      className="btn btn-info"
+                      onClick={() => openAssignDriverModal(order.orderId)}
+                    >
+                      Assign Driver
+                    </button>
+                  ) : (
+                    <span>N/A</span>
+                  )}
+                </td>
                 <td>
                   <button
                     className="btn btn-primary"
@@ -106,13 +133,22 @@ const ListOrderOfSales = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="9" className="text-center">No Orders Found</td>
+              <td colSpan="10" className="text-center">No Orders Found</td>
             </tr>
           )}
         </tbody>
       </table>
+
+      {/* Render the AssignDriverComponent if a driver is being assigned */}
+      {selectedOrderId && (
+        <AssignDriverComponent 
+          orderId={selectedOrderId} 
+          onClose={closeAssignDriverModal} 
+          onAssigned={handleDriverAssigned} 
+        />
+      )}
     </div>
   );
 };
 
-export default ListOrderOfSales;
+export default Booking;

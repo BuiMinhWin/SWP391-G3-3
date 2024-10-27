@@ -27,6 +27,8 @@ import ResetPasswordComponent from "../components/Member/ResetPasswordComponent"
 import Map from "../components/Map";
 import { SnackbarProvider } from 'notistack';
 import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
+import DriverBooking from "../components/SaleStaff/AssignDriverComponent";
+import ConfirmDriver from "../components/SaleStaff/ConfirmDriver";
 // import DistanceCalculator from "../components/DistanceCalculator";
 
 function index() {
@@ -180,6 +182,26 @@ function index() {
         element={
           <Authenticate allowedRoles={["Sales"]}>
             <ListOrderOfSales />
+          </Authenticate>
+        }
+      />
+
+        {/*SalesStaff*/}
+        <Route
+        path="/salestaff/driverbooking"
+        element={
+          <Authenticate allowedRoles={["Sales"]}>
+            <DriverBooking />
+          </Authenticate>
+        }
+      />
+
+      {/*SalesStaff*/}
+      <Route
+        path="/salestaff/test"
+        element={
+          <Authenticate allowedRoles={["Sales"]}>
+            <ConfirmDriver />
           </Authenticate>
         }
       />
