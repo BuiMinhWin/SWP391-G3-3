@@ -9,6 +9,7 @@ import com.example.demo.mapper.OrderMapper;
 import com.example.demo.mapper.TransactionMapper;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.TransactionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ public class TransactionService {
     private final OrderService orderService;
 
 
+    @Transactional
     public void createTransaction(String orderId, String vnpTxnRef, int totalPrice) {
         Order order = orderService.findOrderById(orderId);
         Transaction transaction = new Transaction();

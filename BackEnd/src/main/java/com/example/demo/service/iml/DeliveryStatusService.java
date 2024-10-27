@@ -8,6 +8,7 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.DeliveryStatusMapper;
 import com.example.demo.repository.DeliveryStatusRepository;
 import com.example.demo.repository.OrderRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class DeliveryStatusService {
     private OrderRepository orderRepository;
 
 
+    @Transactional
     public DeliveryStatusDTO createDeliveryStatus(DeliveryStatusDTO deliveryStatusDTO) {
 
         Order order = orderRepository.findById(deliveryStatusDTO.getOrderId())
@@ -66,6 +68,7 @@ public class DeliveryStatusService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public DeliveryStatusDTO updateDeliveryStatus(String deliveryStatusId, DeliveryStatusDTO updatedStatusDTO) {
         DeliveryStatus originalDeliveryStatus = deliveryStatusRepository.findById(deliveryStatusId)
                 .orElseThrow(() -> new ResourceNotFoundException("DeliveryStatus not found with id " + deliveryStatusId));

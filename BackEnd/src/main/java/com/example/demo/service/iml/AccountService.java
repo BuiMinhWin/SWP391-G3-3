@@ -37,6 +37,7 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Transactional
     public AccountDTO createAccount(AccountDTO accountDTO) {
         if (accountRepository.existsByEmail(accountDTO.getEmail())) {
             throw new DuplicateEmailException("This email address '" + accountDTO.getEmail() + "' is already in use.");
@@ -97,6 +98,7 @@ public class AccountService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public AccountDTO updateAccount(String accountId, AccountDTO updatedAccountDTO) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
@@ -134,6 +136,7 @@ public class AccountService {
         return AccountMapper.maptoAccountDTO(updatedAccount);
     }
 
+    @Transactional
     public void deactivateAccount(String accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
@@ -171,6 +174,7 @@ public class AccountService {
 
 
 
+    @Transactional
     public String updateAvatar(MultipartFile file, String accountId) throws IOException {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));

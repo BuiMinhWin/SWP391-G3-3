@@ -6,6 +6,7 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.OrderDetailMapper;
 import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.repository.OrderRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -22,6 +23,7 @@ public class OrderDetailService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Transactional
     public OrderDetailDTO createOrderDetail(OrderDetailDTO orderDetailDTO) {
         System.out.println("Received OrderDetailDTO: " + orderDetailDTO);
 

@@ -7,6 +7,7 @@ import com.example.demo.mapper.FeedbackMapper;
 import com.example.demo.repository.FeedbackRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.entity.Order;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class FeedbackService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Transactional
     public FeedbackDTO createFeedback(FeedbackDTO feedbackDTO) {
 
         Order order = orderRepository.findById(feedbackDTO.getOrderId())
@@ -62,6 +64,7 @@ public class FeedbackService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public FeedbackDTO respondToCustomerFeedback(String feedbackId, FeedbackDTO responseDTO) {
         Feedback customerFeedback = feedbackRepository.findById(feedbackId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer feedback not found with id " + feedbackId));

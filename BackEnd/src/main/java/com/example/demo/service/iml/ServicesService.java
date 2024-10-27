@@ -27,6 +27,7 @@ public class ServicesService {
     @Autowired
     private OrderDetailRepository orderDetailRepository;
 
+    @Transactional
     public List<ServicesDTO> createServicesForOrder(ServicesDTO servicesDTO) {
 
         OrderDetail orderDetail = orderDetailRepository.findById(servicesDTO.getOrderDetailId())

@@ -6,6 +6,7 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.DocumentRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.util.ImageUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final OrderRepository orderRepository;
 
+    @Transactional
     public String uploadImage(MultipartFile file, String orderId) throws IOException {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
