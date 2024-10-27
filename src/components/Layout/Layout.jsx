@@ -1,4 +1,4 @@
-import { Outlet, NavLink, Link } from "react-router-dom";
+import { Outlet, NavLink, Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import {
   AppBar,
@@ -19,7 +19,7 @@ import {
 import HomeIcon from "@mui/icons-material/Home";
 import HelpIcon from "@mui/icons-material/Help";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
-import { getAccountById } from "../../services/CustomerService";
+import { getAccountById, getAvatar } from "../../services/CustomerService";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
 
@@ -27,7 +27,9 @@ const drawerWidth = 240;
 
 const Layout = () => {
   const [account, setAccount] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(null); 
   const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -36,6 +38,9 @@ const Layout = () => {
         try {
           const accountData = await getAccountById(accountId);
           setAccount(accountData);
+
+          const fetchedAvatarUrl = await getAvatar(accountId);
+          setAvatarUrl(fetchedAvatarUrl); // Set the fetched avatar URL
         } catch (error) {
           console.error("Error fetching account:", error);
         }
@@ -50,6 +55,7 @@ const Layout = () => {
   const handleLogout = () => {
     localStorage.removeItem("accountId");
     setAnchorEl(null);
+    navigate("/");
   };
 
   return (
@@ -196,7 +202,7 @@ const Layout = () => {
 
               {/* Avatar with Hover Menu */}
               <Avatar
-                src={account?.avatar} // Display the avatar dynamically
+                src={avatarUrl} // Display the avatar dynamically
                 alt={account?.userName || "Account Avatar"}
                 onMouseEnter={handleAvatarHover}
                 sx={{ cursor: "pointer" }}
