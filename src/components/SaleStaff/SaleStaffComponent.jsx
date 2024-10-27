@@ -178,11 +178,7 @@ const SaleStaffComponent = () => {
                     )}
                   </div>
                 </div>  
-
-               
-              
-              
-
+                
               </div>
 
             </header>

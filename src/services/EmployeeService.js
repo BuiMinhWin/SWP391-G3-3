@@ -19,12 +19,13 @@ export const getAccount = (accountId) => {
 
 
 export const updateAccount = (accountId, account) => {
-  return axios.put(REST_API_BASE_URL + '/' + accountId, account);
+  return axios.patch(REST_API_BASE_URL + '/update/'+accountId, account);
 };
 
 
 export const deleteAccount = (accountId) => {
-  return axios.delete(REST_API_BASE_URL + '/' + accountId);
+  console.log(accountId);
+  return axios.patch(`${REST_API_BASE_URL}/deActive/${accountId}`, { isDeleted: true });
 };
 
 // export const updateAvatar = (accountId, avatar) => {
