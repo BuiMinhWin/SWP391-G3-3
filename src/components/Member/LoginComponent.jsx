@@ -2,7 +2,7 @@
   import { useNavigate } from 'react-router-dom';
   import { GoogleLogin } from '@react-oauth/google';
   import './Login.css';
-  import { loginAccount, googleLogin, updateAvatar } from '../../services/EmployeeService';
+  import { loginAccount, googleLogin } from '../../services/EmployeeService';
   import * as jwtJsDecode from 'jwt-js-decode';
   import { useSnackbar } from 'notistack';
 
@@ -69,8 +69,6 @@
           userName,
           password,
           email,
-          phone,
-          avatar,
           roleId: "Customer",
           createAt: localStorage.getItem('createAt') || new Date().toISOString(),
         };
@@ -80,6 +78,8 @@
             const result = response.data;
             localStorage.setItem('createAt', account.createAt);
             localStorage.setItem('roleId', result.roleId);
+            localStorage.setItem('accountId', result.accountId);
+            console.log(result.accountId);
             console.log(result);
             // updateAvatar(result.accountId,avatar);
 
