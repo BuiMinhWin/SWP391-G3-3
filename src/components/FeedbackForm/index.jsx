@@ -25,9 +25,6 @@ const StyledRating = styled(Rating)(({ theme }) => ({
   },
   "& .MuiRating-iconEmpty": {
     fontSize: "2rem",
-  },
-  "& .MuiRating-iconFilled": {
-    fontSize: "2rem",
   }
 }));
 
