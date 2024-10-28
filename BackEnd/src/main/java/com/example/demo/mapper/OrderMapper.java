@@ -76,11 +76,7 @@ public class OrderMapper {
         // Set the distance
         order.setDistance(orderDTO.getDistance());
 
-        Set<Services> services = order.getOrderDetails().stream()
-                .flatMap(orderDetail -> orderDetail.getKoiServices().stream())
-                .collect(Collectors.toSet());
-
-        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(orderDTO.getDistance(), RATE_PER_KM, services);
+        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(orderDTO.getDistance(), RATE_PER_KM);
         order.setTotalPrice(calculatedTotalPrice);
 
 

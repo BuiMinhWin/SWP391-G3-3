@@ -18,8 +18,7 @@ public class DistanceCalculator {
 //        return EARTH_RADIUS_KM * c;
 //    }
 
-    public static int calculateTotalPrice(double distance, int ratePerKm, Collection<Services> services) {
-        // Calculate the base price based on distance and rate
+    public static int calculateTotalPrice(double distance, int ratePerKm) {
         int distancePrice;
 
         if (distance <= 10) {
@@ -32,10 +31,6 @@ public class DistanceCalculator {
             distancePrice = (int) (distance * ratePerKm * 1.5);
         }
 
-        double servicesPrice = services.stream()
-                .mapToDouble(Services::getPrice)
-                .sum();
-
-        return distancePrice + (int) servicesPrice;
+        return distancePrice;
     }
 }
