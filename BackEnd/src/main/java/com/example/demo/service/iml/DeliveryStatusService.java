@@ -67,6 +67,7 @@ public class DeliveryStatusService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public DeliveryStatusDTO updateDeliveryStatus(String deliveryStatusId, DeliveryStatusDTO updatedStatusDTO) {
         DeliveryStatus originalDeliveryStatus = deliveryStatusRepository.findById(deliveryStatusId)
                 .orElseThrow(() -> new ResourceNotFoundException("DeliveryStatus not found with id " + deliveryStatusId));
@@ -74,8 +75,8 @@ public class DeliveryStatusService {
         DeliveryStatus newDeliveryStatus = new DeliveryStatus();
         newDeliveryStatus.setOrder(originalDeliveryStatus.getOrder());
 
+        Order order = originalDeliveryStatus.getOrder();
         if (updatedStatusDTO.getStatus() == 5) {
-            Order order = originalDeliveryStatus.getOrder();
             order.setShippedDate(LocalDateTime.now());
             orderRepository.save(order);
             newDeliveryStatus.setTimeTracking(LocalDateTime.now());
@@ -83,21 +84,18 @@ public class DeliveryStatusService {
             newDeliveryStatus.setStatus(updatedStatusDTO.getStatus());
         }
 
-        if (updatedStatusDTO.getCurrentLocate() != null) {
-            newDeliveryStatus.setCurrentLocate(updatedStatusDTO.getCurrentLocate());
-        } else {
-            newDeliveryStatus.setCurrentLocate(originalDeliveryStatus.getCurrentLocate());
-        }
+        newDeliveryStatus.setCurrentLocate(
+                updatedStatusDTO.getCurrentLocate() != null ? updatedStatusDTO.getCurrentLocate() : originalDeliveryStatus.getCurrentLocate()
+        );
 
-        if (updatedStatusDTO.getTimeTracking() == null) {
-            newDeliveryStatus.setTimeTracking(LocalDateTime.now());
-        } else {
-            newDeliveryStatus.setTimeTracking(updatedStatusDTO.getTimeTracking());
-        }
+        newDeliveryStatus.setTimeTracking(
+                updatedStatusDTO.getTimeTracking() != null ? updatedStatusDTO.getTimeTracking() : LocalDateTime.now()
+        );
 
         DeliveryStatus savedNewDeliveryStatus = deliveryStatusRepository.save(newDeliveryStatus);
 
         return DeliveryStatusMapper.maptoDeliveryStatusDTO(savedNewDeliveryStatus);
     }
+
 
 }

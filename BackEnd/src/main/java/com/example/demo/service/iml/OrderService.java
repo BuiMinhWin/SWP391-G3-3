@@ -216,6 +216,11 @@ public class OrderService {
         newStatus = validateStatus(newStatus);
 
         order.setStatus(newStatus);
+
+        if (newStatus == STATUS_DELIVERED) {
+            order.setShippedDate(LocalDateTime.now());
+        }
+
         Order updatedOrder = orderRepository.save(order);
 
         handleStatusSpecificLogic(order, newStatus);
@@ -238,10 +243,10 @@ public class OrderService {
                 break;
             case STATUS_APPROVED:
                 logger.info("Order status updated to Pending.");
+                sendEmailNotification(order);
                 break;
             case STATUS_ASSIGNED_TO_CARRIER:
                 logger.info("Order status updated to Processing.");
-                sendEmailNotification(order);
                 break;
             case STATUS_PICKED_UP:
                 logger.info("Order status updated to Ready for Pickup.");
