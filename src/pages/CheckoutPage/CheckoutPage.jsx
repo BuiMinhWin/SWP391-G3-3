@@ -9,20 +9,23 @@ import {
   Stepper,
   Step,
   StepLabel,
-  Divider,
 } from "@mui/material";
 import {
   order,
   orderDetail,
   cancelOrder,
   getOrderPDF,
+  getAccountById,
 } from "../../services/CustomerService";
 import axios from "axios";
+import FeedbackForm from "../../components/FeedbackForm";
 
 const REST_API_BANK_URL =
   "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
 
-const steps = ["Đang xử lí", "Thanh toán", "Đang vận chuyển", "Đã hoàn thành"];
+const formatCurrency = (value) => {
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 
 const CheckoutPage = () => {
   const location = useLocation();
@@ -75,7 +78,7 @@ const CheckoutPage = () => {
       navigate("/");
     } catch (error) {
       console.error("Error canceling order:", error);
-      alert("Failed to cancel order.",{orderId});
+      alert("Failed to cancel order.", { orderId });
     }
   };
 
@@ -124,16 +127,60 @@ const CheckoutPage = () => {
   if (error) return <Typography color="error">Error: {error}</Typography>;
   if (!orderData) return <Typography>Đang tải...</Typography>;
 
-  
+  // Define steps based on orderData
+  const steps = [
+    "Đang Xử Lí", // Step 1
+    "Đã Duyệt", // Step 2
+    orderData.paymentStatus ? "Đang Vận chuyển" : "Thanh Toán", // Step 3
+    "Hoàn Thành", // Step 4
+  ];
+
+  const getActiveStep = (status, paymentStatus) => {
+    // Step 1: Only for order.status = 0
+    if (status === 0) {
+      return 0; // "Đang xử lí"
+    }
+
+    // Step 2: Only for order.status = 1
+    if (status === 1) {
+      return 1; // "Đã duyệt"
+    }
+
+    // Step 3: For order.status = 2 or 3
+    if (status === 2 || status === 3) {
+      return 2; // "Đang vận chuyển"
+    }
+
+    // Step 4: For order.status = 4
+    if (status === 4) {
+      return paymentStatus ? 4 : 3; // If payment is made, go to step 4; if not, stay at step 3
+    }
+
+    // Completed orders
+    if (status === 5) {
+      return paymentStatus ? 4 : 3; // If payment is made, stay at step 4; if not stayed at step 3
+    }
+
+    return 0; // Default case
+  };
+
+  // Get the active step based on order status and payment status
+  const activeStep = getActiveStep(orderData.status, orderData.paymentStatus);
+
   return (
     <Box sx={{ p: 4, bgcolor: "#f5f5f5", minHeight: "100vh" }}>
       <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
+        <Typography
+          variant="h3"
+          align="center"
+          fontWeight={"semi-bold"}
+          gutterBottom
+        >
           Xác nhận đơn hàng
         </Typography>
 
         {/* Stepper for Order Status */}
-        <Stepper activeStep={orderData.status} alternativeLabel sx={{ mb: 4 }}>
+        <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
           {steps.map((label, index) => (
             <Step key={index}>
               <StepLabel>{label}</StepLabel>
@@ -144,25 +191,142 @@ const CheckoutPage = () => {
         {/* Order Information */}
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
-             Thông tin đơn hàng
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Typography>Mã đơn: {orderData.orderId}</Typography>
-            <Typography>
-              Ngày đặt đơn: {new Date(orderData.orderDate).toLocaleString()}
-            </Typography>
-            <Typography>Tổng giá: {orderData.totalPrice} VND</Typography>
-            <Typography>Tình trạng đơn hàng: {steps[orderData.status]}</Typography>
-            <Typography>Tình trạng thanh toán: {orderData.paymentStatus? "Đã thanh toán" : "Chưa thanh toán"} </Typography>
+            <Box
+              sx={{
+                p: 2,
+                border: "1px solid #ddd",
+                borderRadius: 1,
+                backgroundColor: "#fff",
+                mb: 3,
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{ textDecoration: "underline" }}
+                gutterBottom
+              >
+                Thông tin đơn hàng:
+              </Typography>
+              <Typography>Mã đơn: {orderData.orderId}</Typography>
+              <Typography>
+                Ngày đặt đơn: {new Date(orderData.orderDate).toLocaleString()}
+              </Typography>
+              <Typography>
+                <span style={{ fontWeight: "bold" }}>Gửi từ:</span>{" "}
+                {orderData.senderName} - {orderData.senderPhone} -{" "}
+                {orderData.origin}
+              </Typography>
+              <Typography>Ghi chú lấy hàng:</Typography>
+              <Paper
+                elevation={2}
+                sx={{
+                  p: 2,
+                  px: 5,
+                  bgcolor: "#fafafa",
+                  borderRadius: 3,
+                  mb: 1,
+                  mt: 1,
+                }}
+              >
+                <Typography>
+                  {orderData.senderNote && orderData.senderNote.trim() !== ""
+                    ? orderData.senderNote
+                    : "Không có ghi chú nào cho đơn hàng này"}
+                </Typography>
+              </Paper>
+              <Typography>
+                <span style={{ fontWeight: "bold" }}>Gửi đến:</span>{" "}
+                {orderData.receiverName} - {orderData.receiverPhone} -{" "}
+                {orderData.destination}
+              </Typography>
+              <Typography>Ghi chú nhận hàng:</Typography>
+              <Paper
+                elevation={2}
+                sx={{
+                  p: 2,
+                  px: 5,
+                  bgcolor: "#fafafa",
+                  borderRadius: 3,
+                  mb: 1,
+                  mt: 1,
+                }}
+              >
+                <Typography>
+                  {orderData.receiverNote &&
+                  orderData.receiverNote.trim() !== ""
+                    ? orderData.receiverNote
+                    : "Không có ghi chú nào cho đơn hàng này"}
+                </Typography>
+              </Paper>
+              <Typography>
+                Ngày nhận hàng:{" "}
+                {orderData.shippedDate && orderData.shippedDate.trim() !== ""
+                  ? orderData.shippedDate
+                  : "N/A"}
+              </Typography>
+              <Typography>
+                Tình trạng đơn hàng: {steps[orderData.status]}
+              </Typography>
+              <Typography variant="h6">
+                Tổng giá:
+                <span style={{ color: "red", fontWeight: "bold" }}>
+                  {` ${formatCurrency(orderData.totalPrice)} VND`}
+                </span>
+              </Typography>
+              <Typography>
+                Tình trạng thanh toán:{" "}
+                {orderData.paymentStatus ? "Đã thanh toán" : "Chưa thanh toán"}
+              </Typography>
+            </Box>
+
+            {/* Order Detail Information */}
+            <Box
+              sx={{
+                p: 2,
+                border: "1px solid #ddd",
+                borderRadius: 1,
+                backgroundColor: "#fff",
+                maxHeight: 300,
+                overflow: "auto",
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{ textDecoration: "underline" }}
+                gutterBottom
+              >
+                Chi tiết đơn hàng:
+              </Typography>
+
+              {orderDetailData.length > 0 ? (
+                orderDetailData.map((detail) => (
+                  <Box key={detail.orderDetailId}>
+                    <Typography>Loại cá: {detail.koiType}</Typography>
+                    <Typography>Biến thể: {detail.koiName}</Typography>
+                    <Typography>Số lượng: {detail.quantity}</Typography>
+                    <Typography>Cân nặng: {detail.weight} kg</Typography>
+                    <Typography>Mã giảm giá: {detail.discount}</Typography>
+                    <Typography>
+                      Tình trạng cá:{" "}
+                      {detail.status === 0 ? "Bất thường" : "Khỏe mạnh"}
+                    </Typography>
+                  </Box>
+                ))
+              ) : (
+                <Typography>Không có đơn nào được tìm thấy.</Typography>
+              )}
+            </Box>
           </Grid>
 
           {/* PDF Preview */}
           <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
+            <Typography
+              variant="h6"
+              sx={{ textDecoration: "underline" }}
+              gutterBottom
+            >
               Xem trước PDF
             </Typography>
-            <Divider sx={{ mb: 2 }} />
             {pdfUrl ? (
               <iframe
                 src={pdfUrl}
@@ -174,41 +338,11 @@ const CheckoutPage = () => {
             ) : (
               <Typography>PDF đang được tải...</Typography>
             )}
+            <Grid item xs={12}>
+            <FeedbackForm orderId={orderId} />
+          </Grid>
           </Grid>
 
-          {/* Order Details */}
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Chi tiết đơn hàng
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            {orderDetailData.length > 0 ? (
-              <Box
-                sx={{
-                  maxHeight: 300,
-                  overflow: "auto",
-                  p: 1,
-                  bgcolor: "#fafafa",
-                  borderRadius: 1,
-                }}
-              >
-                {orderDetailData.map((detail) => (
-                  <Paper key={detail.orderDetailId} sx={{ mb: 2, p: 2 }}>
-                    <Typography>Loại cá: {detail.koiType}</Typography>
-                    <Typography>Biến thể: {detail.koiName}</Typography>
-                    <Typography>Số lượng: {detail.quantity}</Typography>
-                    <Typography>Cân nặng: {detail.weight} kg</Typography>
-                    <Typography>Mã giảm giá: {detail.discount}</Typography>
-                    <Typography>
-                      Tình trạng cá: {detail.status === 1 ? "Khỏe mạnh" : "Bất thường"}
-                    </Typography>
-                  </Paper>
-                ))}
-              </Box>
-            ) : (
-              <Typography>Không có đơn nào được tìm thấy.</Typography>
-            )}
-          </Grid>
 
           {(orderData.status === 0 || orderData.status === 1) && (
             <Button
