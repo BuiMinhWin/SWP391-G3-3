@@ -30,6 +30,9 @@ import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
 import DriverBooking from "../components/SaleStaff/AssignDriverComponent";
 import ConfirmDriver from "../components/SaleStaff/ConfirmDriver";
 import ListOrderManageComponent from "../components/Manager/ListOrderManageComponent";
+import RespondFeedBack from "../components/SaleStaff/ResponseFeedback";
+import AboutUs from "../pages/AboutUs/AboutUsComponent";
+import Support from "../pages/Support/SupportComponent";
 
 function index() {
   return (
@@ -42,6 +45,9 @@ function index() {
       <Route path="/login" element={<LoginComponent />} />
       <Route path="/user-page" element={<UserPage />} />
       <Route path="/register" element={<RegisterComponent />} />
+      <Route path="/AboutUs" element={<AboutUs />} />
+      <Route path="/Support" element={<Support />} />
+     
       <Route path="/reset" element={<ResetPasswordComponent />} />
       <Route path="/map" element={< Map />} />
       {/* <Route path="/calculate" element={< DistanceCalculator />} /> */}
@@ -208,6 +214,17 @@ function index() {
           </Authenticate>
         }
       />
+
+      {/*SalesStaff*/}
+      <Route
+        path="/salestaff/respondFeedback/:orderId"
+        element={
+          <Authenticate allowedRoles={["Sales"]}>
+            <RespondFeedBack />
+          </Authenticate>
+        }
+      />
+
 
       <Route
         path="/salestaff"

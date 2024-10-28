@@ -12,6 +12,7 @@ import { MdSupportAgent} from "react-icons/md";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { CgProfile } from "react-icons/cg";
 import { CiLogout } from "react-icons/ci";
+import './SaleStaff.css';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler );
 
@@ -28,9 +29,9 @@ const SaleStaffComponent = () => {
     setDropdownOpen(!isDropdownOpen);
   }
 
-  const handleViewOrder = (orderId) => {
-    navigate(`/order/${orderId}`);
-  };
+  // const handleViewOrder = (orderId) => {
+  //   navigate(`/order/${orderId}`);
+  // };
 
   const [orders, setOrders] = useState([]);
   const [orderDetail, setOrderDetail] = useState(null);
@@ -143,6 +144,10 @@ const SaleStaffComponent = () => {
             <a href="/salestaff/test"><i className="bi bi-chat-dots me-2"> <HiOutlineClipboardDocumentList/> </i> Driver Booking</a>
           </li>
 
+          {/* <li>
+            <a href="/salestaff/respondFeedback"><i className="bi bi-chat-dots me-2"> <HiOutlineClipboardDocumentList/> </i> Respond FeedBack</a>
+          </li>
+
           <li>
             <a href="/orders"><i className="bi bi-person-badge me-2"><MdSupportAgent /></i> View Report</a>
           </li>
@@ -153,7 +158,7 @@ const SaleStaffComponent = () => {
 
           <li>
             <a href="#"><i className="bi bi-gear me-2"><IoSettingsOutline /></i> Settings</a>
-           </li>
+           </li> */}
          
         </ul>
         </nav>
@@ -244,7 +249,7 @@ const SaleStaffComponent = () => {
                     <th>TotalPrice</th>
                     <th>Origin</th>
                     <th>Status</th>
-                    <th></th>
+ 
                     </tr>
                   </thead>
                   <tbody>
@@ -259,9 +264,9 @@ const SaleStaffComponent = () => {
                         <td>{order.totalPrice}</td>
                         <td>{order.origin}</td>
                         <td>{statusLabels[order.status]}</td>
-                        <td>
+                        {/* <td>
                           <button onClick={() => handleViewOrder(order.orderId)}>View</button>
-                        </td>
+                        </td> */}
                       </tr>
                     ))
                   ) : (
