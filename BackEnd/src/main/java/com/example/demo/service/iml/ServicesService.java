@@ -1,11 +1,13 @@
 package com.example.demo.service.iml;
 
 import com.example.demo.dto.request.ServicesDTO;
+import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderDetail;
 import com.example.demo.entity.Services;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.ServicesMapper;
 import com.example.demo.repository.OrderDetailRepository;
+import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ServiceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +29,18 @@ public class ServicesService {
     @Autowired
     private OrderDetailRepository orderDetailRepository;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
     public List<ServicesDTO> createServicesForOrder(ServicesDTO servicesDTO) {
 
         OrderDetail orderDetail = orderDetailRepository.findById(servicesDTO.getOrderDetailId())
                 .orElseThrow(() -> new ResourceNotFoundException("OrderDetail not found with id " + servicesDTO.getOrderDetailId()));
+
+        Order order = orderDetail.getOrder();
+        if (order == null) {
+            throw new ResourceNotFoundException("Order not found for OrderDetail with id: " + servicesDTO.getOrderDetailId());
+        }
 
         List<ServicesDTO> servicesDTOList = new ArrayList<>();
 
@@ -39,7 +49,7 @@ public class ServicesService {
             newServiceDTO.setOrderDetailId(servicesDTO.getOrderDetailId());
             newServiceDTO.setServicesId(servicesId);
             newServiceDTO.setServiceStatus("No");
-            newServiceDTO.setPrice(0.0);
+            newServiceDTO.setPrice(0);
 
             String serviceName;
             switch (servicesId) {
@@ -83,26 +93,42 @@ public class ServicesService {
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("OrderDetail not found with id: " + orderDetailId));
 
+        Order order = orderDetail.getOrder();
+        if (order == null) {
+            throw new ResourceNotFoundException("Order not found for OrderDetail with id: " + orderDetailId);
+        }
+
         Services service = serviceRepository.findByOrderDetailAndServicesId(orderDetail, servicesId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found with orderId: " + orderDetailId + " and serviceId: " + servicesId));
 
         if ("Yes".equalsIgnoreCase(newStatus) || "No".equalsIgnoreCase(newStatus)) {
             service.setServiceStatus(newStatus);
 
+            int price;
             switch (service.getServicesId()) {
                 case 1:
-                    service.setPrice("Yes".equalsIgnoreCase(newStatus) ? 30.0 : 0.0);
+                    price = "Yes".equalsIgnoreCase(newStatus) ? 30 : 0;
                     break;
                 case 2:
-                    service.setPrice("Yes".equalsIgnoreCase(newStatus) ? 50.0 : 0.0);
+                    price = "Yes".equalsIgnoreCase(newStatus) ? 50 : 0;
                     break;
                 case 3:
-                    service.setPrice("Yes".equalsIgnoreCase(newStatus) ? 0 : 0.0);
+                    price = 0;
                     break;
                 default:
-                    service.setPrice(0.0);
+                    price = 0;
                     break;
             }
+
+            service.setPrice(price);
+
+            if ("Yes".equalsIgnoreCase(newStatus)) {
+                order.setTotalPrice(order.getTotalPrice() + price);
+            } else {
+                order.setTotalPrice(order.getTotalPrice() - price);
+            }
+
+            orderRepository.save(order);
         } else {
             throw new IllegalArgumentException("Invalid status. Must be 'Yes' or 'No'.");
         }
@@ -111,5 +137,6 @@ public class ServicesService {
 
         return ServicesMapper.maptoServicesDTO(updatedService);
     }
+
 }
 
