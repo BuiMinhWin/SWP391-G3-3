@@ -67,9 +67,7 @@ const ListCustomerComponent = () => {
           i
           {accounts.length > 0 ? (
             accounts.map(account => (
-              
-             
-             
+            
               <tr key={account.accountId}>
                 <td>{account.accountId}</td>
                 <td>{account.roleId}</td>

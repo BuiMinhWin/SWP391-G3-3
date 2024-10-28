@@ -1,12 +1,12 @@
 // src/components/Homepage.jsx
 import React, { useState, useEffect } from 'react';
-import './HomePage.css';
+import './AboutUs.css';
 import FAQs from "../../components/FAQs/FAQs";
 import logo from '../../assets/Logo.png';
 import blog from '../../assets/Blog.jpg';
 import { useNavigate } from 'react-router-dom';
 import { getOrder } from '../../services/CustomerService';
-import DeliveryStatus from '../../pages/DeliveryStatus/DeliveryStatus'; // Import component hiển thị trạng thái đơn hàng
+
 
 const Homepage = () => {
 
@@ -62,7 +62,7 @@ const Homepage = () => {
               <a href="#">Chương trình khuyến mãi</a>
             </div>
           </div>
-          <a href="/AboutUs" className="nav-link">Giới Thiệu</a>
+          <a href="#" className="nav-link">Giới Thiệu</a>
         </div>
         
         <div className="navbar-right">
@@ -108,67 +108,6 @@ const Homepage = () => {
       </header>
 
       {/* Main content */}
-      <div className="homepage-main-content">
-        <div className="tabs">
-          <button 
-            className={`tab-button ${activeTab === 'tracking' ? 'active' : ''}`} 
-            onClick={() => handleTabClick('tracking')}
-          >
-            Theo Dõi Đơn Hàng
-          </button>
-          <button 
-            className={`tab-button ${activeTab === 'estimate' ? 'active' : ''}`} 
-            onClick={() => handleTabClick('estimate')}
-          >
-            Ước Tính Chi Phí
-          </button>
-        </div>
-
-        <div className="tab-content">
-        {activeTab === 'tracking' && (
-          <div className="tracking-section">
-            <div className="tracking-input-container">
-              <input
-                type="text"
-                placeholder="Nhập mã đơn hàng bạn cần tra cứu"
-                className="tracking-input"
-                value={trackingCode}
-                onChange={(e) => setTrackingCode(e.target.value)}
-              />
-              <button className="tracking-btn" onClick={handleTrackingSubmit}>Theo Dõi</button>
-            </div>
-
-            {/* Kết quả theo dõi đơn hàng */}
-            {trackingResult && (
-          <div className="tracking-result active">
-             <DeliveryStatus orderId={trackingResult.orderId} /> 
-          </div>
-        )}
-
-        </div>
-        )}
-
-        {activeTab === 'estimate' && (
-          <div className="estimate-section">
-            <div className="estimate-input-row-holder">
-              <input type="text" placeholder="Điểm đi" className="estimate-input" />
-              <input type="text" placeholder="Điểm đến" className="estimate-input" />
-            </div>
-
-            <div className="estimate-input-row">
-              <input type="number" placeholder="Số kg" className="estimate-input" />
-              <input type="number" placeholder="Số lượng cá" className="estimate-input" />
-            </div>
-
-            <button className="estimate-btn">Tính Tiền</button>
-
-            <div className="estimate-result">
-              {/* Giá tiền sẽ hiện ở đây */}
-            </div>
-          </div>
-        )}
-      </div>
-      </div>
 
       {/* Phần giới thiệu */}
       <div className="why-choose-section">
@@ -246,10 +185,6 @@ const Homepage = () => {
         <div>Vận Chuyển Trong Nước</div>
         <div>Vận Chuyển Quốc Tế</div>
     </div>
-    </div>
-
-    <div>
-      <FAQs />
     </div>
 
     {/* The end section */}

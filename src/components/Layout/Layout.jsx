@@ -1,4 +1,4 @@
-import { Outlet, NavLink, Link, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, Link, useNavigate} from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import {
   AppBar,
@@ -41,6 +41,9 @@ const Layout = () => {
 
           const fetchedAvatarUrl = await getAvatar(accountId);
           setAvatarUrl(fetchedAvatarUrl); // Set the fetched avatar URL
+
+          const avatar = await getAvatar(accountId);
+          setAvatarUrl(avatar);
         } catch (error) {
           console.error("Error fetching account:", error);
         }
@@ -55,6 +58,7 @@ const Layout = () => {
   const handleLogout = () => {
     localStorage.removeItem("accountId");
     setAnchorEl(null);
+    navigate("/");
     navigate("/");
   };
 

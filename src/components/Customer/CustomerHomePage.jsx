@@ -4,9 +4,8 @@ import "./CustomerHomePage.css";
 import FAQs from "../FAQs/FAQs";
 import logo from '../../assets/Logo.png';
 import blog from '../../assets/Blog.jpg';
-import avatar from '../../assets/Avatar.jpg';
 import { useNavigate } from 'react-router-dom';
-import { getOrder } from '../../services/CustomerService';
+import { getOrder,getAvatar } from '../../services/CustomerService';
 import { logout } from '../Member/auth'; 
 
 
@@ -16,7 +15,9 @@ const Homepage = () => {
   const [trackingCode, setTrackingCode] = useState(""); // State để quản lý mã đơn hàng
   const [trackingResult, setTrackingResult] = useState(null); // State cho kết quả theo dõi
   const navigate = useNavigate();
-
+  const [avatar, setAvatar] = useState(null); 
+  const accountId = localStorage.getItem('accountId');
+  console.log("Stored Account ID:", accountId);
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
@@ -44,7 +45,20 @@ const Homepage = () => {
       setTrackingCode(""); // Xóa mã đơn hàng
       setTrackingResult(null); // Xóa kết quả tra cứu
     }
-  }, [activeTab]);
+
+    const fetchAccount = async () => {
+      try {
+       
+        const avatarUrl = await getAvatar(accountId);
+        setAvatar(avatarUrl);
+        // console.log(avatarUrl); 
+      } catch (error) {
+        console.error("Error fetching account data:", error);
+      } 
+    };
+    if (accountId) fetchAccount();
+
+  }, [activeTab,accountId]);
 
   const [isDropdownOpen, setDropdownOpen] = useState(false); // Quản lý trạng thái mở dropdown
 
@@ -64,24 +78,24 @@ const Homepage = () => {
               Dịch Vụ
             </a>
             <div className="dropdown-content">
-              <a href="#">Tạo Đơn</a>
-              <a href="#">Ước Tính Chi Phí</a>
-              <a href="#">Theo dõi đơn hàng</a>
+              <a href="/form">Tạo Đơn</a>
+              {/* <a href="#">Ước Tính Chi Phí</a>
+              <a href="#">Theo dõi đơn hàng</a> */}
               <a href="#">Quy định vận chuyển</a>
               <a href="#">Chương trình khuyến mãi</a>
             </div>
           </div>
 
-          <a href="#" className="nav-link">
+          <a href="/AboutUsUser" className="nav-link">
             Giới Thiệu
           </a>
         </div>
         <div className="navbar-right">
-          <a href="#" className="nav-link support-link">
+          <a href="/SupportUser" className="nav-link support-link">
             <i className="fas fa-question-circle"></i> Hỗ Trợ
           </a>
           <div className="dropdown">
-            <img src={avatar} alt="Avatar" className="avatar" />
+          <img src={avatar || '/default-avatar.png'} alt="Avatar" className="avatar" />
             <div className="dropdown-content-avatar ">
               <a href="user-page">Tài khoản của tôi</a>
               <a  onClick={handleLogout}>Đăng xuất</a>
@@ -336,10 +350,10 @@ const Homepage = () => {
             <h4>Dịch Vụ</h4>
             <a href="#">Theo Dõi Đơn Hàng</a>
             <br />
-            <a href="#">Ước Tính Chi Phí</a>
+            {/* <a href="#">Ước Tính Chi Phí</a>
             <br />
             <a href="/form">Tạo đơn hàng</a>
-            <br />
+            <br /> */}
             <a href="#">Quy định vận chuyển</a>
             <br />
             <a href="#">Chương trình khuyến mãi</a>
@@ -347,14 +361,14 @@ const Homepage = () => {
 
           {/* Cột 3: Giới Thiệu */}
           <div className="footer-column">
-            <a className="footer-link" href="#">
+            <a className="footer-link" href="/AboutUsUser">
               Giới Thiệu
             </a>
           </div>
 
           {/* Cột 4: Hỗ Trợ */}
           <div className="footer-column">
-            <a className="footer-link" href="#">
+            <a className="footer-link" href="/SupportUser">
               Hỗ Trợ
             </a>
           </div>

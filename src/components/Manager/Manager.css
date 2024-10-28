@@ -59,9 +59,12 @@
   color: #ffc107;
 }
 
-.KoiDeli {
-  margin-left: -170px; /* Align the Koi Deli text properly */
+.KoiDeli{
+  margin-top:20px;
+  margin-left: -100px;
+  color: white;
 }
+
 .logo-separator {
   border-color: rgba(255, 255, 255, 0.2);
 }
