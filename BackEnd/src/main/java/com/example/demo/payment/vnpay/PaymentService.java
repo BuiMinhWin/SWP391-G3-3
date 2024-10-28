@@ -46,7 +46,7 @@ public class PaymentService {
 
             vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
 
-            vnpParamsMap.put("vnp_ReturnUrl", "http://localhost:3000/payment-outcome");
+//            vnpParamsMap.put("vnp_ReturnUrl", "http://localhost:3000/payment-outcome");
 
             String vnpTxnRef = UUID.randomUUID().toString();
             vnpParamsMap.put("vnp_TxnRef", vnpTxnRef);
