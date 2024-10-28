@@ -310,14 +310,6 @@ public class OrderService {
 
         order.setPaymentStatus(paymentStatus);
         orderRepository.save(order);
-
-        if (paymentStatus) {
-            Transaction transaction = new Transaction();
-            transaction.setOrder(order);
-            transaction.setTransactionDate(LocalDateTime.now());
-            transactionRepository.save(transaction);
-            logger.info("Transaction created for Order ID: {}", orderId);
-        }
     }
 
     public Order findOrderById(String orderId) {
