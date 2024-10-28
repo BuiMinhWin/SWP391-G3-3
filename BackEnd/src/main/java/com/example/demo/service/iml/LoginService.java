@@ -25,6 +25,9 @@ public class LoginService {
         if (account == null) {
             account = accountRepository.findByEmail(loginDTO.getEmail());
         }
+        if (account == null) {
+            account = accountRepository.findByPhone(loginDTO.getPhone());
+        }
         if (account != null) {
             String inputPassword = loginDTO.getPassword();
             String encodedPassword = account.getPassword();
@@ -46,7 +49,7 @@ public class LoginService {
             }
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new LoginMessage("User Name or Email not exists", false, null, null));
+                    .body(new LoginMessage("User Name or Email or Phone not exists", false, null, null));
         }
     }
 }
