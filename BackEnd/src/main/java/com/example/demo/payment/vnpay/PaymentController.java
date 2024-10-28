@@ -5,6 +5,7 @@ import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.response.ResponseObject;
 import com.example.demo.service.iml.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,18 +48,23 @@ public class PaymentController {
     }
 
     @GetMapping("/vn-pay-callback")
-    public ResponseObject<PaymentDTO.VNPayResponse> payCallbackHandler(HttpServletRequest request) {
+    public void payCallbackHandler(HttpServletRequest request, HttpServletResponse response) {
         String status = request.getParameter("vnp_ResponseCode");
         String vnpTxnRef = paymentService.extractAndLogTxnRef(request);
 
         log.debug("Received VNPay callback for vnpTxnRef: {} with status: {}", vnpTxnRef, status);
-        PaymentDTO.VNPayResponse response = paymentService.handlePayCallback(vnpTxnRef, status);
+        PaymentDTO.VNPayResponse paymentResponse = paymentService.handlePayCallback(vnpTxnRef, status, response);
 
-        if ("00".equals(response.getCode())) {
-            return new ResponseObject<>(HttpStatus.OK, "Success", response);
+        if ("00".equals(paymentResponse.getCode())) {
+            try {
+                response.sendRedirect("http://localhost:3000/payment-outcome");
+            } catch (IOException e) {
+                log.error("Error during redirection: {}", e.getMessage());
+            }
         } else {
-            return new ResponseObject<>(HttpStatus.BAD_REQUEST, response.getMessage(), null);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
+
 
 }
