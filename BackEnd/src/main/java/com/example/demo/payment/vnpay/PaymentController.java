@@ -45,7 +45,7 @@ public class PaymentController {
         return new ResponseObject<>(HttpStatus.OK, "Success", response);
     }
 
-    @GetMapping("/payment-outcome")
+    @GetMapping("/vn-pay-callback")
     public ResponseObject<PaymentDTO.VNPayResponse> payCallbackHandler(HttpServletRequest request) {
         String status = request.getParameter("vnp_ResponseCode");
         String vnpTxnRef = paymentService.extractAndLogTxnRef(request);
