@@ -1,93 +1,183 @@
-import React from "react";
-import { Formik, Form, Field } from "formik";
+import React, { useEffect, useState } from "react";
+import { useFormik } from "formik";
 import * as Yup from "yup";
-import { TextField, Button, Typography, Box } from "@mui/material";
-import Rating from "@mui/material/Rating";
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import axios from "axios";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Rating,
+  Paper,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import {
+  createFeedback,
+  getFeedbackByOrderId,
+} from "../../services/FeedBackService";
 
-
-const REST_API_FEEDBACK = "http://koideliverysystem.id.vn:8080/api/feedbacks"
-
-// Custom styled rating component
-const StyledRating = (props) => {
-  return (
-    <Rating
-      {...props}
-      icon={<FavoriteIcon fontSize="inherit" style={{ color: "red" }} />}
-      emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
-    />
-  );
-};
+// Custom styled Rating component
+const StyledRating = styled(Rating)(({ theme }) => ({
+  "& .MuiRating-iconFilled": {
+    color: "#ff6d75",
+  },
+  "& .MuiRating-iconHover": {
+    color: "#ff3d47",
+  },
+  "& .MuiRating-iconEmpty": {
+    fontSize: "2rem",
+  },
+  "& .MuiRating-iconFilled": {
+    fontSize: "2rem",
+  }
+}));
 
 const FeedbackForm = ({ orderId }) => {
-  const INITIAL_FORM_STATE = {
-    feedbackId: "", 
-    orderId: orderId,
-    rating: 0,
-    comment: "",
-    createdAt: new Date().toISOString(),
-    status: 0,
-  };
+  const [existingFeedback, setExistingFeedback] = useState(null);
+  const [accountId, setAccountId] = useState("");
 
-  const FORM_VALIDATION = Yup.object().shape({
-    comment: Yup.string()
-      .max(500, "Feedback must be 500 characters or less")
-      .required("Feedback is required"),
-    rating: Yup.number()
-      .min(1, "Rating is required")
-      .max(5, "Rating cannot be more than 5")
-      .required("Rating is required"),
+  useEffect(() => {
+    const fetchExistingFeedback = async () => {
+      try {
+        const feedback = await getFeedbackByOrderId(orderId);
+        if (feedback && feedback.length > 0) {
+          setExistingFeedback(feedback[0]);
+        } else {
+          setExistingFeedback(null);
+        }
+      } catch (error) {
+        console.error("Error fetching feedback:", error);
+      }
+    };
+
+    fetchExistingFeedback();
+  }, [orderId]);
+
+  useEffect(() => {
+    const id = localStorage.getItem("accountId");
+    if (id) setAccountId(id);
+  }, []);
+
+  const formik = useFormik({
+    initialValues: {
+      rating: 0,
+      comment: "",
+    },
+    validationSchema: Yup.object({
+      rating: Yup.number()
+        .required("Please provide a rating.")
+        .min(1, "Minimum rating is 1.")
+        .max(5, "Maximum rating is 5."),
+      comment: Yup.string().required("Comment is required."),
+    }),
+    onSubmit: async (values) => {
+      try {
+        await createFeedback({
+          orderId,
+          rating: values.rating,
+          comment: values.comment,
+          accountId: accountId,
+        });
+        alert("Feedback submitted successfully!");
+        // After submission, fetch existing feedback again to update state
+        const feedback = await getFeedbackByOrderId(orderId);
+        if (feedback && feedback.length > 0) {
+          setExistingFeedback(feedback[0]); // Update with the new feedback
+        } else {
+          setExistingFeedback(null); // No feedback available
+        }
+        formik.resetForm();
+      } catch (error) {
+        console.error("Error submitting feedback:", error);
+        alert("Failed to submit feedback.");
+      }
+    },
   });
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      const response = await axios.post(`${REST_API_FEEDBACK}/create`, values);
-      console.log("Feedback submitted successfully:", response.data);
-    } catch (error) {
-      console.error("Error submitting feedback:", error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  // Render existing feedback if available
+  if (existingFeedback) {
+    return (
+      <Box
+        sx={{
+          p: 2,
+          border: "1px solid #ddd",
+          borderRadius: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{ textDecoration: "underline" }}
+          gutterBottom
+        >
+          Existing Feedback
+        </Typography>
+        <Typography>Rating: {existingFeedback.rating}</Typography>
+        <Typography>Comment: {existingFeedback.comment}</Typography>
+        {/* Display responses if available */}
+        {existingFeedback.responses &&
+          existingFeedback.responses.length > 0 && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1">Responses:</Typography>
+              {existingFeedback.responses.map((response) => (
+                <Paper key={response.feedbackId} sx={{ p: 2, mb: 1 }}>
+                  <Typography>Response: {response.comment}</Typography>
+                  <Typography>Rating: {response.rating}</Typography>
+                </Paper>
+              ))}
+            </Box>
+          )}
+      </Box>
+    );
+  }
 
+  // Render the feedback submission form
   return (
-    <Formik
-      initialValues={INITIAL_FORM_STATE}
-      validationSchema={FORM_VALIDATION}
-      onSubmit={handleSubmit}
+    <Box
+      component="form"
+      onSubmit={formik.handleSubmit}
+      sx={{
+        p: 2,
+        border: "1px solid #ddd",
+        borderRadius: 1,
+        backgroundColor: "#fff",
+      }}
     >
-      {({ values, setFieldValue }) => (
-        <Form>
-          <Typography variant="h6">Feedback</Typography>
-          <Typography component="legend">Đánh giá</Typography>
-          <Box marginBottom={2}>
-            <StyledRating
-              name="rating"
-              value={values.rating}
-              onChange={(event, newValue) => {
-                setFieldValue("rating", newValue);
-              }}
-              max={5} // Setting the max rating value to 5
-            />
-          </Box>
-          <Field
-            as={TextField}
-            name="comment"
-            label="Comment"
-            multiline
-            rows={4}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-          />
-          <Button type="submit" variant="contained" color="primary">
-            Submit Feedback
-          </Button>
-        </Form>
+      <Typography
+        variant="h6"
+        sx={{ textDecoration: "underline" }}
+        gutterBottom
+      >
+        Submit Feedback
+      </Typography>
+      <StyledRating
+        name="rating"
+        value={formik.values.rating}
+        onChange={(event, newValue) => {
+          formik.setFieldValue("rating", newValue);
+        }}
+      />
+      {formik.touched.rating && formik.errors.rating && (
+        <Typography color="error">{formik.errors.rating}</Typography>
       )}
-    </Formik>
+      <TextField
+        fullWidth
+        multiline
+        rows={4}
+        variant="outlined"
+        margin="normal"
+        label="Comment"
+        name="comment"
+        value={formik.values.comment}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+      />
+      {formik.touched.comment && formik.errors.comment && (
+        <Typography color="error">{formik.errors.comment}</Typography>
+      )}
+      <Button variant="contained" color="primary" type="submit">
+        Submit Feedback
+      </Button>
+    </Box>
   );
 };
 
