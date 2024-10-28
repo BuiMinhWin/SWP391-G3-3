@@ -15,6 +15,7 @@ public class VNPAYConfig {
     @Getter
     @Value("${payment.vnPay.url}")
     private String vnp_PayUrl;
+    @Getter
     @Value("${payment.vnPay.returnUrl}")
     private String vnp_ReturnUrl;
     @Value("${payment.vnPay.tmnCode}")
