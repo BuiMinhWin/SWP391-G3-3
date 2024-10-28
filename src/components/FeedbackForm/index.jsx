@@ -14,6 +14,7 @@ import {
   createFeedback,
   getFeedbackByOrderId,
 } from "../../services/FeedBackService";
+import { useSnackbar } from "notistack";
 
 // Custom styled Rating component
 const StyledRating = styled(Rating)(({ theme }) => ({
@@ -33,6 +34,7 @@ const StyledRating = styled(Rating)(({ theme }) => ({
 const FeedbackForm = ({ orderId }) => {
   const [existingFeedback, setExistingFeedback] = useState(null);
   const [accountId, setAccountId] = useState("");
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     const fetchExistingFeedback = async () => {
@@ -76,7 +78,7 @@ const FeedbackForm = ({ orderId }) => {
           comment: values.comment,
           accountId: accountId,
         });
-        alert("Feedback submitted successfully!");
+        enqueueSnackbar("Feedback được gửi thành công", { variant: "success" });
         // After submission, fetch existing feedback again to update state
         const feedback = await getFeedbackByOrderId(orderId);
         if (feedback && feedback.length > 0) {
@@ -87,7 +89,7 @@ const FeedbackForm = ({ orderId }) => {
         formik.resetForm();
       } catch (error) {
         console.error("Error submitting feedback:", error);
-        alert("Failed to submit feedback.");
+        enqueueSnackbar("Feedback gửi thất bại", { variant: "error" });
       }
     },
   });

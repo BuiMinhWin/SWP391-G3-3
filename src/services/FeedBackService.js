@@ -19,7 +19,6 @@ export const respondToFeedback = (feedbackId, comment, accountId) => {
   return axios.post(`${API_BASE_URL}/respond/${feedbackId}`, {
     feedbackId,
     comment,
-    createdAt: new Date().toISOString(),
     accountId,
   });
 };

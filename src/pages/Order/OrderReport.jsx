@@ -48,6 +48,7 @@ const OrderReport = () => {
 
   // Determine button properties based on order status
   const getButtonProps = (status, paymentStatus) => {
+    console.log("Button prop: ", paymentStatus)
     switch (status) {
       case 0:
         return { text: "Pending", color: "warning" };
@@ -70,7 +71,7 @@ const OrderReport = () => {
     <Stack spacing={2} sx={{ margin: 2 }}>
       {orders.length > 0 ? (
         orders.map((order) => {
-          const { text, color } = getButtonProps(order.status);
+          const { text, color } = getButtonProps(order.status, order.paymentStatus);
 
           return (
             <Paper
