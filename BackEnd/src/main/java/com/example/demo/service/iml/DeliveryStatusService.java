@@ -28,7 +28,6 @@ public class DeliveryStatusService {
     private OrderRepository orderRepository;
 
 
-    @Transactional
     public DeliveryStatusDTO createDeliveryStatus(DeliveryStatusDTO deliveryStatusDTO) {
 
         Order order = orderRepository.findById(deliveryStatusDTO.getOrderId())
@@ -68,14 +67,21 @@ public class DeliveryStatusService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public DeliveryStatusDTO updateDeliveryStatus(String deliveryStatusId, DeliveryStatusDTO updatedStatusDTO) {
         DeliveryStatus originalDeliveryStatus = deliveryStatusRepository.findById(deliveryStatusId)
                 .orElseThrow(() -> new ResourceNotFoundException("DeliveryStatus not found with id " + deliveryStatusId));
 
         DeliveryStatus newDeliveryStatus = new DeliveryStatus();
         newDeliveryStatus.setOrder(originalDeliveryStatus.getOrder());
-        newDeliveryStatus.setStatus(updatedStatusDTO.getStatus());
+
+        if (updatedStatusDTO.getStatus() == 5) {
+            Order order = originalDeliveryStatus.getOrder();
+            order.setShippedDate(LocalDateTime.now());
+            orderRepository.save(order);
+            newDeliveryStatus.setTimeTracking(LocalDateTime.now());
+        } else {
+            newDeliveryStatus.setStatus(updatedStatusDTO.getStatus());
+        }
 
         if (updatedStatusDTO.getCurrentLocate() != null) {
             newDeliveryStatus.setCurrentLocate(updatedStatusDTO.getCurrentLocate());

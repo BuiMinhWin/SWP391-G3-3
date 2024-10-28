@@ -8,7 +8,6 @@ import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.OrderMapper;
 import com.example.demo.repository.*;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -40,7 +39,6 @@ public class OrderService {
     private final TransactionRepository transactionRepository;
     private final DeliveryStatusRepository deliveryStatusRepository;
     private final OrderMapper orderMapper;
-    private final MailService mailService;
 
     private static final int STATUS_CANCELLED = 9000;
     private static final int STATUS_WAITING_APPROVAL = 0;
@@ -51,7 +49,6 @@ public class OrderService {
     private static final int STATUS_DELIVERED = 5;
 
 
-    @Transactional
     public OrderDTO createOrder(OrderDTO orderDTO) {
         logger.info("Received OrderDTO: {}", orderDTO);
 
@@ -82,7 +79,6 @@ public class OrderService {
         return orderMapper.mapToOrderDTO(savedOrder);
     }
 
-    @Transactional
     public OrderDTO cancelOrder(String orderId) {
         logger.info("Cancelling Order with ID: {}", orderId);
 
@@ -101,7 +97,6 @@ public class OrderService {
         }
     }
 
-    @Transactional
     public OrderDTO updateOrderWhenCanceled(String orderId, OrderDTO orderDTO) {
         logger.info("Updating Order with ID: {}", orderId);
 
@@ -126,7 +121,6 @@ public class OrderService {
         return orderMapper.mapToOrderDTO(updatedOrder);
     }
 
-    @Transactional
     private void updateOrderFields(Order order, OrderDTO orderDTO) {
         Optional.ofNullable(orderDTO.getOrderDate()).ifPresent(order::setOrderDate);
         Optional.ofNullable(orderDTO.getShippedDate()).ifPresent(order::setShippedDate);
@@ -182,7 +176,6 @@ public class OrderService {
 
 
 
-    @Transactional
     public void deleteOrder(String orderId) {
         logger.info("Deleting Order and related entities with ID: {}", orderId);
 
@@ -214,7 +207,6 @@ public class OrderService {
     }
 
 
-    @Transactional
     public OrderDTO updateOrderStatus(String orderId, int newStatus) {
         logger.info("Updating status of Order with ID: {} to {}", orderId, newStatus);
 
@@ -294,7 +286,6 @@ public class OrderService {
                 .map(Order::getVnpTxnRef);
     }
 
-    @Transactional
     public void updateVnpTxnRef(String orderId, String vnpTxnRef) {
         log.debug("Updating vnpTxnRef for orderId: {} with vnpTxnRef: {}", orderId, vnpTxnRef);
         orderRepository.findById(orderId).ifPresentOrElse(order -> {
@@ -308,7 +299,6 @@ public class OrderService {
         });
     }
 
-    @Transactional
     public void updatePaymentStatus(String orderId, boolean paymentStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found for orderId: " + orderId));

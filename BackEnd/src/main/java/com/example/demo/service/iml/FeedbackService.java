@@ -1,17 +1,19 @@
 package com.example.demo.service.iml;
 
 import com.example.demo.dto.request.FeedbackDTO;
+import com.example.demo.entity.Account;
 import com.example.demo.entity.Feedback;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.FeedbackMapper;
+import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.FeedbackRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.entity.Order;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,13 +27,18 @@ public class FeedbackService {
     @Autowired
     private OrderRepository orderRepository;
 
-    @Transactional
+    @Autowired
+    private AccountRepository accountRepository;
+
     public FeedbackDTO createFeedback(FeedbackDTO feedbackDTO) {
 
         Order order = orderRepository.findById(feedbackDTO.getOrderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Feedback not found with id " + feedbackDTO.getOrderId()));
 
-        Feedback feedback = FeedbackMapper.mapToFeedback(feedbackDTO, order);
+        Account account = accountRepository.findById(feedbackDTO.getAccountId())
+                .orElseThrow(() -> new ResourceNotFoundException("Feedback not found with id " + feedbackDTO.getAccountId()));
+
+        Feedback feedback = FeedbackMapper.mapToFeedback(feedbackDTO, order, account);
 
         if (feedbackDTO.getRating() < 1 || feedbackDTO.getRating() > 5) {
             throw new IllegalArgumentException("Rating must be between 1 and 5.");
@@ -64,26 +71,34 @@ public class FeedbackService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public FeedbackDTO respondToCustomerFeedback(String feedbackId, FeedbackDTO responseDTO) {
         Feedback customerFeedback = feedbackRepository.findById(feedbackId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer feedback not found with id " + feedbackId));
+                .orElseThrow(() -> new ResourceNotFoundException("Feedback not found with id " + feedbackId));
 
-        Feedback responseFeedback = FeedbackMapper.mapToFeedback(responseDTO, customerFeedback.getOrder());
+        Account account = accountRepository.findById(responseDTO.getAccountId())
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + responseDTO.getAccountId()));
 
-        if (responseDTO.getCreatedAt() == null) {
-            responseFeedback.setCreatedAt(LocalDateTime.now());
-        }
+        Feedback responseFeedback = new Feedback();
+        responseFeedback.setOrder(customerFeedback.getOrder());
+        responseFeedback.setAccount(account);
+        responseFeedback.setComment(responseDTO.getComment());
+        responseFeedback.setRating(0);
+        responseFeedback.setCreatedAt(LocalDateTime.now());
 
-        responseDTO.setRating(0);
-
-        if (responseDTO.getStatus() == 0) {
-            responseFeedback.setStatus(1);
-        }
+        responseFeedback.setParentFeedback(customerFeedback);
 
         Feedback savedResponseFeedback = feedbackRepository.save(responseFeedback);
 
-        return FeedbackMapper.maptoFeedbackDTO(savedResponseFeedback);
+        List<Feedback> responses = customerFeedback.getResponses();
+        if (responses == null) {
+            responses = new ArrayList<>();
+        }
+        responses.add(savedResponseFeedback);
+        customerFeedback.setResponses(responses);
+
+        feedbackRepository.save(customerFeedback);
+
+        return FeedbackMapper.maptoFeedbackDTO(customerFeedback);
     }
 
     public void deleteFeedback(String feedbackId) {

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,6 +18,7 @@ public class FeedbackDTO {
     private String orderId;
     private int rating;
     private String comment;
+    private List<FeedbackDTO> responses;
     private LocalDateTime createdAt;
-    private int status;
+    private String accountId;
 }

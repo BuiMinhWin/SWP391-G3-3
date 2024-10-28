@@ -45,27 +45,4 @@ public class ImageUtils {
         return outputStream.toByteArray();
     }
 
-    public static byte[] downloadImageAsBytes(String imageUrl) throws IOException {
-        URL url = new URL(imageUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.connect();
-
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new IOException("Failed to download image, HTTP response code: " + connection.getResponseCode());
-        }
-
-        try (InputStream inputStream = connection.getInputStream();
-             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, bytesRead);
-            }
-
-            return byteArrayOutputStream.toByteArray();
-        }
-    }
 }

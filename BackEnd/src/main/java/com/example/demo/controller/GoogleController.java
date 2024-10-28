@@ -15,6 +15,7 @@ public class GoogleController {
     @Autowired
     private AccountService accountService;
 
+    @CrossOrigin(origins = "https://koi-delivery-system.vercel.app")
     @PostMapping("/loginGG")
     public ResponseEntity<AccountDTO> createAccountGG(@RequestBody AccountDTO accountDTO) {
         AccountDTO savedAccount = accountService.createAccountGG(accountDTO);

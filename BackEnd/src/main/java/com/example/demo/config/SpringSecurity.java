@@ -23,14 +23,6 @@ public class SpringSecurity {
                         .permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth -> oauth
-                        .loginPage("/login")
-                        .loginProcessingUrl("/doLogin")
-                        .failureUrl("/login?error=true")
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/").permitAll()
-                )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
