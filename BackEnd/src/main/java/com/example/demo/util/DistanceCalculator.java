@@ -1,5 +1,9 @@
 package com.example.demo.util;
 
+import com.example.demo.entity.Services;
+
+import java.util.Collection;
+
 public class DistanceCalculator {
 
     private static final double EARTH_RADIUS_KM = 6378.0;
@@ -14,19 +18,24 @@ public class DistanceCalculator {
 //        return EARTH_RADIUS_KM * c;
 //    }
 
-    public static int calculateTotalPrice(double distance, int ratePerKm) {
-        int totalPrice;
+    public static int calculateTotalPrice(double distance, int ratePerKm, Collection<Services> services) {
+        // Calculate the base price based on distance and rate
+        int distancePrice;
 
         if (distance <= 10) {
-            totalPrice = (int) (distance * ratePerKm);
+            distancePrice = (int) (distance * ratePerKm);
         } else if (distance <= 50) {
-            totalPrice = (int) (distance * ratePerKm * 0.2);
+            distancePrice = (int) (distance * ratePerKm * 0.2);
         } else if (distance <= 100) {
-            totalPrice = (int) (distance * ratePerKm * 1.2);
+            distancePrice = (int) (distance * ratePerKm * 1.2);
         } else {
-            totalPrice = (int) (distance * ratePerKm * 1.5);
+            distancePrice = (int) (distance * ratePerKm * 1.5);
         }
 
-        return totalPrice;
+        double servicesPrice = services.stream()
+                .mapToDouble(Services::getPrice)
+                .sum();
+
+        return distancePrice + (int) servicesPrice;
     }
 }

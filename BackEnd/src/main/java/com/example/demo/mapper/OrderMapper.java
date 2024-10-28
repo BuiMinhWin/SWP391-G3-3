@@ -3,8 +3,12 @@ package com.example.demo.mapper;
 import com.example.demo.dto.request.OrderDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Order;
+import com.example.demo.entity.Services;
 import com.example.demo.util.DistanceCalculator;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class OrderMapper {
@@ -69,9 +73,16 @@ public class OrderMapper {
 //                orderDTO.getDestinationLatitude(),
 //                orderDTO.getDestinationLongitude()
 //        );
+        // Set the distance
         order.setDistance(orderDTO.getDistance());
-        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(orderDTO.getDistance(), RATE_PER_KM);
+
+        Set<Services> services = order.getOrderDetails().stream()
+                .flatMap(orderDetail -> orderDetail.getKoiServices().stream())
+                .collect(Collectors.toSet());
+
+        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(orderDTO.getDistance(), RATE_PER_KM, services);
         order.setTotalPrice(calculatedTotalPrice);
+
 
         order.setStatus(orderDTO.getStatus());
         order.setPaymentStatus(orderDTO.isPaymentStatus());
