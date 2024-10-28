@@ -19,16 +19,15 @@ import {
 const StyledRating = styled(Rating)(({ theme }) => ({
   "& .MuiRating-iconFilled": {
     color: "#ff6d75",
+    fontSize: "2rem",
   },
   "& .MuiRating-iconHover": {
     color: "#ff3d47",
   },
   "& .MuiRating-iconEmpty": {
+    color: "#ff6d75",
     fontSize: "2rem",
   },
-  "& .MuiRating-iconFilled": {
-    fontSize: "2rem",
-  }
 }));
 
 const FeedbackForm = ({ orderId }) => {
@@ -109,9 +108,9 @@ const FeedbackForm = ({ orderId }) => {
           sx={{ textDecoration: "underline" }}
           gutterBottom
         >
-          Existing Feedback
+          Feedback của bạn:
         </Typography>
-        <Typography>Rating: {existingFeedback.rating}</Typography>
+        <StyledRating value={existingFeedback.rating} readOnly />
         <Typography>Comment: {existingFeedback.comment}</Typography>
         {/* Display responses if available */}
         {existingFeedback.responses &&
@@ -121,7 +120,6 @@ const FeedbackForm = ({ orderId }) => {
               {existingFeedback.responses.map((response) => (
                 <Paper key={response.feedbackId} sx={{ p: 2, mb: 1 }}>
                   <Typography>Response: {response.comment}</Typography>
-                  <Typography>Rating: {response.rating}</Typography>
                 </Paper>
               ))}
             </Box>

@@ -215,6 +215,6 @@ export const getServiceStatus = async (orderDetailId) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching Service Status:", error);
-    throw error;
+    return[];
   }
 };

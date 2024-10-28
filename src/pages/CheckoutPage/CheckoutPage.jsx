@@ -15,7 +15,7 @@ import {
   orderDetail,
   cancelOrder,
   getOrderPDF,
-  getAccountById,
+  getServiceStatus,
 } from "../../services/CustomerService";
 import axios from "axios";
 import FeedbackForm from "../../components/FeedbackForm";
@@ -34,6 +34,7 @@ const CheckoutPage = () => {
 
   const [orderData, setOrderData] = useState(null);
   const [orderDetailData, setOrderDetailData] = useState([]);
+  const [serviceStatusData, setServiceStatusData] = useState([]);
   const [error, setError] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
 
@@ -47,6 +48,16 @@ const CheckoutPage = () => {
         setOrderDetailData(
           Array.isArray(fetchedOrderDetails) ? fetchedOrderDetails : []
         );
+
+        // Fetch service status for each order detail
+        const statusPromises = fetchedOrderDetails.map((detail) =>
+          getServiceStatus(detail.orderDetailId)
+        );
+        const serviceStatusResults = await Promise.all(statusPromises);
+        setServiceStatusData(serviceStatusResults);
+
+        // Log service status data
+        console.log("Service Status Data:", serviceStatusResults);
       } catch (err) {
         console.error("Error fetching order data:", err);
         setError(err.message);
@@ -98,7 +109,6 @@ const CheckoutPage = () => {
       console.log("Payment URL:", paymentUrl);
 
       if (paymentUrl) {
-        // Store a flag in state to indicate payment status
         navigate("/payment-outcome", {
           state: { orderId, paymentStatus: "pending" },
         });
@@ -109,7 +119,6 @@ const CheckoutPage = () => {
     } catch (error) {
       if (error.response) {
         console.error("API Error:", error.response.data);
-        // If the payment fails
         navigate("/payment-outcome", {
           state: { orderId, paymentStatus: "failed" },
         });
@@ -136,35 +145,14 @@ const CheckoutPage = () => {
   ];
 
   const getActiveStep = (status, paymentStatus) => {
-    // Step 1: Only for order.status = 0
-    if (status === 0) {
-      return 0; // "Đang xử lí"
-    }
-
-    // Step 2: Only for order.status = 1
-    if (status === 1) {
-      return 1; // "Đã duyệt"
-    }
-
-    // Step 3: For order.status = 2 or 3
-    if (status === 2 || status === 3) {
-      return 2; // "Đang vận chuyển"
-    }
-
-    // Step 4: For order.status = 4
-    if (status === 4) {
-      return paymentStatus ? 4 : 3; // If payment is made, go to step 4; if not, stay at step 3
-    }
-
-    // Completed orders
-    if (status === 5) {
-      return paymentStatus ? 4 : 3; // If payment is made, stay at step 4; if not stayed at step 3
-    }
-
+    if (status === 0) return 0; // "Đang xử lí"
+    if (status === 1) return 1; // "Đã duyệt"
+    if (status === 2 || status === 3) return 2; // "Đang vận chuyển"
+    if (status === 4) return paymentStatus ? 4 : 3; // Completed orders
+    if (status === 5) return paymentStatus ? 4 : 3; // If payment is made
     return 0; // Default case
   };
 
-  // Get the active step based on order status and payment status
   const activeStep = getActiveStep(orderData.status, orderData.paymentStatus);
 
   return (
