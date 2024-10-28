@@ -327,10 +327,9 @@ const CheckoutPage = () => {
               <Typography>PDF đang được tải...</Typography>
             )}
             <Grid item xs={12}>
-            <FeedbackForm orderId={orderId} />
+              {orderData.status === 5 && <FeedbackForm orderId={orderId} />}
+            </Grid>
           </Grid>
-          </Grid>
-
 
           {(orderData.status === 0 || orderData.status === 1) && (
             <Button
@@ -342,15 +341,17 @@ const CheckoutPage = () => {
               Hủy đơn
             </Button>
           )}
-          {orderData.status === 1 && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleProceedToPayment}
-            >
-              Thanh toán
-            </Button>
-          )}
+
+          {[1, 2, 3, 4, 5].includes(orderData.status) &&
+            !orderData.paymentStatus && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleProceedToPayment}
+              >
+                Thanh toán
+              </Button>
+            )}
         </Grid>
       </Paper>
     </Box>
