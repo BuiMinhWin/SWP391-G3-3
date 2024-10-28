@@ -62,7 +62,6 @@ public class PaymentService {
             log.info("Payment URL generated: {}", paymentUrl);
 
             orderService.updateVnpTxnRef(orderId, vnpTxnRef);
-            orderService.updateVnpTxnRef(orderId, vnpTxnRef);
             orderService.updatePaymentStatus(orderId, true);
 
             return PaymentDTO.VNPayResponse.builder()
