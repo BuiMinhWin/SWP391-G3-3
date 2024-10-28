@@ -77,6 +77,9 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<DeliveryStatus> deliveryStatus;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Feedback> feedBack;
+
     @Column(name = "status")
     private int status;
 
