@@ -9,6 +9,8 @@ import com.example.demo.mapper.ServicesMapper;
 import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ServiceRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,15 +81,24 @@ public class ServicesService {
 
 
 
-    public List<ServicesDTO> getServices(String orderDetailId) {
+    public String getServices(String orderDetailId) {
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("OrderDetail not found with id: " + orderDetailId));
 
         List<Services> services = serviceRepository.findByOrderDetail(orderDetail);
+
         return services.stream()
                 .map(ServicesMapper::maptoServicesDTO)
-                .collect(Collectors.toList());
+                .map(serviceDTO -> {
+                    try {
+                        return new ObjectMapper().writeValueAsString(serviceDTO);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("Error converting to JSON", e);
+                    }
+                })
+                .collect(Collectors.joining(",\n"));
     }
+
 
     public ServicesDTO updateServiceStatusByOrderIdAndServiceId(String orderDetailId, Integer servicesId, String newStatus) {
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
