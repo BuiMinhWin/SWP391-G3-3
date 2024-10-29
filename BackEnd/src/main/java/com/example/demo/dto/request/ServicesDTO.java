@@ -16,5 +16,5 @@ public class ServicesDTO {
     private String orderDetailId;
     private double price;
     private String serviceStatus;
-    private String serviceName;
+    private String servicesName;
 }

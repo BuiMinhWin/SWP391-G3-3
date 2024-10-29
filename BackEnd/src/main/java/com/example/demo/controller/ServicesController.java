@@ -17,24 +17,24 @@ public class ServicesController {
     @Autowired
     private ServicesService servicesService;
 
-    @GetMapping("/getServices/{orderDetailId}/{servicesId}")
+    @GetMapping("/getServices/{orderDetailId}/{servicesName}")
     public ResponseEntity<ServicesDTO> getService(
             @PathVariable String orderDetailId,
-            @PathVariable String servicesId) {
-        ServicesDTO serviceDTO = servicesService.getService(orderDetailId, servicesId);
+            @RequestParam String servicesName) {
+        ServicesDTO serviceDTO = servicesService.getService(orderDetailId, servicesName);
         return ResponseEntity.ok(serviceDTO);
     }
 
-    @PatchMapping("/updateService/{orderDetailId}/service/{serviceId}")
-    public ResponseEntity<ServicesDTO> updateServiceStatusByOrderIdAndServiceId(
+    @PatchMapping("/{orderDetailId}/{servicesName}/updateStatus")
+    public ResponseEntity<ServicesDTO> updateServiceStatusByOrderIdAndServiceName(
             @PathVariable String orderDetailId,
-            @PathVariable String serviceId,
+            @PathVariable String servicesName,
             @RequestParam String newStatus) {
-        ServicesDTO updatedService = servicesService.updateServiceStatusByOrderIdAndServiceId(orderDetailId, serviceId, newStatus);
+        ServicesDTO updatedService = servicesService.updateServiceStatusByOrderIdAndServiceName(orderDetailId, servicesName, newStatus);
         return ResponseEntity.ok(updatedService);
     }
 
-    @PutMapping("/{servicesId}/price")
+    @PutMapping("/updatePrice/{servicesName}")
     public ResponseEntity<String> updateServicePrice(
             @PathVariable String servicesName,
             @RequestParam int newPrice) {

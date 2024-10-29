@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,14 @@ public class ServicesService {
     private final ServiceRepository serviceRepository;
     private final OrderDetailRepository orderDetailRepository;
 
+    private final Map<String, Integer> servicePrices = new ConcurrentHashMap<>();
+
+    {
+        servicePrices.put("Bảo hiểm cho cá", 30);
+        servicePrices.put("Chăm sóc cá", 50);
+        servicePrices.put("Trả sau", 0);
+    }
+
     public List<ServicesDTO> createServicesForOrder(ServicesDTO servicesDTO) {
         OrderDetail orderDetail = orderDetailRepository.findById(servicesDTO.getOrderDetailId())
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -27,43 +37,43 @@ public class ServicesService {
 
         List<ServicesDTO> servicesDTOList = new ArrayList<>();
 
-        // Define the names of the services
-        String[] serviceNames = {"Bảo hiểm cho cá", "Chăm sóc cá", "Trả sau"};
-
-        for (String serviceName : serviceNames) {
+        for (String serviceName : servicePrices.keySet()) {
             ServicesDTO newServiceDTO = new ServicesDTO();
-            newServiceDTO.setServiceName(serviceName);  // Assuming ServicesDTO has a setName method
+            newServiceDTO.setServicesName(serviceName);
+            newServiceDTO.setServiceStatus("Yes");
+            newServiceDTO.setPrice(servicePrices.get(serviceName));
 
             Services service = ServicesMapper.mapToServices(newServiceDTO, orderDetail);
-            Services savedService = serviceRepository.save(service);
 
+            Services savedService = serviceRepository.save(service);
             servicesDTOList.add(ServicesMapper.maptoServicesDTO(savedService));
         }
 
         return servicesDTOList;
     }
 
-    public void updateServicePrice(String serviceName, double newPrice) {
-        Services service = serviceRepository.findByServicesName(serviceName)
-                .orElseThrow(() -> new ResourceNotFoundException("Service not found with name: " + serviceName));
-        service.setPrice(newPrice);
-        serviceRepository.save(service);
+    public void updateServicePrice(String serviceName, int newPrice) {
+        if (!servicePrices.containsKey(serviceName)) {
+            throw new ResourceNotFoundException("Service not found: " + serviceName);
+        }
+        servicePrices.put(serviceName, newPrice);
     }
 
-    public ServicesDTO getService(String orderDetailId, String servicesId) {
+
+    public ServicesDTO getService(String orderDetailId, String servicesName) {
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "OrderDetail not found with id: " + orderDetailId));
 
-        Services service = serviceRepository.findByOrderDetailAndServicesId(orderDetail, servicesId)
+        Services service = serviceRepository.findByOrderDetailAndServicesName(orderDetail, servicesName)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Service not found with orderId: " + orderDetailId + " and serviceId: " + servicesId));
+                        "Service not found with orderId: " + orderDetailId + " and serviceName: " + servicesName));
 
         return ServicesMapper.maptoServicesDTO(service);
     }
 
-    public ServicesDTO updateServiceStatusByOrderIdAndServiceId(
-            String orderDetailId, String servicesId, String newStatus) {
+    public ServicesDTO updateServiceStatusByOrderIdAndServiceName(
+            String orderDetailId, String servicesName, String newStatus) {
 
         if (!"Yes".equalsIgnoreCase(newStatus) && !"No".equalsIgnoreCase(newStatus)) {
             throw new IllegalArgumentException("Invalid status. Must be 'Yes' or 'No'.");
@@ -73,14 +83,24 @@ public class ServicesService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "OrderDetail not found with id: " + orderDetailId));
 
-        Services service = serviceRepository.findByOrderDetailAndServicesId(orderDetail, servicesId)
+        Services service = serviceRepository.findByOrderDetailAndServicesName(orderDetail, servicesName)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Service not found with orderId: " + orderDetailId + " and serviceId: " + servicesId));
+                        "Service not found with orderId: " + orderDetailId + " and serviceName: " + servicesName));
 
         service.setServiceStatus(newStatus);
-        service.setPrice("Yes".equalsIgnoreCase(newStatus) ? service.getPrice() : 0.0);
+
+        if ("Yes".equalsIgnoreCase(newStatus)) {
+            Integer updatedPrice = servicePrices.get(servicesName);
+            if (updatedPrice == null) {
+                throw new ResourceNotFoundException("Price not found for service: " + servicesName);
+            }
+            service.setPrice(updatedPrice);
+        } else {
+            service.setPrice(0.0);
+        }
 
         Services updatedService = serviceRepository.save(service);
+
         return ServicesMapper.maptoServicesDTO(updatedService);
     }
 

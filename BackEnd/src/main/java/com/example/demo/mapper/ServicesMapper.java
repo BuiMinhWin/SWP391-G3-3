@@ -23,7 +23,7 @@ public class ServicesMapper {
         service.setOrderDetail(orderDetail);
         service.setPrice(servicesDTO.getPrice());
         service.setServiceStatus(servicesDTO.getServiceStatus());
-        service.setServicesName(servicesDTO.getServiceName());
+        service.setServicesName(servicesDTO.getServicesName());
         return service;
     }
 }

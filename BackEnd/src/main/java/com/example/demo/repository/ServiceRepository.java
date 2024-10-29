@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface ServiceRepository extends JpaRepository<Services, String> {
     Optional<Services> findByServicesName(String servicesName);
-    Optional<Services> findByOrderDetailAndServicesId(OrderDetail orderDetail, String servicesId);
+    Optional<Services> findByOrderDetailAndServicesName(OrderDetail orderDetail, String servicesName);
 }
