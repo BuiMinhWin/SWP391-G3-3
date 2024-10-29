@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -54,22 +55,12 @@ public class OrderDetail {
     @Column(name = "total_service_price", columnDefinition = "INTEGER DEFAULT 0")
     private int totalServicePrice;
 
-    @Column(name = "service_id_1")
-    private String serviceId1;
-
-    @Column(name = "service_price_1")
-    private int servicePrice1;
-
-    @Column(name = "service_id_2")
-    private String serviceId2;
-
-    @Column(name = "service_price_2")
-    private int servicePrice2;
-
-    @Column(name = "service_id_3")
-    private String serviceId3;
-
-    @Column(name = "service_price_3")
-    private int servicePrice3;
+    @ManyToMany
+    @JoinTable(
+            name = "order_detail_services",
+            joinColumns = @JoinColumn(name = "order_detail_id"),
+            inverseJoinColumns = @JoinColumn(name = "services_id")
+    )
+    private Set<Services> services = new HashSet<>();
 
 }

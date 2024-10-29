@@ -3,10 +3,18 @@ package com.example.demo.mapper;
 import com.example.demo.dto.request.OrderDetailDTO;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderDetail;
+import com.example.demo.entity.Services;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrderDetailMapper {
 
     public static OrderDetailDTO mapToOrderDetailDTO(OrderDetail orderDetail) {
+        List<String> serviceIds = orderDetail.getServices().stream()
+                .map(Services::getServicesId)
+                .collect(Collectors.toList());
+
         return new OrderDetailDTO(
                 orderDetail.getOrderDetailId(),
                 orderDetail.getOrder().getOrderId(),
@@ -18,12 +26,7 @@ public class OrderDetailMapper {
                 orderDetail.getKoiName(),
                 orderDetail.getStatus(),
                 orderDetail.getTotalServicePrice(),
-                orderDetail.getServiceId1(),
-                orderDetail.getServiceId2(),
-                orderDetail.getServiceId3(),
-                orderDetail.getServicePrice1(),
-                orderDetail.getServicePrice2(),
-                orderDetail.getServicePrice3()
+                serviceIds
         );
     }
 
@@ -38,12 +41,8 @@ public class OrderDetailMapper {
         orderDetail.setCreatedAt(orderDetailDTO.getCreatedAt());
         orderDetail.setKoiName(orderDetailDTO.getKoiName());
         orderDetail.setStatus(orderDetailDTO.getStatus());
-        orderDetail.setServiceId1(orderDetailDTO.getServiceId1());
-        orderDetail.setServiceId2(orderDetailDTO.getServiceId2());
-        orderDetail.setServiceId3(orderDetailDTO.getServiceId3());
-        orderDetail.setServicePrice1(orderDetailDTO.getServicePrice1());
-        orderDetail.setServicePrice2(orderDetailDTO.getServicePrice2());
-        orderDetail.setServicePrice3(orderDetailDTO.getServicePrice3());
+
+        // The services will be set later by the service layer based on the service IDs
         return orderDetail;
     }
 }

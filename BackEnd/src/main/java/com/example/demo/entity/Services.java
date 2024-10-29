@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,10 +25,6 @@ public class Services {
     @Column(name = "services_id", columnDefinition = "CHAR(36)")
     private String servicesId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_detail_id", nullable = false)
-    private OrderDetail orderDetail;
-
     @Column(name = "services_name")
     private String servicesName;
 
@@ -36,4 +34,6 @@ public class Services {
     @Column(name = "service_status")
     private String serviceStatus;
 
+    @ManyToMany(mappedBy = "services")
+    private Set<OrderDetail> orderDetails = new HashSet<>();
 }

@@ -9,7 +9,11 @@ import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import java.time.LocalDateTime;
@@ -27,7 +31,7 @@ public class OrderDetailService {
                               ServiceRepository serviceRepository) {
         this.orderDetailRepository = orderDetailRepository;
         this.orderRepository = orderRepository;
-        this.serviceRepository = serviceRepository;
+        this.serviceRepository = serviceRepository; // Khởi tạo biến
     }
 
     public OrderDetailDTO createOrderDetail(OrderDetailDTO orderDetailDTO) {
@@ -57,39 +61,55 @@ public class OrderDetailService {
 
     private void setServicePrices(OrderDetailDTO orderDetailDTO, OrderDetail orderDetail) {
         int totalServicePrice = 0;
+        Set<Services> servicesSet = new HashSet<>();
 
-        if (orderDetailDTO.getServiceId1() != null && !orderDetailDTO.getServiceId1().isEmpty()) {
-            orderDetail.setServiceId1(orderDetailDTO.getServiceId1());
-            Services service1 = serviceRepository.findByServicesId(orderDetailDTO.getServiceId1())
-                    .orElseThrow(() -> new ResourceNotFoundException("Service not found with id " + orderDetailDTO.getServiceId1()));
-            orderDetail.setServicePrice1(service1.getPrice());
-            totalServicePrice += service1.getPrice();
-        } else {
-            orderDetail.setServicePrice1(0);
+        Set<String> requestedServiceIds = new HashSet<>();
+        if (orderDetailDTO.getServiceIds() != null && !orderDetailDTO.getServiceIds().isEmpty()) {
+            List<String> serviceIdsList = orderDetailDTO.getServiceIds();
+            requestedServiceIds.addAll(serviceIdsList);
         }
 
-        if (orderDetailDTO.getServiceId2() != null && !orderDetailDTO.getServiceId2().isEmpty()) {
-            orderDetail.setServiceId2(orderDetailDTO.getServiceId2());
-            Services service2 = serviceRepository.findByServicesId(orderDetailDTO.getServiceId2())
-                    .orElseThrow(() -> new ResourceNotFoundException("Service not found with id " + orderDetailDTO.getServiceId2()));
-            orderDetail.setServicePrice2(service2.getPrice());
-            totalServicePrice += service2.getPrice();
-        } else {
-            orderDetail.setServicePrice2(0);
+        int servicePrice1 = 0;
+        int servicePrice2 = 0;
+        int servicePrice3 = 0;
+
+        for (String serviceId : requestedServiceIds) {
+            Services service = serviceRepository.findById(serviceId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Service not found with id " + serviceId));
+            servicesSet.add(service);
+
+            switch (serviceId) {
+                case "1":
+                    servicePrice1 = service.getPrice();
+                    break;
+                case "2":
+                    servicePrice2 = service.getPrice();
+                    break;
+                case "3":
+                    servicePrice3 = service.getPrice();
+                    break;
+                default:
+                    break;
+            }
+
+            totalServicePrice += service.getPrice();
         }
 
-        if (orderDetailDTO.getServiceId3() != null && !orderDetailDTO.getServiceId3().isEmpty()) {
-            orderDetail.setServiceId3(orderDetailDTO.getServiceId3());
-            Services service3 = serviceRepository.findByServicesId(orderDetailDTO.getServiceId3())
-                    .orElseThrow(() -> new ResourceNotFoundException("Service not found with id " + orderDetailDTO.getServiceId3()));
-            orderDetail.setServicePrice3(service3.getPrice());
-            totalServicePrice += service3.getPrice();
-        } else {
-            orderDetail.setServicePrice3(0);
+        if (!requestedServiceIds.contains("1")) {
+            servicePrice1 = 0;
+        }
+        if (!requestedServiceIds.contains("2")) {
+            servicePrice2 = 0;
+        }
+        if (!requestedServiceIds.contains("3")) {
+            servicePrice3 = 0;
         }
 
+        orderDetail.setServices(servicesSet);
         orderDetail.setTotalServicePrice(totalServicePrice);
     }
+
+
 
 
     public List<OrderDetailDTO> getOrderDetailsByOrderId(String orderId) {
