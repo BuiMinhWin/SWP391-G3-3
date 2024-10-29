@@ -9,6 +9,11 @@ import {
   Stepper,
   Step,
   StepLabel,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import {
   order,
@@ -19,6 +24,7 @@ import {
 } from "../../services/CustomerService";
 import axios from "axios";
 import FeedbackForm from "../../components/FeedbackForm";
+import { useSnackbar } from "notistack";
 
 const REST_API_BANK_URL =
   "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
@@ -30,6 +36,7 @@ const formatCurrency = (value) => {
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [openDialog, setOpenDialog] = useState(false);
   const orderId = location.state?.orderId;
 
   const [orderData, setOrderData] = useState(null);
@@ -37,6 +44,16 @@ const CheckoutPage = () => {
   const [serviceStatusData, setServiceStatusData] = useState([]);
   const [error, setError] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const confirmCancelOrder = () => {
+    setOpenDialog(true); // Open the confirmation dialog
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false); // Close the dialog without canceling the order
+  };
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -89,9 +106,13 @@ const CheckoutPage = () => {
       navigate("/");
     } catch (error) {
       console.error("Error canceling order:", error);
-      alert("Failed to cancel order.", { orderId });
     }
   };
+const handleConfirmCancel = async () => {
+  await handleCancelOrder(); // Execute cancel order logic after confirmation
+  enqueueSnackbar("Đơn của bạn đã được hủy", { variant: "success" }); // Show success notification
+  setOpenDialog(false); // Close the dialog
+};
 
   const handleProceedToPayment = async () => {
     try {
@@ -335,16 +356,33 @@ const CheckoutPage = () => {
             <Button
               variant="contained"
               color="error"
-              onClick={handleCancelOrder}
-              sx={{ mr: 2 }}
+              onClick={confirmCancelOrder} // Use confirmCancelOrder to open the dialog
+              sx={{ mr: 2, mt: 5, mx: 15 }}
             >
               Hủy đơn
             </Button>
           )}
+          <Dialog open={openDialog} onClose={handleCloseDialog}>
+            <DialogTitle>Confirm Cancellation</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to cancel this order?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog} color="primary">
+                No
+              </Button>
+              <Button onClick={handleConfirmCancel} color="error" autoFocus>
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           {[1, 2, 3, 4, 5].includes(orderData.status) &&
             !orderData.paymentStatus && (
               <Button
+                sx={{ mt: 5, mx: 15 }}
                 variant="contained"
                 color="primary"
                 onClick={handleProceedToPayment}

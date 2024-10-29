@@ -36,6 +36,7 @@ import FileUpload from "../FromUI/FileUpload";
 import CheckboxWrapper from "../FromUI/Checkbox";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import axios from "axios";
+import { useSnackbar } from "notistack";
 
 // Initial Form State
 const INITIAL_FORM_STATE = {
@@ -138,6 +139,8 @@ const OrderForm = () => {
 
   // const [distanceData, setDistanceData] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const API_KEY = import.meta.env.VITE_GOONG_API_KEY; // Thay bằng API Key của bạn
 
@@ -414,7 +417,7 @@ const OrderForm = () => {
 
           navigate("/checkout", { state: { orderId: newOrderId } });
         } catch (error) {
-          alert("Upload failed, please try again");
+          enqueueSnackbar("Đã xảy ra lỗi trong quá trình tạo đơn", { variant: "error" });
           console.error("Error creating order:", error);
           setErrors({ submit: error.message });
         } finally {
