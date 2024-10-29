@@ -21,4 +21,11 @@ public class OrderDetailDTO {
     private LocalDateTime createdAt;
     private String koiName;
     private int status;
+    private int totalServicePrice;
+    private String serviceId1;
+    private String serviceId2;
+    private String serviceId3;
+    private int servicePrice1;
+    private int servicePrice2;
+    private int servicePrice3;
 }

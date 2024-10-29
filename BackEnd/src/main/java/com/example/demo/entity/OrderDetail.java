@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -49,7 +51,25 @@ public class OrderDetail {
     @Column(name = "status")
     private int status;
 
-    @OneToMany(mappedBy = "orderDetail", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Services> koiServices;
+    @Column(name = "total_service_price", columnDefinition = "INTEGER DEFAULT 0")
+    private int totalServicePrice;
+
+    @Column(name = "service_id_1")
+    private String serviceId1;
+
+    @Column(name = "service_price_1")
+    private int servicePrice1;
+
+    @Column(name = "service_id_2")
+    private String serviceId2;
+
+    @Column(name = "service_price_2")
+    private int servicePrice2;
+
+    @Column(name = "service_id_3")
+    private String serviceId3;
+
+    @Column(name = "service_price_3")
+    private int servicePrice3;
 
 }

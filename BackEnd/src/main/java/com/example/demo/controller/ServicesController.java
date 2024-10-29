@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.dto.request.ServicesDTO;
 import com.example.demo.service.iml.ServicesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,34 +19,17 @@ public class ServicesController {
     @Autowired
     private ServicesService servicesService;
 
-    @GetMapping("/getServices/{orderDetailId}/{servicesName}")
-    public ResponseEntity<ServicesDTO> getService(
-            @PathVariable String orderDetailId,
-            @RequestParam String servicesName) {
-        ServicesDTO serviceDTO = servicesService.getService(orderDetailId, servicesName);
-        return ResponseEntity.ok(serviceDTO);
-    }
-
-    @GetMapping("/Services")
-    public ResponseEntity<List<Map<String, Object>>> getAllServiceNamesAndPrices() {
-        List<Map<String, Object>> services = servicesService.getAllServiceNamesAndPrices();
-        return ResponseEntity.ok(services);
-    }
-
-    @PatchMapping("/{orderDetailId}/{servicesName}/updateStatus")
-    public ResponseEntity<ServicesDTO> updateServiceStatusByOrderIdAndServiceName(
-            @PathVariable String orderDetailId,
-            @PathVariable String servicesName,
-            @RequestParam String newStatus) {
-        ServicesDTO updatedService = servicesService.updateServiceStatusByOrderIdAndServiceName(orderDetailId, servicesName, newStatus);
-        return ResponseEntity.ok(updatedService);
-    }
-
-    @PutMapping("/updatePrice/{servicesName}")
+    @PutMapping("/{servicesId}/price")
     public ResponseEntity<String> updateServicePrice(
-            @PathVariable String servicesName,
+            @PathVariable String servicesId,
             @RequestParam int newPrice) {
-        servicesService.updateServicePrice(servicesName, newPrice);
+        servicesService.updateServicePrice(servicesId, newPrice);
         return ResponseEntity.ok("Service price updated successfully.");
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Map<String, Object>>> getAllServices() {
+        List<Map<String, Object>> services = servicesService.getAllService();
+        return ResponseEntity.ok(services);
     }
 }

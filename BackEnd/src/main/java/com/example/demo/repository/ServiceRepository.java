@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ServiceRepository extends JpaRepository<Services, String> {
-    Optional<Services> findByServicesName(String servicesName);
+    Optional<Services> findByServicesId(String servicesId);
     Optional<Services> findByOrderDetailAndServicesName(OrderDetail orderDetail, String servicesName);
 }

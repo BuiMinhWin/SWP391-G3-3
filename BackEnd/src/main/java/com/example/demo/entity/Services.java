@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,8 +31,9 @@ public class Services {
     private String servicesName;
 
     @Column(name = "price")
-    private double price;
+    private int price;
 
     @Column(name = "service_status")
     private String serviceStatus;
+
 }

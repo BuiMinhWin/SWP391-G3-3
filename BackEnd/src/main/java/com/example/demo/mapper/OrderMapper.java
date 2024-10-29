@@ -73,12 +73,7 @@ public class OrderMapper {
 //        );
         order.setDistance(orderDTO.getDistance());
 
-        OrderDetail orderDetail = order.getOrderDetail();
-        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(
-                orderDTO.getDistance(),
-                RATE_PER_KM,
-                orderDetail
-        );
+        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(orderDTO.getDistance(), RATE_PER_KM);
         order.setTotalPrice(calculatedTotalPrice);
 
 

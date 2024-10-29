@@ -16,7 +16,14 @@ public class OrderDetailMapper {
                 orderDetail.getKoiType(),
                 orderDetail.getCreatedAt(),
                 orderDetail.getKoiName(),
-                orderDetail.getStatus()
+                orderDetail.getStatus(),
+                orderDetail.getTotalServicePrice(),
+                orderDetail.getServiceId1(),
+                orderDetail.getServiceId2(),
+                orderDetail.getServiceId3(),
+                orderDetail.getServicePrice1(),
+                orderDetail.getServicePrice2(),
+                orderDetail.getServicePrice3()
         );
     }
 
@@ -31,6 +38,12 @@ public class OrderDetailMapper {
         orderDetail.setCreatedAt(orderDetailDTO.getCreatedAt());
         orderDetail.setKoiName(orderDetailDTO.getKoiName());
         orderDetail.setStatus(orderDetailDTO.getStatus());
+        orderDetail.setServiceId1(orderDetailDTO.getServiceId1());
+        orderDetail.setServiceId2(orderDetailDTO.getServiceId2());
+        orderDetail.setServiceId3(orderDetailDTO.getServiceId3());
+        orderDetail.setServicePrice1(orderDetailDTO.getServicePrice1());
+        orderDetail.setServicePrice2(orderDetailDTO.getServicePrice2());
+        orderDetail.setServicePrice3(orderDetailDTO.getServicePrice3());
         return orderDetail;
     }
 }
