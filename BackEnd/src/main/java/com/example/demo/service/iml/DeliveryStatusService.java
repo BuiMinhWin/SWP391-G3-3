@@ -75,14 +75,7 @@ public class DeliveryStatusService {
         DeliveryStatus newDeliveryStatus = new DeliveryStatus();
         newDeliveryStatus.setOrder(originalDeliveryStatus.getOrder());
 
-        Order order = originalDeliveryStatus.getOrder();
-        if (updatedStatusDTO.getStatus() == 5) {
-            order.setShippedDate(LocalDateTime.now());
-            orderRepository.save(order);
-            newDeliveryStatus.setTimeTracking(LocalDateTime.now());
-        } else {
-            newDeliveryStatus.setStatus(updatedStatusDTO.getStatus());
-        }
+        newDeliveryStatus.setStatus(updatedStatusDTO.getStatus());
 
         newDeliveryStatus.setCurrentLocate(
                 updatedStatusDTO.getCurrentLocate() != null ? updatedStatusDTO.getCurrentLocate() : originalDeliveryStatus.getCurrentLocate()

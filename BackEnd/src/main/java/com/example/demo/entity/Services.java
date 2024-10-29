@@ -14,9 +14,11 @@ import lombok.Setter;
 @Entity
 @Table(name = "`services`")
 public class Services {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "services_id", columnDefinition = "CHAR(36)")
-    private int servicesId;
+    private String servicesId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_detail_id", nullable = false)

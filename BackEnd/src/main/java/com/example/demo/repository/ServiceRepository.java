@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface ServiceRepository extends JpaRepository<Services, Integer> {
-    List<Services> findByOrderDetail(OrderDetail orderDetail);
-    Optional<Services> findByOrderDetailAndServicesId(OrderDetail orderDetail, Integer servicesId);
+public interface ServiceRepository extends JpaRepository<Services, String> {
+    Optional<Services> findByServicesName(String servicesName);
+    Optional<Services> findByOrderDetailAndServicesId(OrderDetail orderDetail, String servicesId);
 }

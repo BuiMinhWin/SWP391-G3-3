@@ -1,7 +1,7 @@
 package com.example.demo.entity;
 
 
-import jakarta.mail.Service;
+import com.example.demo.service.iml.ServicesService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

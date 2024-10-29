@@ -27,7 +27,7 @@ public class OrderDetailController {
 
         ServicesDTO servicesDTO = new ServicesDTO();
         servicesDTO.setOrderDetailId(savedOrderDetail.getOrderDetailId());
-        servicesService.createServicesForOrder(servicesDTO);
+        List<ServicesDTO> createdServices = servicesService.createServicesForOrder(servicesDTO);
         return new ResponseEntity<>(savedOrderDetail, HttpStatus.CREATED);
     }
 
