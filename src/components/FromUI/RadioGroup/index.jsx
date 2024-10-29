@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   FormControl,
   FormControlLabel,
@@ -6,42 +6,37 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-import { useField, useFormikContext } from "formik";
+import { useFormikContext } from "formik";
 
-const RadioGroupWrapper = ({ name, legend, options, ...otherProps }) => {
-  const { setFieldValue } = useFormikContext(); // Get Formik context
-  const [field] = useField(name); // Field from Formik
+const RadioGroupWrapper = ({ service, serviceIds }) => {
+  const { setFieldValue } = useFormikContext();
 
-  // Auto-set the value to "Yes" when the component mounts
-  useEffect(() => {
-    if (!field.value) {
-      setFieldValue(name, "Yes");
+  const handleChange = (selectedValue) => {
+    if (selectedValue === "Yes") {
+      // Add service ID if "Yes" is selected
+      setFieldValue("serviceIds", [...new Set([...serviceIds, service.id])]);
+    } else {
+      // Remove service ID if "No" is selected
+      setFieldValue("serviceIds", serviceIds.filter((id) => id !== service.id));
     }
-  }, [name, setFieldValue, field.value]);
-
-  const handleChange = (evt) => {
-    console.log(`Radio changed: ${evt.target.value}`);
-    setFieldValue(name, evt.target.value); // Update Formik state on change
   };
 
   return (
     <FormControl>
-      <FormLabel component="legend">{legend}</FormLabel>
-      <RadioGroup
-        {...field}
-        value={field.value} // Bind value to Formik field
-        onChange={handleChange}
-        row // Display radios in a row
-      >
-        {options.map((option) => (
-          <FormControlLabel
-            key={option.value}
-            value={option.value}
-            control={<Radio />}
-            label={option.label}
-            sx={{ color: "black" }} // Set label color to black
-          />
-        ))}
+      <FormLabel component="legend">{service.label}</FormLabel>
+      <RadioGroup row>
+        <FormControlLabel
+          control={<Radio />}
+          label="Yes"
+          value="Yes"
+          onChange={() => handleChange("Yes")}
+        />
+        <FormControlLabel
+          control={<Radio />}
+          label="No"
+          value="No"
+          onChange={() => handleChange("No")}
+        />
       </RadioGroup>
     </FormControl>
   );

@@ -20,7 +20,6 @@ import {
   orderDetail,
   cancelOrder,
   getOrderPDF,
-  getServiceStatus,
 } from "../../services/CustomerService";
 import axios from "axios";
 import FeedbackForm from "../../components/FeedbackForm";
@@ -45,6 +44,8 @@ const CheckoutPage = () => {
   const [error, setError] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
 
+  
+
   const { enqueueSnackbar } = useSnackbar();
 
   const confirmCancelOrder = () => {
@@ -65,16 +66,6 @@ const CheckoutPage = () => {
         setOrderDetailData(
           Array.isArray(fetchedOrderDetails) ? fetchedOrderDetails : []
         );
-
-        // Fetch service status for each order detail
-        const statusPromises = fetchedOrderDetails.map((detail) =>
-          getServiceStatus(detail.orderDetailId)
-        );
-        const serviceStatusResults = await Promise.all(statusPromises);
-        setServiceStatusData(serviceStatusResults);
-
-        // Log service status data
-        console.log("Service Status Data:", serviceStatusResults);
       } catch (err) {
         console.error("Error fetching order data:", err);
         setError(err.message);
@@ -103,16 +94,16 @@ const CheckoutPage = () => {
     try {
       await cancelOrder(orderId);
       alert("Order canceled successfully.");
-      navigate("/");
+      navigate("/customer");
     } catch (error) {
       console.error("Error canceling order:", error);
     }
   };
-const handleConfirmCancel = async () => {
-  await handleCancelOrder(); // Execute cancel order logic after confirmation
-  enqueueSnackbar("Đơn của bạn đã được hủy", { variant: "success" }); // Show success notification
-  setOpenDialog(false); // Close the dialog
-};
+  const handleConfirmCancel = async () => {
+    await handleCancelOrder(); // Execute cancel order logic after confirmation
+    enqueueSnackbar("Đơn của bạn đã được hủy", { variant: "success" }); // Show success notification
+    setOpenDialog(false); // Close the dialog
+  };
 
   const handleProceedToPayment = async () => {
     try {
@@ -153,7 +144,7 @@ const handleConfirmCancel = async () => {
     }
   };
 
-  if (!orderId) return <Navigate to="/" />;
+  if (!orderId) return <Navigate to="/customer" />;
   if (error) return <Typography color="error">Error: {error}</Typography>;
   if (!orderData) return <Typography>Đang tải...</Typography>;
 
@@ -161,7 +152,7 @@ const handleConfirmCancel = async () => {
   const steps = [
     "Đang Xử Lí", // Step 1
     "Đã Duyệt", // Step 2
-    orderData.paymentStatus ? "Đang Vận chuyển" : "Thanh Toán", // Step 3
+    orderData.paymentStatus ? "Đang Vận chuyển" : "Vui Lòng Thanh Toán", // Step 3
     "Hoàn Thành", // Step 4
   ];
 
@@ -182,10 +173,10 @@ const handleConfirmCancel = async () => {
         <Typography
           variant="h3"
           align="center"
-          fontWeight={"semi-bold"}
+          fontWeight={"bold"}
           gutterBottom
         >
-          Xác nhận đơn hàng
+          Thông Tin Đơn Hàng
         </Typography>
 
         {/* Stepper for Order Status */}
@@ -219,6 +210,12 @@ const handleConfirmCancel = async () => {
               <Typography>Mã đơn: {orderData.orderId}</Typography>
               <Typography>
                 Ngày đặt đơn: {new Date(orderData.orderDate).toLocaleString()}
+              </Typography>
+              <Typography>
+                Ngày nhận hàng:{" "}
+                {orderData.shippedDate && orderData.shippedDate.trim() !== ""
+                  ? orderData.shippedDate
+                  : "Đơn hàng chưa được giao đến"}
               </Typography>
               <Typography>
                 <span style={{ fontWeight: "bold" }}>Gửi từ:</span>{" "}
@@ -267,13 +264,7 @@ const handleConfirmCancel = async () => {
                     : "Không có ghi chú nào cho đơn hàng này"}
                 </Typography>
               </Paper>
-              <Typography>
-                Ngày nhận hàng:{" "}
-                {orderData.shippedDate && orderData.shippedDate.trim() !== ""
-                  ? orderData.shippedDate
-                  : "N/A"}
-              </Typography>
-              <Typography>
+              <Typography sx={{ fontWeight: "bold" }}>
                 Tình trạng đơn hàng: {steps[orderData.status]}
               </Typography>
               <Typography variant="h6">
@@ -314,7 +305,12 @@ const handleConfirmCancel = async () => {
                     <Typography>Biến thể: {detail.koiName}</Typography>
                     <Typography>Số lượng: {detail.quantity}</Typography>
                     <Typography>Cân nặng: {detail.weight} kg</Typography>
-                    <Typography>Mã giảm giá: {detail.discount}</Typography>
+                    <Typography>
+                      Mã giảm giá:{" "}
+                      {detail.discount && detail.discount.trim() !== ""
+                        ? detail.discount
+                        : "Không có mã giảm giá nào được áp dụng cho đơn hàng này"}{" "}
+                    </Typography>
                     <Typography>
                       Tình trạng cá:{" "}
                       {detail.status === 0 ? "Bất thường" : "Khỏe mạnh"}
@@ -352,32 +348,17 @@ const handleConfirmCancel = async () => {
             </Grid>
           </Grid>
 
-          {(orderData.status === 0 || orderData.status === 1) && (
-            <Button
-              variant="contained"
-              color="error"
-              onClick={confirmCancelOrder} // Use confirmCancelOrder to open the dialog
-              sx={{ mr: 2, mt: 5, mx: 15 }}
-            >
-              Hủy đơn
-            </Button>
-          )}
-          <Dialog open={openDialog} onClose={handleCloseDialog}>
-            <DialogTitle>Confirm Cancellation</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Are you sure you want to cancel this order?
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog} color="primary">
-                No
+          {(orderData.status === 0 || orderData.status === 1) &&
+            orderData.paymentStatus == false && (
+              <Button
+                variant="contained"
+                color="error"
+                onClick={confirmCancelOrder} // Use confirmCancelOrder to open the dialog
+                sx={{ mr: 2, mt: 5, mx: 15 }}
+              >
+                Hủy đơn
               </Button>
-              <Button onClick={handleConfirmCancel} color="error" autoFocus>
-                Yes
-              </Button>
-            </DialogActions>
-          </Dialog>
+            )}
 
           {[1, 2, 3, 4, 5].includes(orderData.status) &&
             !orderData.paymentStatus && (
@@ -392,6 +373,52 @@ const handleConfirmCancel = async () => {
             )}
         </Grid>
       </Paper>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            p: 2,
+            width: "400px",
+            bgcolor: "#171B36",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: "bold",
+            textAlign: "center",
+            pb: 1,
+            color: "#ffffff",
+          }}
+        >
+          Xác nhận hủy đơn
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ textAlign: "center", fontSize: "16px",  color: "#ffffff", }}>
+            Bạn có chắc muốn hủy đơn này?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center", gap: 2 }}>
+          <Button
+            onClick={handleCloseDialog}
+            variant="outlined"
+            sx={{ borderRadius: 2, px: 4,  color: "#ffffff", }}
+          >
+            Không
+          </Button>
+          <Button
+            onClick={handleConfirmCancel}
+            variant="contained"
+            color="error"
+            sx={{ borderRadius: 2, px: 4 }}
+            autoFocus
+          >
+            Có
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -5,7 +5,7 @@ const REST_API_ORDER_URL = "http://koideliverysystem.id.vn:8080/api/orders";
 const REST_API_ORDER_DETAIL_URL = "http://koideliverysystem.id.vn:8080/api/ordersDetail";
 const REST_API_DOCUMENT_URL = "http://koideliverysystem.id.vn:8080/api/documents";
 const REST_API_ACCOUNT_URL = "http://koideliverysystem.id.vn:8080/api/accounts";
-const REST_API_FEEDBACK = "http://koideliverysystem.id.vn:8080/api/feedbacks";
+
 
 export const createOrder = async (orderData) => {
   try {
@@ -50,12 +50,15 @@ export const createOrderDetail = async (orderDetailData) => {
       `${REST_API_ORDER_DETAIL_URL}/create`,
       orderDetailData
     );
+    console.log("Order detail created successfully:", response.data)
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error.response || error.message);
     throw error;
   }
 };
+
+
 export const order = async (orderId) => {
   try {
     const response = await axios.get(`${REST_API_ORDER_URL}/${orderId}`);
@@ -88,11 +91,14 @@ export const cancelOrder = async (orderId) => {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to cancel order ");
+    throw new Error("Failed to cancel order");
   }
 
-  return response.json();
+  // Only try to parse JSON if there is content
+  const data = response.status !== 204 ? await response.json() : {};
+  return data;
 };
+
 
 export const getOrderPDF = async (orderId) => {
   const response = await fetch(`${REST_API_DOCUMENT_URL}/download/order/${orderId}`);
@@ -157,57 +163,32 @@ export const updateAvatar = async (accountId, avatarFile) => {
   }
 };
 
-export const updateServiceStatus = async (
-  orderDetailId,
-  serviceId,
-  serviceStatus
-) => {
+export const updatePaymentStatus = async (orderId) => {
   try {
-    console.log("Sending request with:", {
-      orderDetailId,
-      serviceId,
-      serviceStatus,
+    console.log(`Sending PATCH request for order ID: ${orderId}`); // Debug log
+    console.log("Sending PATCH request with body:", JSON.stringify({ paymentStatus: true }));
+
+    const response = await fetch(`${REST_API_ORDER_URL}/update/${orderId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ paymentStatus: true }),
     });
 
-    const response = await axios.patch(
-      `${REST_API_SERVICE_URL}/updateService/${orderDetailId}/service/${serviceId}`,
-      null,
-      {
-        params: { newStatus: serviceStatus },
-      }
-    );
-
-    console.log("Response status:", response.status);
-    console.log("Response data:", response.data);
-
-    if (response.status !== 200) {
-      throw new Error(`Unexpected response status: ${response.status}`);
+    if (!response.ok) {
+      console.error("PATCH request failed:", response.status, response.statusText);
+      const errorData = await response.json();
+      console.error("Error response data:", errorData);
+      throw new Error("Failed to update payment status.");
     }
 
-    return response.data;
+    const data = await response.json();
+    console.log("Payment status successfully updated:", data);
+    return data;
   } catch (error) {
-    console.error("Error updating service: status", error);
-    if (error.response) {
-      console.error("Error response data:", error.response.data);
-      console.error("Error response status:", error.response.status);
-    } else if (error.request) {
-      console.error("Error request:", error.request);
-    } else {
-      console.error("Error message:", error.message);
-    }
-    throw new Error("Failed to update service status.");
+    console.error("An error occurred in updatePaymentStatus:", error);
+    throw error;
   }
 };
 
-export const getServiceStatus = async (orderDetailId) => {
-  try {
-    console.log("Sending request with:", orderDetailId);
-    const response = await axios.get(
-      `${REST_API_SERVICE_URL}/getServices/${orderDetailId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching Service Status:", error);
-    return[];
-  }
-};
