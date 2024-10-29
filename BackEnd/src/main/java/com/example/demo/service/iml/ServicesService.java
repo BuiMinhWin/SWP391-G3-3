@@ -72,6 +72,20 @@ public class ServicesService {
         return ServicesMapper.maptoServicesDTO(service);
     }
 
+    public List<Map<String, Object>> getAllServiceNamesAndPrices() {
+        List<Map<String, Object>> servicesList = new ArrayList<>();
+
+        for (Map.Entry<String, Integer> entry : servicePrices.entrySet()) {
+            Map<String, Object> serviceData = new ConcurrentHashMap<>();
+            serviceData.put("serviceName", entry.getKey());
+            serviceData.put("price", entry.getValue());
+            servicesList.add(serviceData);
+        }
+
+        return servicesList;
+    }
+
+
     public ServicesDTO updateServiceStatusByOrderIdAndServiceName(
             String orderDetailId, String servicesName, String newStatus) {
 
