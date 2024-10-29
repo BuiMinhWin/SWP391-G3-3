@@ -135,6 +135,7 @@ public class OrderService {
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + accountId));
             order.setAccount(account);
         });
+        Optional.ofNullable(orderDTO.isPaymentStatus()).ifPresent(order::setPaymentStatus);
     }
 
 

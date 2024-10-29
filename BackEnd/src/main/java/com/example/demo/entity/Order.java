@@ -83,8 +83,8 @@ public class Order {
     @Column(name = "status")
     private int status;
 
-    @Column(name = "payment_status", nullable = false, columnDefinition = "BIT")
-    private boolean paymentStatus;
+    @Column(name = "payment_status", nullable = false, columnDefinition = "BIT default 0")
+    private boolean paymentStatus = false;
 
 //    @Column(name = "origin_latitude")
 //    private double originLatitude;
