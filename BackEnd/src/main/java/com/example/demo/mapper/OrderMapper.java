@@ -3,6 +3,7 @@ package com.example.demo.mapper;
 import com.example.demo.dto.request.OrderDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Order;
+import com.example.demo.entity.OrderDetail;
 import com.example.demo.util.DistanceCalculator;
 import org.springframework.stereotype.Component;
 
@@ -70,10 +71,14 @@ public class OrderMapper {
 //                orderDTO.getDestinationLatitude(),
 //                orderDTO.getDestinationLongitude()
 //        );
-        // Set the distance
         order.setDistance(orderDTO.getDistance());
 
-        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(orderDTO.getDistance(), RATE_PER_KM);
+        OrderDetail orderDetail = order.getOrderDetail();
+        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(
+                orderDTO.getDistance(),
+                RATE_PER_KM,
+                orderDetail
+        );
         order.setTotalPrice(calculatedTotalPrice);
 
 

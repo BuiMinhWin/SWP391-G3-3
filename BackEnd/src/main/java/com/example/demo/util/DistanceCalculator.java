@@ -1,5 +1,6 @@
 package com.example.demo.util;
 
+import com.example.demo.entity.OrderDetail;
 import com.example.demo.entity.Services;
 
 import java.util.Collection;
@@ -18,7 +19,7 @@ public class DistanceCalculator {
 //        return EARTH_RADIUS_KM * c;
 //    }
 
-    public static int calculateTotalPrice(double distance, int ratePerKm) {
+    public static int calculateTotalPrice(double distance, int ratePerKm, OrderDetail orderDetail) {
         int distancePrice;
 
         if (distance <= 10) {
@@ -31,6 +32,20 @@ public class DistanceCalculator {
             distancePrice = (int) (distance * ratePerKm * 1.5);
         }
 
-        return distancePrice;
+        double servicesTotal = 0;
+        if (orderDetail.getKoiServices() != null && !orderDetail.getKoiServices().isEmpty()) {
+            for (Services service : orderDetail.getKoiServices()) {
+                servicesTotal += service.getPrice();
+            }
+        }
+
+        int totalPrice = distancePrice + (int) servicesTotal;
+
+        if (orderDetail.getDiscount() != null && !orderDetail.getDiscount().isEmpty()) {
+            double discount = Double.parseDouble(orderDetail.getDiscount());
+            totalPrice *= (1 - discount / 100);
+        }
+
+        return totalPrice;
     }
 }

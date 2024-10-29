@@ -112,4 +112,11 @@ public class Order {
 
     @Column(name = "sale")
     private String sale;
+
+    public OrderDetail getOrderDetail() {
+        if (orderDetails != null && !orderDetails.isEmpty()) {
+            return orderDetails.iterator().next();
+        }
+        return null;
+    }
 }
