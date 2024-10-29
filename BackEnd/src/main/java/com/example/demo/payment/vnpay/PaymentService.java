@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
@@ -47,6 +46,8 @@ public class PaymentService {
 
             vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
 
+//            vnpParamsMap.put("vnp_ReturnUrl", "http://localhost:3000/payment-outcome");
+
             String vnpTxnRef = UUID.randomUUID().toString();
             vnpParamsMap.put("vnp_TxnRef", vnpTxnRef);
 
@@ -61,6 +62,7 @@ public class PaymentService {
             log.info("Payment URL generated: {}", paymentUrl);
 
             orderService.updateVnpTxnRef(orderId, vnpTxnRef);
+//            orderService.updatePaymentStatus(orderId, true);
 
             return PaymentDTO.VNPayResponse.builder()
                     .code("200")
@@ -82,19 +84,15 @@ public class PaymentService {
         return vnpTxnRef;
     }
 
-    public PaymentDTO.VNPayResponse handlePayCallback(String vnpTxnRef, String status, HttpServletResponse response) {
+    public PaymentDTO.VNPayResponse handlePayCallback(String vnpTxnRef, String status) {
         try {
             OrderDTO orderDTO = orderService.getOrderByVnpTxnRef(vnpTxnRef);
 
             if ("00".equals(status)) {
                 orderService.updatePaymentStatus(orderDTO.getOrderId(), true);
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 1);
-
                 transactionService.createTransaction(orderDTO.getOrderId(), vnpTxnRef, orderDTO.getTotalPrice());
-
-                String returnUrl = "http://localhost:3000/payment-outcome";
-                response.sendRedirect(returnUrl);
-                return new PaymentDTO.VNPayResponse("00", "Success", returnUrl);
+                return new PaymentDTO.VNPayResponse("00", "Success", "http://localhost:3000/payment-outcome");
             } else {
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 0);
                 return new PaymentDTO.VNPayResponse("01", "Failed", null);
