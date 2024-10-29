@@ -123,19 +123,24 @@ const OrderForm = () => {
   console.log("accId: ", testaccId, "accData: ", "accountData: ", accountData);
 
   const navigate = useNavigate();
-  const [provinces, setProvinces] = useState([]);
-  const [districts, setDistricts] = useState([]); // State để lưu danh sách quận
-  const [wards, setWards] = useState([]); // State để lưu danh sách phường
+  // state lưu danh sáchh tỉnh, phường, quận người gửi
+  const [provincesS, setProvincesS] = useState([]);
+  const [districtsS, setDistrictsS] = useState([]); 
+  const [wardsS, setWardsS] = useState([]); 
+  // state lưu danh sáchh tỉnh, phường, quận người nhận
+  const [provincesR, setProvincesR] = useState([]);
+  const [districtsR, setDistrictsR] = useState([]); 
+  const [wardsR, setWardsR] = useState([]); 
 
   // người gửi
-  const [selectedProvinceS, setSelectedProvinceS] = useState("");
-  const [selectedDistrictSId, setSelectedDistrictSId] = useState("");
-  const [selectedWardSId, setSelectedSWard] = useState("");
+  const [selectedProvinceS, setSelectedProvinceS] = useState(null);
+  const [selectedDistrictSId, setSelectedDistrictSId] = useState(null);
+  const [selectedWardSId, setSelectedSWard] = useState(null);
 
   // người nhận
-  const [selectedProvinceR, setSelectedProvinceR] = useState("");
-  const [selectedDistrictRId, setSelectedDistrictRId] = useState("");
-  const [selectedWardRId, setSelectedRWard] = useState("");
+  const [selectedProvinceR, setSelectedProvinceR] = useState(null);
+  const [selectedDistrictRId, setSelectedDistrictRId] = useState(null);
+  const [selectedWardRId, setSelectedRWard] = useState(null);
 
   // const [distanceData, setDistanceData] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -188,8 +193,10 @@ const OrderForm = () => {
             label: province.ProvinceName,
             value: province.ProvinceID,
           }));
-
-          setProvinces(provinceOptions);
+  
+          // Lưu các tỉnh cho cả người gửi và người nhận
+          setProvincesS(provinceOptions);
+          setProvincesR(provinceOptions);
         } else {
           console.log("No data found");
         }
@@ -197,11 +204,11 @@ const OrderForm = () => {
         console.error("Error fetching provinces:", error);
       }
     };
-
+  
     fetchProvinces();
   }, []);
-
-  const fetchDistricts = async (provinceId) => {
+  
+  const fetchDistricts = async (provinceId, isSender) => {
     try {
       const response = await fetch(
         `https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${provinceId}`,
@@ -220,14 +227,23 @@ const OrderForm = () => {
           label: district.DistrictName,
           value: district.DistrictID,
         }));
-        setDistricts(districtOptions);
+  
+       // check điều kiện để gán
+        if (isSender) {
+          setDistrictsS(districtOptions);// set quận người gửi
+          setWardsS([]); // reset 
+        } else {
+          setDistrictsR(districtOptions);// set quận người nhận
+          setWardsR([]); 
+        }
       }
     } catch (error) {
       console.error("Error fetching districts:", error);
     }
   };
-
-  const fetchWards = async (districtId) => {
+  
+ 
+  const fetchWards = async (districtId, isSender) => {
     try {
       const response = await fetch(
         `https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${districtId}`,
@@ -246,7 +262,13 @@ const OrderForm = () => {
           label: ward.WardName,
           value: ward.WardCode,
         }));
-        setWards(wardOptions);
+  
+        // check điều kiện để gán
+        if (isSender && wardsS !== wardOptions) {
+          setWardsS(wardOptions); // set quận người gửi
+        } else if (!isSender && wardsR !== wardOptions) {
+          setWardsR(wardOptions); // set quận người nhận
+        }
       }
     } catch (error) {
       console.error("Error fetching wards:", error);
@@ -429,74 +451,89 @@ const OrderForm = () => {
       {({ handleSubmit, errors, setFieldValue }) => {
         console.log("Validation errors:", errors); // Log validation errors
         const handleSenderProvinceChange = (event) => {
-          const selectedProvince = provinces.find(
+          const selectedProvince = provincesS.find(
             (province) => province.value === event.target.value
           );
           if (selectedProvince) {
-            setSelectedProvinceS(selectedProvince.value); // Save the value for state
-            setFieldValue("cityS", selectedProvince.label); // Save the label for the form
+            setSelectedProvinceS(selectedProvince.value);
+            setFieldValue("cityS", selectedProvince.label);
             console.log("Selected Province ID:", selectedProvince.value);
-            fetchDistricts(selectedProvince.value);
+        
+            // Reset quận và phường của người gửi khi thay đổi tỉnh người gửi
+            setDistrictsS([]); 
+            setWardsS([]);     
+        
+            fetchDistricts(selectedProvince.value, true); // true cho người nhận,check dk không bị mất 
           }
         };
-
+        
         const handleReceiverProvinceChange = (event) => {
-          const selectedProvince = provinces.find(
+          const selectedProvince = provincesR.find(
             (province) => province.value === event.target.value
           );
           if (selectedProvince) {
             setSelectedProvinceR(selectedProvince.value);
             setFieldValue("cityR", selectedProvince.label);
             console.log("Selected Province ID:", selectedProvince.value);
-            fetchDistricts(selectedProvince.value);
+        
+            // Reset quận và phường của người nhận khi thay đổi tỉnh người nhận
+            setDistrictsR([]); 
+            setWardsR([]);     
+        
+            fetchDistricts(selectedProvince.value, false); // false cho người nhận,check dk không bị mất 
           }
         };
-
+        
+        
         const handleSenderDistrictChange = (event) => {
-          const selectedDistrict = districts.find(
+          const selectedDistrict = districtsS.find(
             (district) => district.value === event.target.value
           );
           if (selectedDistrict) {
             setSelectedDistrictSId(selectedDistrict.value);
-            setFieldValue("districtS", selectedDistrict.label); // Save the label for the form
+            setFieldValue("districtS", selectedDistrict.label); 
             console.log("Selected District ID:", selectedDistrict.value);
-            fetchWards(selectedDistrict.value);
+            
+            fetchWards(selectedDistrict.value, true); 
           }
         };
-
+        
         const handleReceiverDistrictChange = (event) => {
-          const selectedDistrict = districts.find(
+          const selectedDistrict = districtsR.find(
             (district) => district.value === event.target.value
           );
           if (selectedDistrict) {
             setSelectedDistrictRId(selectedDistrict.value);
-            setFieldValue("districtR", selectedDistrict.label); // Save the label for the form
+            setFieldValue("districtR", selectedDistrict.label); 
             console.log("Selected District ID:", selectedDistrict.value);
-            fetchWards(selectedDistrict.value);
+            
+            fetchWards(selectedDistrict.value, false); 
           }
         };
-
+        
+        
         const handleSenderWardChange = (event) => {
-          const selectedWard = wards.find(
+          const selectedWard = wardsS.find(
             (ward) => ward.value === event.target.value
           );
           if (selectedWard) {
             setSelectedSWard(selectedWard.value);
-            setFieldValue("wardS", selectedWard.label); // Save the label for the form
+            setFieldValue("wardS", selectedWard.label); 
             console.log("Selected Ward ID:", selectedWard.value);
           }
         };
-
+        
         const handleReceiverWardChange = (event) => {
-          const selectedWard = wards.find(
+          const selectedWard = wardsR.find(
             (ward) => ward.value === event.target.value
           );
           if (selectedWard) {
             setSelectedRWard(selectedWard.value);
-            setFieldValue("wardR", selectedWard.label); // Save the label for the form
+            setFieldValue("wardR", selectedWard.label);
             console.log("Selected Ward ID:", selectedWard.value);
           }
         };
+        
 
         return (
           <Form onSubmit={handleSubmit}>
@@ -527,7 +564,7 @@ const OrderForm = () => {
                           onChange={handleSenderProvinceChange}
                           label="Tỉnh (người gửi)"
                         >
-                          {provinces.map((province) => (
+                          {provincesS.map((province) => (
                             <MenuItem
                               key={province.value}
                               value={province.value}
@@ -547,7 +584,7 @@ const OrderForm = () => {
                           onChange={handleSenderDistrictChange}
                           label="Quận (người gửi)"
                         >
-                          {districts.map((district) => (
+                          {districtsS.map((district) => (
                             <MenuItem
                               key={district.value}
                               value={district.value}
@@ -568,7 +605,7 @@ const OrderForm = () => {
                           value={selectedWardSId} // Nếu bạn có state để lưu phường đã chọn
                           onChange={handleSenderWardChange} // Nếu bạn có hàm xử lý cho phường
                         >
-                          {wards.map((ward) => (
+                          {wardsS.map((ward) => (
                             <MenuItem key={ward.value} value={ward.value}>
                               {ward.label}
                             </MenuItem>
@@ -621,7 +658,7 @@ const OrderForm = () => {
                           onChange={handleReceiverProvinceChange}
                           label="Tỉnh (người nhận)"
                         >
-                          {provinces.map((province) => (
+                          {provincesR.map((province) => (
                             <MenuItem
                               key={province.value}
                               value={province.value}
@@ -642,7 +679,7 @@ const OrderForm = () => {
                           onChange={handleReceiverDistrictChange}
                           label="Quận (người nhận)"
                         >
-                          {districts.map((district) => (
+                          {districtsR.map((district) => (
                             <MenuItem
                               key={district.value}
                               value={district.value}
@@ -663,7 +700,7 @@ const OrderForm = () => {
                           value={selectedWardRId}
                           onChange={handleReceiverWardChange}
                         >
-                          {wards.map((ward) => (
+                          {wardsR.map((ward) => (
                             <MenuItem key={ward.value} value={ward.value}>
                               {ward.label}
                             </MenuItem>
