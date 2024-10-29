@@ -2,6 +2,7 @@ package com.example.demo.payment.vnpay;
 
 import com.example.demo.config.VNPAYConfig;
 import com.example.demo.dto.request.OrderDTO;
+import com.example.demo.entity.OrderDetail;
 import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.service.iml.OrderService;
 import com.example.demo.service.iml.TransactionService;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,10 +34,20 @@ public class PaymentService {
                 throw new IllegalArgumentException("orderId cannot be null or empty");
             }
 
+            // Lấy OrderDTO
             OrderDTO orderDTO = orderService.getOrderByIdV2(orderId);
             log.info("Total price for orderId {}: {} VND", orderId, orderDTO.getTotalPrice());
 
-            BigDecimal amount = BigDecimal.valueOf(orderDTO.getTotalPrice()).multiply(new BigDecimal(100));
+            // Lấy danh sách OrderDetail
+            List<OrderDetail> orderDetails = orderService.getOrderDetailsByOrderId(orderId);
+
+            // Tính tổng totalServicePrice
+            int totalServicePrice = orderDetails.stream()
+                    .mapToInt(OrderDetail::getTotalServicePrice) // Lấy totalServicePrice từ từng OrderDetail
+                    .sum(); // Tính tổng
+
+            // Tính tổng giá trị thanh toán
+            BigDecimal amount = BigDecimal.valueOf(orderDTO.getTotalPrice() + totalServicePrice).multiply(new BigDecimal(100));
 
             Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
             vnpParamsMap.put("vnp_Amount", amount.toPlainString());
@@ -46,11 +58,8 @@ public class PaymentService {
 
             vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
 
-//            vnpParamsMap.put("vnp_ReturnUrl", "http://localhost:3000/payment-outcome");
-
             String vnpTxnRef = UUID.randomUUID().toString();
             vnpParamsMap.put("vnp_TxnRef", vnpTxnRef);
-
             vnpParamsMap.put("vnp_OrderInfo", "Thanh toan don hang: " + orderId);
 
             String queryUrl = VNPayUtil.getPaymentURL(vnpParamsMap, true);
@@ -62,7 +71,6 @@ public class PaymentService {
             log.info("Payment URL generated: {}", paymentUrl);
 
             orderService.updateVnpTxnRef(orderId, vnpTxnRef);
-//            orderService.updatePaymentStatus(orderId, true);
 
             return PaymentDTO.VNPayResponse.builder()
                     .code("200")
@@ -77,6 +85,7 @@ public class PaymentService {
                     .build();
         }
     }
+
 
     public String extractAndLogTxnRef(HttpServletRequest request) {
         String vnpTxnRef = request.getParameter("vnp_TxnRef");
