@@ -50,6 +50,11 @@ public class OrderDetailService {
             orderDetail.setStatus(1);
         }
 
+        if (orderDetailDTO.getServiceIds() != null && !orderDetailDTO.getServiceIds().isEmpty()) {
+            String serviceIdsString = String.join(",", orderDetailDTO.getServiceIds());
+            orderDetail.setServiceIds(serviceIdsString);
+        }
+
         setServicePrices(orderDetailDTO, orderDetail);
 
         System.out.println("Creating OrderDetail with Order ID: " + orderDetail.getOrder().getOrderId());

@@ -55,6 +55,9 @@ public class OrderDetail {
     @Column(name = "total_service_price", columnDefinition = "INTEGER DEFAULT 0")
     private int totalServicePrice;
 
+    @Column(name = "service_ids")
+    private String serviceIds;
+
     @ManyToMany
     @JoinTable(
             name = "order_detail_services",
