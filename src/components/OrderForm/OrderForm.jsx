@@ -113,9 +113,9 @@ const FORM_VALIDATION = Yup.object().shape({
 
 const OrderForm = () => {
   const services = [
-    { id: 1, label: "Service 1" },
-    { id: 2, label: "Service 2" },
-    { id: 3, label: "Service 3" },
+    { id: 1, label: "Bảo hiểm" },
+    { id: 2, label: "Chăm sóc cá" },
+    { id: 3, label: "Người nhận thanh toán" },
   ];
 
   const { testaccId, accountData } = useOutletContext();
