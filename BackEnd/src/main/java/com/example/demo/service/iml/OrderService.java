@@ -127,6 +127,7 @@ public class OrderService {
         Optional.ofNullable(orderDTO.getOrigin()).ifPresent(order::setOrigin);
         Optional.ofNullable(orderDTO.getDestination()).ifPresent(order::setDestination);
         Optional.ofNullable(orderDTO.getFreight()).ifPresent(order::setFreight);
+        Optional.of(orderDTO.isPaymentStatus()).ifPresent(order::setPaymentStatus);
         if (orderDTO.getTotalPrice() != 0) {
             order.setTotalPrice(orderDTO.getTotalPrice());
         }
@@ -135,7 +136,7 @@ public class OrderService {
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + accountId));
             order.setAccount(account);
         });
-        Optional.ofNullable(orderDTO.isPaymentStatus()).ifPresent(order::setPaymentStatus);
+
     }
 
 
