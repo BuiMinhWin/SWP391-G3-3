@@ -145,6 +145,14 @@ public class AccountService {
         Account account = AccountMapper.mapToAccount(accountDTO);
         account.setAccountId(IdGenerator.generateId());
 
+        if(accountDTO.getLastName() == null){
+            accountDTO.setLastName("");
+        }
+
+        if(accountDTO.getFirstName() == null){
+            accountDTO.setFirstName("");
+        }
+
         account.setUserName(accountDTO.getFirstName() + accountDTO.getLastName());
 
         if (accountDTO.getCreateAt() == null) {
