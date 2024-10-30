@@ -272,7 +272,6 @@ public class OrderService {
                 refundAmount, order.getOrderId(), vnpTxnRef, accountId);
     }
 
-
     public OrderDTO getOrderByVnpTxnRef(String vnpTxnRef) {
         return orderRepository.findByVnpTxnRef(vnpTxnRef)
                 .map(orderMapper::convertToDTO)
@@ -322,7 +321,7 @@ public class OrderService {
         Account account = order.getAccount();
         String recipientEmail = account.getEmail();
         String subject = "Your Order is Now Processing!";
-        String message = String.format("Dear %s,\n\nYour order with ID %s is now being processed.\n\nThank you for shopping with us!",
+        String message = String.format("Dear %s,\n\nYour order with ID %s has been approved. Please check your order for details.\n\nThank you for shopping with us!",
                 account.getUserName(), order.getOrderId());
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
