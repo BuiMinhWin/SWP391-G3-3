@@ -110,9 +110,6 @@ public class OrderService {
         if (order.getStatus() == 2) {
             logger.info("Updating 'deliver' information for Processing Order with ID: {}", orderId);
             Optional.ofNullable(orderDTO.getDeliver()).ifPresent(order::setDeliver);
-        } else {
-            logger.warn("Attempted to update an order with an invalid status for update. ID: {}", orderId);
-            throw new IllegalStateException("Order can only be updated if it is in Pending or Processing status.");
         }
 
         updateOrderFields(order, orderDTO);
