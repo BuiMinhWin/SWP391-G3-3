@@ -102,14 +102,12 @@ public class OrderService {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
-        if (orderDTO.getPaymentStatus() != 0) {
-            order.setPaymentStatus(orderDTO.getPaymentStatus());
-        }
-        if (order.getStatus() == 0) {
+
+        if (order.getStatus() == 1) {
             logger.info("Updating 'sale' information for Pending Order with ID: {}", orderId);
             Optional.ofNullable(orderDTO.getSale()).ifPresent(order::setSale);
         }
-        if (order.getStatus() == 1) {
+        if (order.getStatus() == 2) {
             logger.info("Updating 'deliver' information for Processing Order with ID: {}", orderId);
             Optional.ofNullable(orderDTO.getDeliver()).ifPresent(order::setDeliver);
         } else {
@@ -132,6 +130,9 @@ public class OrderService {
         Optional.ofNullable(orderDTO.getFreight()).ifPresent(order::setFreight);
         if (orderDTO.getTotalPrice() != 0) {
             order.setTotalPrice(orderDTO.getTotalPrice());
+        }
+        if (orderDTO.getPaymentStatus() != 0) {
+            order.setPaymentStatus(orderDTO.getPaymentStatus());
         }
 
         Optional.ofNullable(orderDTO.getAccountId()).ifPresent(accountId -> {
