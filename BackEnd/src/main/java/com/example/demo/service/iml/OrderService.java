@@ -105,11 +105,11 @@ public class OrderService {
         if (orderDTO.getPaymentStatus() != 0) {
             order.setPaymentStatus(orderDTO.getPaymentStatus());
         }
-        if (order.getStatus() == 1) {
+        if (order.getStatus() == 0) {
             logger.info("Updating 'sale' information for Pending Order with ID: {}", orderId);
             Optional.ofNullable(orderDTO.getSale()).ifPresent(order::setSale);
         }
-        if (order.getStatus() == 2) {
+        if (order.getStatus() == 1) {
             logger.info("Updating 'deliver' information for Processing Order with ID: {}", orderId);
             Optional.ofNullable(orderDTO.getDeliver()).ifPresent(order::setDeliver);
         } else {

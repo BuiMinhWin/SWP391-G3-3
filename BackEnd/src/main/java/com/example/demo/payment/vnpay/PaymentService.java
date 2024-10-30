@@ -34,19 +34,15 @@ public class PaymentService {
                 throw new IllegalArgumentException("orderId cannot be null or empty");
             }
 
-            // Lấy OrderDTO
             OrderDTO orderDTO = orderService.getOrderByIdV2(orderId);
             log.info("Total price for orderId {}: {} VND", orderId, orderDTO.getTotalPrice());
 
-            // Lấy danh sách OrderDetail
             List<OrderDetail> orderDetails = orderService.getOrderDetailsByOrderId(orderId);
 
-            // Tính tổng totalServicePrice
             int totalServicePrice = orderDetails.stream()
-                    .mapToInt(OrderDetail::getTotalServicePrice) // Lấy totalServicePrice từ từng OrderDetail
-                    .sum(); // Tính tổng
+                    .mapToInt(OrderDetail::getTotalServicePrice)
+                    .sum();
 
-            // Tính tổng giá trị thanh toán
             BigDecimal amount = BigDecimal.valueOf(orderDTO.getTotalPrice() + totalServicePrice).multiply(new BigDecimal(100));
 
             Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
