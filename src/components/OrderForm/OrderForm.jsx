@@ -81,7 +81,7 @@ const FORM_VALIDATION = Yup.object().shape({
     .matches(/^[0-9]{10}$/, "Số điện thoại phải là số và có 10 số"),
   receiverNote: Yup.string().nullable(),
   senderNote: Yup.string().nullable(),
-  orderNote: Yup.string().nullable(), // Optional field for additional notes
+  orderNote: Yup.string().nullable(), 
   discount: Yup.string().nullable(),
   cityS: Yup.string().required("Vui lòng chọn thành phố"), //
   cityR: Yup.string().required("Vui lòng chọn thành phố"), //

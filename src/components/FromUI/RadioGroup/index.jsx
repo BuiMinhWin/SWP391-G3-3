@@ -14,7 +14,9 @@ const RadioGroupWrapper = React.memo(({ service, serviceIds }) => {
 
   // Memoized function to avoid re-creating the handleChange function on every render
   const handleChange = useCallback(
-    (selectedValue) => {
+    (event) => {
+      const selectedValue = event.target.value;
+
       if (selectedValue === "Yes") {
         setFieldValue("serviceIds", [...new Set([...serviceIds, service.id])]);
       } else {
@@ -32,7 +34,8 @@ const RadioGroupWrapper = React.memo(({ service, serviceIds }) => {
     if (!serviceIds.includes(service.id)) {
       setFieldValue("serviceIds", [...serviceIds, service.id]);
     }
-  }, [service.id, serviceIds, setFieldValue]);
+    // Only run on mount by passing an empty dependency array
+  }, []);
 
   return (
     <>
@@ -43,7 +46,7 @@ const RadioGroupWrapper = React.memo(({ service, serviceIds }) => {
         <RadioGroup
           row
           value={serviceIds.includes(service.id) ? "Yes" : "No"}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={handleChange}
         >
           <FormControlLabel
             control={<Radio sx={{ color: "black" }} />}
