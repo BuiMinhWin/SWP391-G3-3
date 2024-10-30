@@ -24,6 +24,8 @@ import {
 import axios from "axios";
 import FeedbackForm from "../../components/FeedbackForm";
 import { useSnackbar } from "notistack";
+import PaymentIcon from "@mui/icons-material/Payment";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 const REST_API_BANK_URL =
   "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
@@ -175,7 +177,17 @@ const CheckoutPage = () => {
   const activeStep = getActiveStep(orderData.status, orderData.paymentStatus);
 
   return (
-    <Box sx={{ p: 4, bgcolor: "#f5f5f5", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        p: 4,
+        bgcolor: "#f5f5f5",
+        minHeight: "100vh", // Ensures the Box fills the viewport height
+        display: "flex", // Use flexbox to control layout
+        flexDirection: "column",
+        justifyContent: "center", // Centers content vertically
+        alignItems: "center", // Centers content horizontally
+      }}
+    >
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography
           variant="h3"
@@ -368,14 +380,14 @@ const CheckoutPage = () => {
               {orderData.status === 5 && <FeedbackForm orderId={orderId} />}
             </Grid>
           </Grid>
-
           {(orderData.status === 0 || orderData.status === 1) &&
             orderData.paymentStatus == false && (
               <Button
+                startIcon={<HighlightOffIcon />}
                 variant="contained"
                 color="error"
                 onClick={confirmCancelOrder} // Use confirmCancelOrder to open the dialog
-                sx={{ mr: 2, mt: 5, mx: 15 }}
+                sx={{ mt: 5, mx: 80 }}
               >
                 Hủy đơn
               </Button>
@@ -384,7 +396,8 @@ const CheckoutPage = () => {
           {[1, 2, 3, 4, 5].includes(orderData.status) &&
             !orderData.paymentStatus && (
               <Button
-                sx={{ mt: 5, mx: 15 }}
+                startIcon={<PaymentIcon />}
+                sx={{ mt: 5, mx: 80 }}
                 variant="contained"
                 color="primary"
                 onClick={handleProceedToPayment}
