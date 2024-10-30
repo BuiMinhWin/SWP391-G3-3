@@ -29,6 +29,7 @@ import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
 import DriverBooking from "../components/SaleStaff/AssignDriverComponent";
 import ConfirmDriver from "../components/SaleStaff/ConfirmDriver";
 import ListOrderManageComponent from "../components/Manager/ListOrderManageComponent";
+import ServiceComponent from "../components/Manager/ServiceComponent";
 import RespondFeedBack from "../components/SaleStaff/ResponseFeedback";
 import AboutUs from "../pages/AboutUs/AboutUsComponent";
 import Support from "../pages/Support/SupportComponent";
@@ -100,6 +101,7 @@ function index() {
           </Authenticate>
         }
       />
+
       <Route
         path="/accounts"
         element={
@@ -141,6 +143,15 @@ function index() {
         element={
           <Authenticate allowedRoles={["Manager"]}>
             <ListOrderManageComponent />
+          </Authenticate>
+        }
+      />
+
+      <Route
+        path="/service"
+        element={
+          <Authenticate allowedRoles={["Manager"]}>
+            <ServiceComponent />
           </Authenticate>
         }
       />

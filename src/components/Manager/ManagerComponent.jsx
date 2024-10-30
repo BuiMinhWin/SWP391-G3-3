@@ -240,6 +240,10 @@
                 <a href="/ordersM"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Orders</a>
               </li>
 
+              <li>
+                <a href="/service"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Services</a>
+              </li>
+
             </div>
 
             <div>
@@ -255,17 +259,6 @@
 
             </div>
 
-            <div>
-            <h6>Maintenance</h6>
-            <li>
-              <a href="#"><i className="bi bi-life-preserver me-2"><MdSupportAgent /></i> Help & Support</a>
-            </li>
-            <li>
-              <a href="#"><i className="bi bi-gear me-2"><IoSettingsOutline /></i> Settings</a>
-            </li>
-
-            </div>
-          
           </ul>
         </nav>
         </div>

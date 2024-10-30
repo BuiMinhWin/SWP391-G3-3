@@ -16,7 +16,7 @@ createRoot(document.getElementById("root")).render(
           horizontal: "right",
         
         }}
-        autoHideDuration={3000}
+        autoHideDuration={2000}
       >
         <App />
       </SnackbarProvider>
