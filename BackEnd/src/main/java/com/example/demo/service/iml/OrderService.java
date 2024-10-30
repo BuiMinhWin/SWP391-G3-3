@@ -102,7 +102,9 @@ public class OrderService {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
-        Optional.of(orderDTO.getPaymentStatus()).ifPresent(order::setPaymentStatus);
+        if (orderDTO.getPaymentStatus() != 0) {
+            order.setPaymentStatus(orderDTO.getPaymentStatus());
+        }
         if (order.getStatus() == 1) {
             logger.info("Updating 'sale' information for Pending Order with ID: {}", orderId);
             Optional.ofNullable(orderDTO.getSale()).ifPresent(order::setSale);
