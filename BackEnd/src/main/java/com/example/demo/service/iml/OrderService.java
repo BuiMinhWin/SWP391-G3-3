@@ -68,7 +68,7 @@ public class OrderService {
             logger.debug("Order status was invalid, set to: {}", STATUS_WAITING_APPROVAL);
         }
 
-        order.setPaymentStatus(false);
+        order.setPaymentStatus(0);
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
 
@@ -102,11 +102,12 @@ public class OrderService {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
-
+        Optional.of(orderDTO.getPaymentStatus()).ifPresent(order::setPaymentStatus);
         if (order.getStatus() == 1) {
             logger.info("Updating 'sale' information for Pending Order with ID: {}", orderId);
             Optional.ofNullable(orderDTO.getSale()).ifPresent(order::setSale);
-        } else if (order.getStatus() == 2) {
+        }
+        if (order.getStatus() == 2) {
             logger.info("Updating 'deliver' information for Processing Order with ID: {}", orderId);
             Optional.ofNullable(orderDTO.getDeliver()).ifPresent(order::setDeliver);
         } else {
@@ -127,17 +128,17 @@ public class OrderService {
         Optional.ofNullable(orderDTO.getOrigin()).ifPresent(order::setOrigin);
         Optional.ofNullable(orderDTO.getDestination()).ifPresent(order::setDestination);
         Optional.ofNullable(orderDTO.getFreight()).ifPresent(order::setFreight);
-        Optional.of(orderDTO.isPaymentStatus()).ifPresent(order::setPaymentStatus);
         if (orderDTO.getTotalPrice() != 0) {
             order.setTotalPrice(orderDTO.getTotalPrice());
         }
+
         Optional.ofNullable(orderDTO.getAccountId()).ifPresent(accountId -> {
             Account account = accountRepository.findById(accountId)
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + accountId));
             order.setAccount(account);
         });
-
     }
+
 
 
 
@@ -305,7 +306,7 @@ public class OrderService {
         });
     }
 
-    public void updatePaymentStatus(String orderId, boolean paymentStatus) {
+    public void updatePaymentStatus(String orderId, int paymentStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found for orderId: " + orderId));
 

@@ -32,7 +32,7 @@ public class OrderMapper {
                 order.getProvince(),
                 order.getTotalPrice(),
                 order.getStatus(),
-                order.isPaymentStatus(),
+                order.getPaymentStatus(),
 
                 order.getSale(),
                 order.getDeliver(),
@@ -78,7 +78,7 @@ public class OrderMapper {
 
 
         order.setStatus(orderDTO.getStatus());
-        order.setPaymentStatus(orderDTO.isPaymentStatus());
+        order.setPaymentStatus(orderDTO.getPaymentStatus());
         order.setVnpTxnRef(orderDTO.getVnpTxnRef());
 
 //        order.setOriginLatitude(orderDTO.getOriginLatitude());

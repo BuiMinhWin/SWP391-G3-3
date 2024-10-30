@@ -30,7 +30,7 @@ public class OrderDTO {
     private String province;
     private int totalPrice;
     private int status;
-    private boolean paymentStatus;
+    private int paymentStatus;
     private String sale;
     private String deliver;
 

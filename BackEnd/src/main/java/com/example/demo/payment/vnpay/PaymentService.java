@@ -98,7 +98,7 @@ public class PaymentService {
             OrderDTO orderDTO = orderService.getOrderByVnpTxnRef(vnpTxnRef);
 
             if ("00".equals(status)) {
-                orderService.updatePaymentStatus(orderDTO.getOrderId(), true);
+                orderService.updatePaymentStatus(orderDTO.getOrderId(), 1);
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 1);
                 transactionService.createTransaction(orderDTO.getOrderId(), vnpTxnRef, orderDTO.getTotalPrice());
                 return new PaymentDTO.VNPayResponse("00", "Success", "http://localhost:3000/payment-outcome");
