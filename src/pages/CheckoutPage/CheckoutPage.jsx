@@ -26,6 +26,7 @@ import FeedbackForm from "../../components/FeedbackForm";
 import { useSnackbar } from "notistack";
 import PaymentIcon from "@mui/icons-material/Payment";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import DeliveryStatusPopup from "../../components/DeliveryTracking";
 
 const REST_API_BANK_URL =
   "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
@@ -38,6 +39,7 @@ const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
+  const [isPopupOpen, setPopupOpen] = useState(false);
   const orderId = location.state?.orderId;
 
   const [orderData, setOrderData] = useState(null);
@@ -406,6 +408,15 @@ const CheckoutPage = () => {
               </Button>
             )}
         </Grid>
+        <Button variant="contained" onClick={() => setPopupOpen(true)}>
+          View Delivery Status
+        </Button>
+
+        <DeliveryStatusPopup
+          open={isPopupOpen}
+          onClose={() => setPopupOpen(false)}
+          orderId={orderId}
+        />
       </Paper>
       <Dialog
         open={openDialog}

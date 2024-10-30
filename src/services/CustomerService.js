@@ -2,14 +2,19 @@ import axios from "axios";
 
 const REST_API_SERVICE_URL = "http://koideliverysystem.id.vn:8080/api/services";
 const REST_API_ORDER_URL = "http://koideliverysystem.id.vn:8080/api/orders";
-const REST_API_ORDER_DETAIL_URL = "http://koideliverysystem.id.vn:8080/api/ordersDetail";
-const REST_API_DOCUMENT_URL = "http://koideliverysystem.id.vn:8080/api/documents";
+const REST_API_ORDER_DETAIL_URL =
+  "http://koideliverysystem.id.vn:8080/api/ordersDetail";
+const REST_API_DOCUMENT_URL =
+  "http://koideliverysystem.id.vn:8080/api/documents";
 const REST_API_ACCOUNT_URL = "http://koideliverysystem.id.vn:8080/api/accounts";
-
+const REST_API_DELI_URL = "http://koideliverysystem.id.vn:8080/api/deliveryStatus"
 
 export const createOrder = async (orderData) => {
   try {
-    const response = await axios.post(`${REST_API_ORDER_URL}/create`, orderData);
+    const response = await axios.post(
+      `${REST_API_ORDER_URL}/create`,
+      orderData
+    );
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error.message);
@@ -50,14 +55,13 @@ export const createOrderDetail = async (orderDetailData) => {
       `${REST_API_ORDER_DETAIL_URL}/create`,
       orderDetailData
     );
-    console.log("Order detail created successfully:", response.data)
+    console.log("Order detail created successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error creating order:", error.response || error.message);
     throw error;
   }
 };
-
 
 export const order = async (orderId) => {
   try {
@@ -70,14 +74,15 @@ export const order = async (orderId) => {
 };
 export const orderDetail = async (orderId) => {
   try {
-    const response = await axios.get(`${REST_API_ORDER_DETAIL_URL}/order/${orderId}`);
+    const response = await axios.get(
+      `${REST_API_ORDER_DETAIL_URL}/order/${orderId}`
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching order data:", error);
     throw error;
   }
 };
-
 
 const REST_API_BASE_URL3 = "http://koideliverysystem.id.vn:8080/api/orders";
 
@@ -99,9 +104,10 @@ export const cancelOrder = async (orderId) => {
   return data;
 };
 
-
 export const getOrderPDF = async (orderId) => {
-  const response = await fetch(`${REST_API_DOCUMENT_URL}/download/order/${orderId}`);
+  const response = await fetch(
+    `${REST_API_DOCUMENT_URL}/download/order/${orderId}`
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch PDF");
   }
@@ -166,7 +172,10 @@ export const updateAvatar = async (accountId, avatarFile) => {
 export const updatePaymentStatus = async (orderId) => {
   try {
     console.log(`Sending PATCH request for order ID: ${orderId}`); // Debug log
-    console.log("Sending PATCH request with body:", JSON.stringify({ paymentStatus: 1 }));
+    console.log(
+      "Sending PATCH request with body:",
+      JSON.stringify({ paymentStatus: 1 })
+    );
 
     const response = await fetch(`${REST_API_ORDER_URL}/update/${orderId}`, {
       method: "PATCH",
@@ -177,7 +186,11 @@ export const updatePaymentStatus = async (orderId) => {
     });
 
     if (!response.ok) {
-      console.error("PATCH request failed:", response.status, response.statusText);
+      console.error(
+        "PATCH request failed:",
+        response.status,
+        response.statusText
+      );
       const errorData = await response.json();
       console.error("Error response data:", errorData);
       throw new Error("Failed to update payment status.");
@@ -192,3 +205,14 @@ export const updatePaymentStatus = async (orderId) => {
   }
 };
 
+export const getDeliveryStatusByOrderId = async (orderId) => {
+  try {
+    const response = await axios.get(
+      `${REST_API_DELI_URL}/getAllDeliveryStatusByOrderId/${orderId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching delivery status:", error);
+    throw error;
+  }
+};

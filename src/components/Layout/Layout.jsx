@@ -116,11 +116,14 @@ const Layout = () => {
             sx={{ "&.active": { bgcolor: "#2f386a" } }}
           >
             <HomeIcon sx={{ mr: 1, color: "#FFFFFF" }} />
-            <ListItemText primary="Lịch sử đơn hàng" sx={{ color: "#FFFFFF" }} />
+            <ListItemText
+              primary="Lịch sử đơn hàng"
+              sx={{ color: "#FFFFFF" }}
+            />
           </ListItem>
           <ListItem
             component={NavLink}
-            to="/"
+            to="/customer"
             sx={{ "&.active": { bgcolor: "#2f386a" } }}
           >
             <HelpIcon sx={{ mr: 1, color: "#FFFFFF" }} />
@@ -176,7 +179,7 @@ const Layout = () => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
                 transformOrigin={{ vertical: "top", horizontal: "left" }}
               >
-                <MenuItem disabled>
+                <MenuItem component={Link} to="/user-page" onClick={handleClose}>
                   <Typography>{account?.userName || "Unknown User"}</Typography>
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
