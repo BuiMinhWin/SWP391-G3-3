@@ -83,7 +83,7 @@ public class Order {
     @Column(name = "status")
     private int status;
 
-    @Column(name = "payment_status", columnDefinition = "BIT default 0")
+    @Column(name = "payment_status")
     private boolean paymentStatus = false;
 
 //    @Column(name = "origin_latitude")
