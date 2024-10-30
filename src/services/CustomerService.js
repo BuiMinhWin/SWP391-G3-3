@@ -166,14 +166,14 @@ export const updateAvatar = async (accountId, avatarFile) => {
 export const updatePaymentStatus = async (orderId) => {
   try {
     console.log(`Sending PATCH request for order ID: ${orderId}`); // Debug log
-    console.log("Sending PATCH request with body:", JSON.stringify({ paymentStatus: true }));
+    console.log("Sending PATCH request with body:", JSON.stringify({ paymentStatus: 1 }));
 
     const response = await fetch(`${REST_API_ORDER_URL}/update/${orderId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ paymentStatus: true }),
+      body: JSON.stringify({ paymentStatus: 1 }),
     });
 
     if (!response.ok) {

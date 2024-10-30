@@ -25,13 +25,13 @@ import OrderReport from "../pages/Order/OrderReport";
 import Authenticate from "../components/Member/Authenticate";
 import ResetPasswordComponent from "../components/Member/ResetPasswordComponent";
 import Map from "../components/Map";
-import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
 import DriverBooking from "../components/SaleStaff/AssignDriverComponent";
 import ConfirmDriver from "../components/SaleStaff/ConfirmDriver";
 import ListOrderManageComponent from "../components/Manager/ListOrderManageComponent";
 import RespondFeedBack from "../components/SaleStaff/ResponseFeedback";
 import AboutUs from "../pages/AboutUs/AboutUsComponent";
 import Support from "../pages/Support/SupportComponent";
+import PaymentOutcome from "../pages/CheckoutPage/PaymentOutcome";
 
 function index() {
   return (

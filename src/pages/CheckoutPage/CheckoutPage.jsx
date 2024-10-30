@@ -44,8 +44,6 @@ const CheckoutPage = () => {
   const [error, setError] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
 
-  
-
   const { enqueueSnackbar } = useSnackbar();
 
   const confirmCancelOrder = () => {
@@ -151,18 +149,27 @@ const CheckoutPage = () => {
   // Define steps based on orderData
   const steps = [
     "Đang Xử Lí", // Step 1
-    "Đã Duyệt", // Step 2
-    orderData.paymentStatus ? "Đang Vận chuyển" : "Vui Lòng Thanh Toán", // Step 3
-    "Hoàn Thành", // Step 4
+    "Đã duyệt", // Step 2
+    "Tài xế đang lấy hàng",
+    "Tài xế đã nhận đơn",
+    "Đơn của bạn đang được vận chuyển", //step 4
+    orderData.paymentStatus === 1 ? "Hoàn thành" : "Vui Lòng Thanh Toán", // Step 5
   ];
 
   const getActiveStep = (status, paymentStatus) => {
-    if (status === 0) return 0; // "Đang xử lí"
-    if (status === 1) return 1; // "Đã duyệt"
-    if (status === 2 || status === 3) return 2; // "Đang vận chuyển"
-    if (status === 4) return paymentStatus ? 4 : 3; // Completed orders
-    if (status === 5) return paymentStatus ? 4 : 3; // If payment is made
+    if (status === 0) return 1; // "Đang xử lí"
+    if (status === 1) return 2; // "Đã duyệt"
+    if (status === 2) return 3; // "Đang vận chuyển"
+    if (status === 3) return 4; // "Đang vận chuyển"
+    if (status === 4) return 5;
+    if (status === 5) return paymentStatus === 0 ? 5 : 6;
     return 0; // Default case
+  };
+
+  const serviceIdToName = {
+    1: "Bảo vệ cá",
+    2: "Chăm sóc cá",
+    3: "Người nhận trả tiền",
   };
 
   const activeStep = getActiveStep(orderData.status, orderData.paymentStatus);
@@ -315,6 +322,20 @@ const CheckoutPage = () => {
                       Tình trạng cá:{" "}
                       {detail.status === 0 ? "Bất thường" : "Khỏe mạnh"}
                     </Typography>
+                    <Typography>
+                      Dịch vụ áp dụng:{" "}
+                      {detail.serviceIds && detail.serviceIds.length > 0
+                        ? detail.serviceIds
+                            .sort((a, b) => a - b) // Sort the IDs in ascending order
+                            .map((id, index) => (
+                              <span key={index}>
+                                {serviceIdToName[id] ||
+                                  `Dịch vụ không xác định (${id})`}
+                                {index < detail.serviceIds.length - 1 && ", "}
+                              </span>
+                            ))
+                        : "Không có dịch vụ nào được áp dụng"}
+                    </Typography>
                   </Box>
                 ))
               ) : (
@@ -396,7 +417,9 @@ const CheckoutPage = () => {
           Xác nhận hủy đơn
         </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ textAlign: "center", fontSize: "16px",  color: "#ffffff", }}>
+          <DialogContentText
+            sx={{ textAlign: "center", fontSize: "16px", color: "#ffffff" }}
+          >
             Bạn có chắc muốn hủy đơn này?
           </DialogContentText>
         </DialogContent>
@@ -404,7 +427,7 @@ const CheckoutPage = () => {
           <Button
             onClick={handleCloseDialog}
             variant="outlined"
-            sx={{ borderRadius: 2, px: 4,  color: "#ffffff", }}
+            sx={{ borderRadius: 2, px: 4, color: "#ffffff" }}
           >
             Không
           </Button>
@@ -412,7 +435,7 @@ const CheckoutPage = () => {
             onClick={handleConfirmCancel}
             variant="contained"
             color="error"
-            sx={{ borderRadius: 2, px: 4 }}
+            sx={{ borderRadius: 3, px: 4 }}
             autoFocus
           >
             Có
