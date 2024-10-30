@@ -25,7 +25,7 @@ import OrderReport from "../pages/Order/OrderReport";
 import Authenticate from "../components/Member/Authenticate";
 import ResetPasswordComponent from "../components/Member/ResetPasswordComponent";
 import Map from "../components/Map";
-import PaymentOutcome from "../pages/CheckoutPage/PaymentOutCome";
+import PaymentOutcome from "../pages/CheckoutPage/PaymentOutcome";
 import DriverBooking from "../components/SaleStaff/AssignDriverComponent";
 import ConfirmDriver from "../components/SaleStaff/ConfirmDriver";
 import ListOrderManageComponent from "../components/Manager/ListOrderManageComponent";
