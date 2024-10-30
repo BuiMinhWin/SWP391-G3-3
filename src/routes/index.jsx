@@ -4,6 +4,7 @@ import Homepage from "../pages/HomePage/HomePage";
 import LoginComponent from "../components/Member/LoginComponent";
 import RegisterComponent from "../components/Member/RegisterComponent";
 import UserPage from "../pages/UserPage/UserPage";
+import EmployeePage from "../pages/EmployeePage/EmployeePage";
 import OrderForm from "../components/OrderForm/OrderForm";
 import SaleStaffComponent from "../components/SaleStaff/SaleStaffComponent";
 import DeliveryComponent from "../components/DeliveryStaff/DeliveryComponent";
@@ -47,6 +48,7 @@ function index() {
       <Route path="/register" element={<RegisterComponent />} />
       <Route path="/AboutUs" element={<AboutUs />} />
       <Route path="/Support" element={<Support />} />
+      <Route path="/employee-page" element={<EmployeePage />} />
      
       <Route path="/reset" element={<ResetPasswordComponent />} />
       <Route path="/map" element={< Map />} />
@@ -56,19 +58,19 @@ function index() {
         <Route
           path="/user"
           element={
-            // <Authenticate allowedRoles={["Customer"]}>
-            //   <UserPage />
-            // </Authenticate>
-               <UserPage />
+            <Authenticate allowedRoles={["Customer"]}>
+              <UserPage />
+            </Authenticate>
+              
           }
         />
         <Route
           path="/form"
           element={
-            // <Authenticate allowedRoles={["Customer"]}>
-            //   <OrderForm />
-            // </Authenticate>
-            <OrderForm />
+            <Authenticate allowedRoles={["Customer"]}>
+              <OrderForm />
+            </Authenticate>
+          
           }
         />
         <Route

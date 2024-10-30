@@ -1,5 +1,4 @@
   import React, { useState, useEffect } from 'react';
-  import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler  } from 'chart.js';
   import 'bootstrap/dist/css/bootstrap.min.css';
   import './DeliveryStaff.css';
   import { useNavigate } from 'react-router-dom';
@@ -21,7 +20,6 @@
   import {  getAvatar} from "../../services/CustomerService";
   import { trackingOrderState } from '../../services/DeliveryStatusService';
   import { useSnackbar } from 'notistack';
-  import polyline from 'polyline';
   import axios from "axios";
   import Map from '../Map';
 
@@ -332,7 +330,7 @@
                   <img src={avatar || '/default-avatar.png'} alt="Avatar" className="avatar" />
                     {isDropdownOpen && ( 
                       <div className="dropdown-content">
-                        <a  href="user-page"><CgProfile /> View Profile</a>
+                        <a  href="employee-page"><CgProfile /> View Profile</a>
                         <a  onClick={handleLogout}><CiLogout /> Logout</a>
                       </div>
                     )}
