@@ -73,7 +73,7 @@ public class DeliveryStatusService {
                 .orElseThrow(() -> new ResourceNotFoundException("DeliveryStatus not found with id " + deliveryStatusId));
 
         DeliveryStatus newDeliveryStatus = new DeliveryStatus();
-        newDeliveryStatus.setOrder(originalDeliveryStatus.getOrder());
+        newDeliveryStatus.setOrder(originalDeliveryStatus.getOrder()); //lấy orderId
 
         newDeliveryStatus.setStatus(updatedStatusDTO.getStatus());
 
