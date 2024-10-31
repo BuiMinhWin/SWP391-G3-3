@@ -47,6 +47,7 @@ public class OrderService {
     private static final int STATUS_PICKED_UP = 3;
     private static final int STATUS_IN_TRANSIT = 4;
     private static final int STATUS_DELIVERED = 5;
+    private static final int STATUS_OTHER = 6;
 
 
     public OrderDTO createOrder(OrderDTO orderDTO) {
@@ -140,8 +141,6 @@ public class OrderService {
     }
 
 
-
-
     public List<OrderDTO> getAllOrders() {
         logger.info("Fetching all orders.");
         List<Order> orders = orderRepository.findAll();
@@ -232,7 +231,7 @@ public class OrderService {
     }
 
     private int validateStatus(int newStatus) {
-        if (newStatus < STATUS_WAITING_APPROVAL || newStatus > STATUS_DELIVERED) {
+        if (newStatus < STATUS_WAITING_APPROVAL || newStatus > STATUS_OTHER) {
             logger.info("Invalid status provided. Defaulting to Processing.");
             return STATUS_ASSIGNED_TO_CARRIER;
         }
@@ -260,6 +259,8 @@ public class OrderService {
             case STATUS_DELIVERED:
                 logger.info("Order status updated to Delivered.");
                 break;
+            case STATUS_OTHER:
+                logger.info("There was a problem with the order.");
             default:
                 logger.warn("Order status updated to an unrecognized status: {}", status);
                 break;
