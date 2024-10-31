@@ -131,7 +131,9 @@ const OrderReport = () => {
                     ? "Đang chờ xét duyệt"
                     : order.status === 1
                     ? "Đã duyệt - Đơn hàng của bạn đang được chuẩn bị cho bắt đầu vận chuyển"
-                    : [2, 4].includes(order.status)
+                    : order.status === 2
+                    ? "Tài xế đã nhận đơn"
+                    : [3, 4].includes(order.status)
                     ? `Đơn hàng đang được giao đến địa điểm chỉ định sau ${
                         order.freight === "Dịch vụ tiêu chuẩn"
                           ? "5-7 ngày"
@@ -139,8 +141,6 @@ const OrderReport = () => {
                           ? "3-4 ngày"
                           : "Thời gian không xác định"
                       } kể từ ngày duyệt đơn`
-                    : order.status === 3
-                    ? "Đơn hàng đang được vận chuyển"
                     : order.status === 5
                     ? "Đơn hàng đã được giao đến"
                     : "Trạng thái không xác định"}

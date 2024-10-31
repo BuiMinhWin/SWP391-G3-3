@@ -135,22 +135,6 @@ const Homepage = () => {
         TẠO ĐƠN TẠI ĐÂY
       </button>  
 
-      {!roleId ? ( 
-        <>
-          <button className="register-btn" onClick={() => navigate('/register')}>Đăng Ký</button>
-          <button className="login-btn" onClick={() => navigate('/login')}>Đăng Nhập</button>
-        </>
-      ) : (
-        <>
-          <div className="dropdown">
-            <img src={avatar || '/default-avatar.png'} alt="Avatar" className="avatar" />
-            <div className="dropdown-content-avatar">
-              <a href="/user-page">Tài khoản của tôi</a>
-              <a onClick={handleLogout}>Đăng xuất</a>
-            </div>  
-          </div>
-        </>
-      )} 
     </header>
 
 
