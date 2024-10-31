@@ -28,6 +28,20 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import DeliveryStatusPopup from "../../components/DeliveryTracking";
 
+const buttonStyles = {
+  backgroundColor: "#3e404e",
+  color: "white",
+  "&:hover": { backgroundColor: "#727376" },
+  padding: "8px 16px",
+  borderRadius: "8px",
+  minWidth: "auto",
+  maxWidth: "fit-content",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+
 const REST_API_BANK_URL =
   "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
 
@@ -298,6 +312,9 @@ const CheckoutPage = () => {
                 Tình trạng thanh toán:{" "}
                 {orderData.paymentStatus ? "Đã thanh toán" : "Chưa thanh toán"}
               </Typography>
+                      <Button sx={{...buttonStyles}} variant="contained" onClick={() => setPopupOpen(true)}>
+          Nhấn vào đây để xem vị trí đơn hàng
+        </Button>
             </Box>
 
             {/* Order Detail Information */}
@@ -408,10 +425,6 @@ const CheckoutPage = () => {
               </Button>
             )}
         </Grid>
-        <Button variant="contained" onClick={() => setPopupOpen(true)}>
-          View Delivery Status
-        </Button>
-
         <DeliveryStatusPopup
           open={isPopupOpen}
           onClose={() => setPopupOpen(false)}

@@ -1,14 +1,11 @@
-// DeliveryStatusPopup.js
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
-  IconButton,
   CircularProgress,
   Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import {
   Timeline,
   TimelineItem,
@@ -16,8 +13,9 @@ import {
   TimelineConnector,
   TimelineContent,
   TimelineDot,
+  TimelineOppositeContent,
 } from "@mui/lab";
-
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { getDeliveryStatusByOrderId } from "../../services/CustomerService";
 
 const DeliveryStatusPopup = ({ open, onClose, orderId }) => {
@@ -41,27 +39,47 @@ const DeliveryStatusPopup = ({ open, onClose, orderId }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>
-        Delivery Status
-      </DialogTitle>
+      <DialogTitle>Vị trí đơn hàng</DialogTitle>
       <DialogContent dividers>
         {loading ? (
           <CircularProgress />
         ) : deliveryStatus.length === 0 ? (
-          <Typography>No delivery status available.</Typography>
+          <Typography>Vị trí đơn hàng vẫn chưa được cập nhật.</Typography>
         ) : (
-          <Timeline position="alternate">
+          <Timeline>
             {deliveryStatus.map((status, index) => (
               <TimelineItem key={index}>
+                <TimelineOppositeContent
+                  color="textSecondary"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "end",
+                  }}
+                >
+                  {new Date(status.timeTracking).toLocaleString()}
+                </TimelineOppositeContent>
                 <TimelineSeparator>
-                  <TimelineDot color="primary" />
+                  <TimelineDot
+                    sx={{
+                      bgcolor: "#171B36",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent:"center"
+                    }}
+                  >
+                    <LocalShippingIcon sx={{ color: "#FFFFFF" }} />
+                  </TimelineDot>
                   {index < deliveryStatus.length - 1 && <TimelineConnector />}
                 </TimelineSeparator>
-                <TimelineContent>
-                  <Typography variant="h6">
-                    {new Date(status.timeTracking).toLocaleString()}
-                  </Typography>
-                  <Typography>{status.currentLocate}</Typography>
+                <TimelineContent
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <Typography variant="h6">{status.currentLocate}</Typography>
                 </TimelineContent>
               </TimelineItem>
             ))}

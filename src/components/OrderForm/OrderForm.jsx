@@ -97,15 +97,16 @@ const FORM_VALIDATION = Yup.object().shape({
   senderNote: Yup.string().nullable(),
   orderNote: Yup.string().nullable(),
   discount: Yup.string().nullable(),
-  cityS: Yup.string().required("Vui lòng chọn thành phố"), //
-  cityR: Yup.string().required("Vui lòng chọn thành phố"), //
-  koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"), //
-  koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"), //
+  cityS: Yup.string().required("Vui lòng chọn thành phố"), 
+  cityR: Yup.string().required("Vui lòng chọn thành phố"), 
+  koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"), 
+  koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"), 
   quantity: Yup.number()
     .min(1, "Số lượng phải lớn hơn 0")
     .required("Vui lòng nhập số lượng"),
   weight: Yup.number()
     .min(0.1, "Cân nặng phải lớn hơn 0")
+    .max(50, "Cá Koi kỷ lục thể giới chỉ đạt 41kg bạn có chắc bạn có con cá lớn hơn chứ 0-o!?")
     .required("Vui lòng nhập cân nặng"),
   freight: Yup.string().required("Vui lòng chọn phương thức vận chuyển"),
   termsOfService: Yup.boolean()
@@ -131,9 +132,6 @@ const OrderForm = () => {
     { id: 2, label: "Chăm sóc cá" },
     { id: 3, label: "Người nhận thanh toán" },
   ];
-
-  const { testaccId, accountData } = useOutletContext();
-  console.log("accId: ", testaccId, "accData: ", "accountData: ", accountData);
 
   const navigate = useNavigate();
   // state lưu danh sáchh tỉnh, phường, quận người gửi
@@ -688,14 +686,14 @@ const OrderForm = () => {
                     <Grid item xs={6}>
                       <SelectWrapper
                         name="koi_type"
-                        label="Koi Type"
+                        label="Loại cá Koi"
                         options={koi_type}
                       />
                     </Grid>
                     <Grid item xs={6}>
                       <SelectWrapper
                         name="koi_name"
-                        label="Koi Variant"
+                        label="Biến thể Koi"
                         options={koi_name}
                       />
                     </Grid>
@@ -791,9 +789,9 @@ const OrderForm = () => {
                   <CheckboxWrapper
                     name="termsOfService"
                     legend="Terms Of Service"
-                    label="I agree"
+                    label="Tôi đã đọc và đồng ý với các điều khoản"
                   /></Grid>
-                  <ButtonWrapper>Submit Order</ButtonWrapper>
+                  <ButtonWrapper>Tạo đơn đặt hàng</ButtonWrapper>
                   
                 </Paper>
               </Box>
