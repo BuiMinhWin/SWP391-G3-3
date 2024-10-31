@@ -119,10 +119,24 @@ const Homepage = () => {
 
       {/* Welcome section */}
       <header className="homepage-header">
-        <h1 className='title-1'>VẬN CHUYỂN CÁ KOI</h1>
-        <h1 className='title-2'>GẦN GŨI - TIN CẬY - HIỆU QUẢ</h1>
-        <button className="order-btn" onClick={() => navigate('/login')}>TẠO ĐƠN TẠI ĐÂY</button>  
-      </header>
+      <h1 className='title-1'>VẬN CHUYỂN CÁ KOI</h1>
+      <h1 className='title-2'>GẦN GŨI - TIN CẬY - HIỆU QUẢ</h1>
+      
+      <button 
+        className="order-btn" 
+        onClick={() => {
+          if (roleId) {
+            navigate('/form');  // Điều hướng đến trang /form nếu đã đăng nhập
+          } else {
+            navigate('/login'); // Điều hướng đến trang /login nếu chưa đăng nhập
+          }
+        }}
+      >
+        TẠO ĐƠN TẠI ĐÂY
+      </button>  
+
+    </header>
+
 
       {/* Main content */}
       <div className="homepage-main-content">

@@ -35,7 +35,7 @@ const FileUpload = ({ name, ...otherProps }) => {
       {isDragActive ? (
         <Typography>Drop the file here...</Typography>
       ) : (
-        <Typography>Drag 'n' drop a PDF file here, or click to select</Typography>
+        <Typography>Kéo và Thả file cần Upload</Typography>
       )}
       {field.value && (
         <Typography variant="body2" sx={{ mt: 2 }}>

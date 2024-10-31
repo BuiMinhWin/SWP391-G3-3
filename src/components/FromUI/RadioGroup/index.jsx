@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useFormikContext } from "formik";
 
-const RadioGroupWrapper = React.memo(({ service, serviceIds }) => {
+const RadioGroupWrapper = React.memo(({ service, serviceIds = [] }) => {
   const { setFieldValue, values } = useFormikContext();
 
   // Memoized function to avoid re-creating the handleChange function on every render
@@ -62,7 +62,7 @@ const RadioGroupWrapper = React.memo(({ service, serviceIds }) => {
           />
         </RadioGroup>
       </FormControl>
-      <Divider sx={{ backgroundColor: "black", margin: "10px 0" }} />
+      <Divider sx={{ backgroundColor: "black", margin: "5px 50px" }} />
     </>
   );
 });
