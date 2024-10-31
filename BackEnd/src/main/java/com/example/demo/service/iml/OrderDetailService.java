@@ -115,8 +115,6 @@ public class OrderDetailService {
     }
 
 
-
-
     public List<OrderDetailDTO> getOrderDetailsByOrderId(String orderId) {
         List<OrderDetail> orderDetails = orderDetailRepository.findByOrder_OrderId(orderId);
         if (orderDetails.isEmpty()) {
