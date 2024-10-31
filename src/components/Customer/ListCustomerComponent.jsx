@@ -64,7 +64,6 @@ const ListCustomerComponent = () => {
           </tr>
         </thead>
         <tbody>
-          i
           {accounts.length > 0 ? (
             accounts.map(account => (
             

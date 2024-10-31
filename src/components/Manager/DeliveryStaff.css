@@ -6,8 +6,6 @@
   width: 250%;
 }
 
-
-
 .side-bar{
   margin-left:60px;
 }
@@ -159,3 +157,22 @@
     display: block; 
 }
   
+.modal .modal-header .close {
+  font-size: 0.8rem;  /* Reduces the size of the icon */
+  margin-left: 330px;  /* Aligns the button to the far right */
+  padding: 2px 6px;   /* Adds minimal padding for a smaller button */
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal .modal-header .close:hover {
+  color: black; /* Adds a hover effect */
+}
+.modal .modal-header .modal-title {
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  font-size: 1.25rem; /* Ensures the font size is large enough */
+  font-weight: 500; /* Sets a moderate font weight */
+  color: #000; /* Sets the color to black or your preferred color */
+}

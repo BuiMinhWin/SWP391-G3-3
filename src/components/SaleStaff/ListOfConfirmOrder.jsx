@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { listOrder, updateStatus, updateSale } from '../../services/SaleStaffService';
-import { FaLongArrowAltLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
 const ListOrderComponent = () => {

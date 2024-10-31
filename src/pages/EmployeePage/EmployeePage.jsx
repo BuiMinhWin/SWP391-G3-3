@@ -108,9 +108,10 @@ const AccountForm = () => {
               bgcolor: "#f5f5f5",
               overflow: "hidden", 
               p: 3, 
+            
             }}
           >
-            <Paper elevation={3} sx={{ width: "100%", maxWidth: "1200px", padding: "20px" }}>
+            <Paper elevation={3} sx={{ width: "100%", maxWidth: "1200px", padding: "20px", overflow: "hidden"  }}>
               <Typography variant="h4" gutterBottom>
                 Hồ sơ của tôi
               </Typography>
