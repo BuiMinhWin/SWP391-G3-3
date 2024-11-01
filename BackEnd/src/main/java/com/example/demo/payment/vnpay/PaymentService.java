@@ -38,17 +38,23 @@ public class PaymentService {
             log.info("Total price for orderId {}: {} VND", orderId, orderDTO.getTotalPrice());
 
             List<OrderDetail> orderDetails = orderService.getOrderDetailsByOrderId(orderId);
-            int totalServicePrice = orderDetails.stream().mapToInt(OrderDetail::getTotalServicePrice).sum();
-            int totalQuantity = orderDetails.stream().mapToInt(OrderDetail::getQuantity).sum();
-            float totalWeight = (float) orderDetails.stream().mapToDouble(OrderDetail::getWeight).sum();
 
-            BigDecimal amount = BigDecimal.valueOf(orderDTO.getTotalPrice() + totalServicePrice)
-                    .add(BigDecimal.valueOf(totalQuantity * 10))
-                    .add(BigDecimal.valueOf(totalWeight * 5))
-                    .multiply(new BigDecimal(100));
+            int totalServicePrice = orderDetails.stream()
+                    .mapToInt(OrderDetail::getTotalServicePrice)
+                    .sum();
+            int totalQuantity = orderDetails.stream()
+                    .mapToInt(OrderDetail::getQuantity)
+                    .sum();
+            int totalWeight = (int) orderDetails.stream()
+                    .mapToDouble(OrderDetail::getWeight)
+                    .sum();
+
+            int amount = (orderDTO.getTotalPrice() + totalServicePrice
+                    + (totalQuantity * 10)
+                    + (totalWeight * 5)) * 100;
 
             Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
-            vnpParamsMap.put("vnp_Amount", amount.toPlainString());
+            vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
 
             if (bankCode != null && !bankCode.isEmpty()) {
                 vnpParamsMap.put("vnp_BankCode", bankCode);
@@ -82,6 +88,7 @@ public class PaymentService {
                     .build();
         }
     }
+
 
 
 
