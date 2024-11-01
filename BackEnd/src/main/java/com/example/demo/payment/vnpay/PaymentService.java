@@ -38,16 +38,9 @@ public class PaymentService {
             log.info("Total price for orderId {}: {} VND", orderId, orderDTO.getTotalPrice());
 
             List<OrderDetail> orderDetails = orderService.getOrderDetailsByOrderId(orderId);
-
-            int totalServicePrice = orderDetails.stream()
-                    .mapToInt(OrderDetail::getTotalServicePrice)
-                    .sum();
-            int totalQuantity = orderDetails.stream()
-                    .mapToInt(OrderDetail::getQuantity)
-                    .sum();
-            float totalWeight = (float) orderDetails.stream()
-                    .mapToDouble(OrderDetail::getWeight)
-                    .sum();
+            int totalServicePrice = orderDetails.stream().mapToInt(OrderDetail::getTotalServicePrice).sum();
+            int totalQuantity = orderDetails.stream().mapToInt(OrderDetail::getQuantity).sum();
+            float totalWeight = (float) orderDetails.stream().mapToDouble(OrderDetail::getWeight).sum();
 
             BigDecimal amount = BigDecimal.valueOf(orderDTO.getTotalPrice() + totalServicePrice)
                     .add(BigDecimal.valueOf(totalQuantity * 10))
@@ -62,7 +55,6 @@ public class PaymentService {
             }
 
             vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
-
             String vnpTxnRef = UUID.randomUUID().toString();
             vnpParamsMap.put("vnp_TxnRef", vnpTxnRef);
             vnpParamsMap.put("vnp_OrderInfo", "Thanh toan don hang: " + orderId);
@@ -90,6 +82,7 @@ public class PaymentService {
                     .build();
         }
     }
+
 
 
     public String extractAndLogTxnRef(HttpServletRequest request) {
