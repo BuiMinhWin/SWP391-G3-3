@@ -4,19 +4,16 @@
   import { useNavigate } from 'react-router-dom';
   import { listOrder, getOrderDetail, updateStatus } from '../../services/DeliveryService';
   import { logout } from '../Member/auth'; 
-  import { FaRegCalendarAlt } from "react-icons/fa";
-  import { FiHome } from "react-icons/fi";
+  import { FaRegCalendarAlt,FaDirections } from "react-icons/fa";
   import { IoSettingsOutline } from "react-icons/io5";
-  import { MdSupportAgent} from "react-icons/md";
+  import { MdSupportAgent,MdOutlineReportProblem} from "react-icons/md";
   import { IoIosNotificationsOutline } from "react-icons/io";
   import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
-  import { FaRegMessage } from "react-icons/fa6";
   import { CgProfile } from "react-icons/cg";
   import { CiLogout } from "react-icons/ci";
-  import { FaTruckFast } from "react-icons/fa6";
-  import { FiAlertTriangle } from "react-icons/fi";
-  import { FaRegRectangleList } from "react-icons/fa6";
-  import { FaBoxesStacked } from "react-icons/fa6";
+  import { FiAlertTriangle,FiHome  } from "react-icons/fi";
+  import { FaRegRectangleList,FaBoxesStacked,FaRegMessage,FaTruckFast  } from "react-icons/fa6";
+
   import {  getAvatar} from "../../services/CustomerService";
   import { trackingOrderState } from '../../services/DeliveryStatusService';
   import { useSnackbar } from 'notistack';
@@ -222,12 +219,49 @@
       let newStatus = currentOrder.status;
       console.log(newStatus);
   
-      if (newStatus < 5) {
+      if (newStatus < 7) {
         newStatus += 1;
       } else {
         enqueueSnackbar("Trạng thái không thể tăng thêm nữa!", { variant: "warning", autoHideDuration: 1000 });
         return;
       }
+      
+      if (newStatus) {
+        updateStatus(orderId, newStatus);
+        console.log(orderId);
+        console.log(newStatus);
+      
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async (position) => {
+            try {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              const currentLocate = await reverseGeocodeAddress(latitude, longitude);
+              const trackingData = { orderId,currentLocate,status: newStatus };
+              const response = await trackingOrderState(trackingData);
+              const result = response?.data;
+              console.log(result);
+      
+              if (result) {
+                enqueueSnackbar("Cập nhật trạng thái thành công", { variant: "success", autoHideDuration: 1000 });
+                getAllOrders();
+              }
+            } catch (error) {
+              enqueueSnackbar("Cập nhật thất bại. Vui lòng thử lại.", { variant: "error", autoHideDuration: 1000 });
+            }
+          }, () => {
+            enqueueSnackbar("Không thể lấy vị trí hiện tại.", { variant: "error", autoHideDuration: 1000 });
+          });
+        } else {
+          alert("Geolocation fail.");
+        }
+      }
+    };
+
+    const updateOrderSpecial = async (orderId) => {
+  
+      let newStatus = 6;
+      console.log(newStatus);
       
       if (newStatus) {
         updateStatus(orderId, newStatus);
@@ -423,14 +457,15 @@
                 <thead>
                   <tr>
                     <th>OrderId</th>
-                    <th>OrderDate</th>
+                    {/* <th>OrderDate</th> */}
                     <th>Origin</th>
                     <th>Destination</th>
                     <th>Service</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    {/* <th>Status</th> */}
+                    <th>Tracking</th>
                     <th>Details</th>
-                    <th>Direction</th>
+                    <th></th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -440,22 +475,27 @@
                       .map((order) => (
                         <tr key={order.orderId}>
                           <td>{order.orderId}</td>
-                          <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                          {/* <td>{new Date(order.orderDate).toLocaleDateString()}</td> */}
                           <td>{order.origin}</td>
                           <td>{order.destination}</td>
                           <td>{order.freight}</td>
-                          <td>
+                          {/* <td>
                             {order.status === 2 && "Đang lấy hàng"}
                             {order.status === 3 && "Đã lấy hàng"}
                             {order.status === 4 && "Đang giao"}
                             {order.status === 5 && "Đã hoàn thành"}  
-                          </td>
+                            {order.status === 6 && "Đơn sự cố"}  
+                          </td> */}
                           <td>
                             <button
                               className="btn btn-info"
                               onClick={() => updateOrderStatus(order.orderId)}
                             >
-                              Update Status
+                              {order.status === 2 && "Đang lấy hàng"}
+                              {order.status === 3 && "Đã lấy hàng"}
+                              {order.status === 4 && "Đang giao"}
+                              {order.status === 5 && "Đã hoàn thành"}  
+                              {order.status === 6 && "Đơn sự cố"}  
                             </button>
                           </td>
                           <td>
@@ -466,10 +506,20 @@
                               className="btn btn-primary"
                               onClick={() => handleDirection( order.destination)}
                             >
-                              Direction
+                             <FaDirections />
                             </button>
                           </td>
+                          <td>
+                          <button
+                              className="btn btn-primary"
+                              onClick={() =>  updateOrderSpecial(order.orderId)}
+                            >
+                              <MdOutlineReportProblem />
+                            </button>
+                         
+                          </td>
                         </tr>
+                        
                       ))
                   ) : (
                     <tr>

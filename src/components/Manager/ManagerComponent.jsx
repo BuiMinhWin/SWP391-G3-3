@@ -85,7 +85,7 @@
             // Tính số lượng đơn hàng cho sales staff
             const salesCounts = {};
             salesStaff.forEach((account) => {
-              const totalSO = ordersResponse.data.filter(order => order.salesperson === account.accountId).length;
+              const totalSO = ordersResponse.data.filter(order => order.sale === account.accountId).length;
               salesCounts[account.accountId] = totalSO;
             });
             setSalesOrderCounts(salesCounts);

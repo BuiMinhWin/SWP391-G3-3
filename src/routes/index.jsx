@@ -193,7 +193,7 @@ function index() {
       <Route
         path="/order/:orderId"
         element={
-          <Authenticate allowedRoles={["Delivery"]}>
+          <Authenticate allowedRoles={["Delivery","Manager"]}>
             <OrderDetailComponent />
           </Authenticate>
         }
