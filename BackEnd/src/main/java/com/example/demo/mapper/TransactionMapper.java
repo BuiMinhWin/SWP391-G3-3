@@ -11,7 +11,6 @@ public class TransactionMapper {
                 transaction.getTransactionId(),
                 transaction.getOrder().getOrderId(),
                 transaction.getTransactionDate(),
-                transaction.getVnpTxnRef(),
                 transaction.getTotalPrice()
         );
     }
@@ -21,6 +20,7 @@ public class TransactionMapper {
         transaction.setTransactionId(transactionDTO.getTransactionId());
         transaction.setOrder(order);
         transaction.setTransactionDate(transactionDTO.getTransactionDate());
+        transaction.setTotalPrice(transactionDTO.getTotalPrice());
         return transaction;
     }
 }

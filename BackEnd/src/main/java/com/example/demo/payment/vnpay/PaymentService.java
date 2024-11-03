@@ -53,6 +53,8 @@ public class PaymentService {
                     + (totalQuantity * 10)
                     + (totalWeight * 5)) * 100;
 
+            transactionService.createTransaction(orderDTO.getOrderId(), amount);
+
             Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
             vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
 
@@ -105,7 +107,7 @@ public class PaymentService {
             if ("00".equals(status)) {
                 orderService.updatePaymentStatus(orderDTO.getOrderId(), 1);
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 1);
-                transactionService.createTransaction(orderDTO.getOrderId(), vnpTxnRef, orderDTO.getTotalPrice());
+                transactionService.createTransaction(orderDTO.getOrderId(), orderDTO.getTotalPrice());
                 return new PaymentDTO.VNPayResponse("00", "Success", "http://localhost:3000/payment-outcome");
             } else {
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 0);

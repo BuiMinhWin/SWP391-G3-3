@@ -33,15 +33,18 @@ public class TransactionService {
     private final OrderService orderService;
 
 
-    public void createTransaction(String orderId, String vnpTxnRef, int totalPrice) {
+    public Transaction createTransaction(String orderId, int totalPrice) {
         Order order = orderService.findOrderById(orderId);
+        if (order == null) {
+            throw new ResourceNotFoundException("Order not found with ID: " + orderId);
+        }
+
         Transaction transaction = new Transaction();
         transaction.setOrder(order);
-        transaction.setVnpTxnRef(vnpTxnRef);
         transaction.setTotalPrice(totalPrice);
         transaction.setTransactionDate(LocalDateTime.now());
 
-        transactionRepository.save(transaction);
+        return transactionRepository.save(transaction);
     }
 
 
