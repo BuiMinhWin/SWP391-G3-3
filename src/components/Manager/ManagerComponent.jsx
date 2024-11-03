@@ -15,11 +15,11 @@
     import { listAccount } from '../../services/EmployeeService';
     import { CiLogout } from "react-icons/ci";
     import { IoIosNotificationsOutline } from "react-icons/io";
+    import { FaRegMessage } from "react-icons/fa6";
+    import { IoSettingsOutline } from "react-icons/io5";
     import {  getAvatar} from "../../services/CustomerService";  
 
     ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler );
-
-
 
     const ManagerComponent = () => {
       const [orders, setOrders] = useState([]);
@@ -45,8 +45,6 @@
         setDropdownOpen(!isDropdownOpen);
       }
       
-
-
       useEffect(() => {
         const fetchData = async () => {
           try {
@@ -73,7 +71,7 @@
             const deliveryStaff = accounts.filter(account => account.roleId === 'Delivery');
             const salesStaff = accounts.filter(account => account.roleId === 'Sales');
             
-    
+            // tính số lượng đơn hàng cho delivery
             const deliveryCounts = {};
             deliveryStaff.forEach((account) => {
               const totalDO = ordersResponse.data.filter(order => order.deliver === account.accountId).length;
@@ -205,16 +203,12 @@
               </div>
               <nav>
           <ul className="list-unstyled">
-            <div>
+             <div>
                 <h6>Main</h6>
                 <li>
                 <a href="/"><i className="bi bi-speedometer2 me-2"> <FiHome /> </i>  Homepage</a>
                 </li>
 
-                {/* <li>
-                  <a href="/user-page"><i className="bi bi-speedometer2 me-2"> <CgProfile /> </i> Profile</a>
-                </li> */}
-              
               </div>
 
               <div>
@@ -236,19 +230,23 @@
                 </li>
 
               </div>
+              <h6>General</h6>
+              <li>
+                <a href="#"><i className="bi bi-chat-dots me-2"><FaRegCalendarAlt /></i> Calendar</a>
+              </li>
 
-              <div>
-                <h6>General</h6>
+              <li>
+                <a href="#"><i className="bi bi-life-preserver me-2"><MdSupportAgent /></i> Help & Support</a>
+              </li>
 
-                <li>
-                  <a href="#"><i className="bi bi-chat-dots me-2"><FaRegCalendarAlt /></i> Calendar</a>
-                </li>
+              <li>
+                <a href="#"><i className="bi bi-chat-dots me-2"> <FaRegMessage/> </i>  Messages</a>
+              </li>
 
-                <li>
-                  <a href="#"><i className="bi bi-chat-dots me-2"><MdOutlineMessage /></i> Notification</a>
-                </li>
-
-              </div>
+              <li>
+                <a href="#"><i className="bi bi-gear me-2"><IoSettingsOutline /></i> Settings</a>
+              </li>
+       
 
             </ul>
           </nav>

@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../Member/auth'; 
 import { FaRegCalendarAlt } from "react-icons/fa";
-import { FiHome } from "react-icons/fi";
+import { FiHome,FiUsers } from "react-icons/fi";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdSupportAgent} from "react-icons/md";
 import { IoIosNotificationsOutline } from "react-icons/io";
@@ -87,13 +87,26 @@ const ServiceComponent = () => {
             </div>
             <nav>
               <ul className="list-unstyled">
+              <div>
+                <h6>Main</h6>
+                <li>
+                <a href="/"><i className="bi bi-speedometer2 me-2"> <FiHome /> </i>  Homepage</a>
+                </li>
+
+              </div>
+              <h6>List</h6>
               <li>
-                  <a href="/"><i className="bi bi-speedometer2 me-2"> <FiHome /> </i>  Homepage</a>
-              </li>
-              <li>
-                <a href="/manager"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i>Manage</a>
+                <a href="/manager"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i>Dashboard</a>
               </li>
 
+              <li>
+                <a  href="/listcustomers"><i className="bi bi-people me-2"><FiUsers /></i> Customers</a>
+              </li>
+
+              <li>
+                <a href="/accounts"><i className="bi bi-person-badge me-2"><FiUsers /></i> Employees</a>
+              </li>
+              <h6>General</h6>
               <li>
                 <a href="#"><i className="bi bi-chat-dots me-2"><FaRegCalendarAlt /></i> Calendar</a>
               </li>
@@ -114,7 +127,7 @@ const ServiceComponent = () => {
           </div>
         </aside>
         <main className="dashboard col-10">
-        <header className="d-flex justify-content-between align-items-center mb-4 ">
+        <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
             <h4 className="title">Service</h4>
             <header className="d-flex justify-content-between align-items-center mb-4 ">
               <div className="header-content" style={{ width: '%' }}> 
@@ -144,7 +157,7 @@ const ServiceComponent = () => {
               </div>
               </header>
           </header>
-          <section className="delivery-ongoing-delivery mt-4 d-flex border-top pt-3">
+          <section className="delivery-ongoing-delivery mt-4 d-flex pt-3">
             <div className="delivery-list col-12">
               <table className="table table-striped table-bordered">
                 <thead>

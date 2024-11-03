@@ -9,7 +9,6 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { MdSupportAgent} from "react-icons/md";
 import { IoIosNotificationsOutline,IoMdAddCircle  } from "react-icons/io";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
-
 import { FaRegMessage } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 import { CiLogout } from "react-icons/ci";
@@ -82,6 +81,7 @@ const ListEmployeeComponent = () => {
   };
 
   const removeAccount = (accountId) => {
+    console.log(accountId)
     deleteAccount(accountId)
       .then(() => {
         getAllAccounts();
@@ -127,11 +127,7 @@ const ListEmployeeComponent = () => {
         <li>
           <a  href="/listcustomers"><i className="bi bi-people me-2"><FiUsers /></i> Customers</a>
         </li>
-
-        <li>
-          <a href="/accounts"><i className="bi bi-person-badge me-2"><FiUsers /></i> Employees</a>
-        </li>
-
+        
          <li>
             <a href="/service"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Services</a>
           </li>
@@ -159,7 +155,7 @@ const ListEmployeeComponent = () => {
       </aside>
       <main className="dashboard col-10 ">
       <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2 ">
-        <h4 className="title">Manage Account</h4>
+        <h4 className="title">Employees</h4>
             <header className="d-flex justify-content-between align-items-center mb-4 ">
            
             <div className="search-bar ml-auto">
