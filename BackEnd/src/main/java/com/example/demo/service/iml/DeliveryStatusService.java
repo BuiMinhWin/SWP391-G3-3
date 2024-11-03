@@ -89,6 +89,4 @@ public class DeliveryStatusService {
 
         return DeliveryStatusMapper.maptoDeliveryStatusDTO(savedNewDeliveryStatus);
     }
-
-
 }
