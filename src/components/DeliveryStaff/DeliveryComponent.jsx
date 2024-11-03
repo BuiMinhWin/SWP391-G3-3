@@ -299,7 +299,7 @@
       <div className="container-fluid">
         <div className="row">
           <aside className="sidebar col- p-3 ">
-            <div className='side-bar'>
+            <div className='manager-sidebar'>
             <div className="profile-container text-center mb-4">
               <div className="SideKoi d-flex align-items-center justify-content-between">
                 <img src="/Logo-Koi/Order.png" alt="Profile "className="profile-img rounded-circle " />
@@ -343,10 +343,10 @@
         </div>
           </aside>
 
-          <main className="dashboard ">
+          <main className="dashboard col-10">
           <header className="d-flex justify-content-between align-items-center mb-4 border-bottom ">
-              <h1>Delivery Orders</h1> 
-              {/* <h6>Delivery Orders</h6>          */}
+              <h4 className="title">Delivery Orders</h4> 
+           
               <header className="d-flex justify-content-between align-items-center mb-4 ">
               <div className="header-content" style={{ width: '%' }}> 
               <div className="d-flex align-items-center justify-content-center search-container">

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './DeliveryStaff.css';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../Member/auth'; 
 import { FaRegCalendarAlt } from "react-icons/fa";
@@ -77,7 +76,7 @@ const ServiceComponent = () => {
     <div className="container-fluid">
       <div className="row">
         <aside className="sidebar col-3 p-3">
-          <div className='side-bar'>
+          <div className='manager-sidebar'>
             <div className="profile-container text-center mb-4">
               <div className="SideKoi d-flex align-items-center justify-content-between">
                 <img src="/Logo-Koi/Order.png" alt="Profile" className="profile-img rounded-circle" />
@@ -114,9 +113,9 @@ const ServiceComponent = () => {
             </nav>
           </div>
         </aside>
-        <main className="dashboard col">
+        <main className="dashboard col-10">
         <header className="d-flex justify-content-between align-items-center mb-4 ">
-            <h1>Service Manage</h1> 
+            <h4 className="title">Service</h4>
             <header className="d-flex justify-content-between align-items-center mb-4 ">
               <div className="header-content" style={{ width: '%' }}> 
               <div className="d-flex align-items-center justify-content-center search-container">
@@ -157,8 +156,8 @@ const ServiceComponent = () => {
                 </thead>
                 <tbody>
                   {services.map((service) => (
-                    <tr key={service.serviceName}>
-                      <td>{service.serviceName}</td>
+                    <tr key={service.servicesName}>
+                      <td>{service.servicesName}</td>
                       <td>${service.price}</td>
                       <td>
                         <button onClick={() => handleOpenModal(service)}>Update</button>

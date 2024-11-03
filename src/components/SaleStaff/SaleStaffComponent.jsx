@@ -122,13 +122,13 @@ import './SaleStaff.css';
       <div className="container-fluid">
         <div className="row">
           {/*SideBar */}
-        <aside className="sidebar col- p-3 ">
-              <div className='side-bar'>
+        <aside className="sidebar col-2 p-3 ">
+              <div className='manager-sidebar'>
               <div className="profile-container text-center mb-4">
-                <div className="SideKoi d-flex align-items-center justify-content-between">
-                <img src={logo} className="logo" alt="Logo" />
+                <div className="SideKoi d-flex ">
+                <img src="/Logo-Koi/Order.png" alt="Profile " className="profile-img rounded-circle me-3"/>
                   <div className=" KoiLogo">
-                    <p className="KoiDeli ">Sale Staff</p>
+                    <p className="KoiDeli ">KoiDeli</p>
                   </div>
                 </div>
                 <hr className="logo-separator" /> 
@@ -172,9 +172,9 @@ import './SaleStaff.css';
           </aside>
 
           <main className="dashboard-sale">
-          <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-4">
+          <header className="d-flex justify-content-between align-items-center mb-4 pb-4">
           
-                <h1>Dashboard</h1>
+                <h4 className="title">Dashboard</h4>
                 <header className="d-flex justify-content-between align-items-center mb-4 ">
                 <div className="header-content" style={{ width: '%' }} > 
                   
