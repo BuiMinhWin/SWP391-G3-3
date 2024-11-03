@@ -9,7 +9,7 @@ public class ServicesMapper {
         return new ServicesDTO(
                 service.getServicesId(),
                 service.getPrice(),
-                service.getServiceStatus(),
+                service.getServicesStatus(),
                 service.getServicesName()
         );
     }
@@ -18,7 +18,7 @@ public class ServicesMapper {
         Services service = new Services();
         service.setServicesId(servicesDTO.getServicesId());
         service.setPrice(servicesDTO.getPrice());
-        service.setServiceStatus(servicesDTO.getServiceStatus());
+        service.setServicesStatus(servicesDTO.getServicesStatus());
         service.setServicesName(servicesDTO.getServicesName());
         return service;
     }

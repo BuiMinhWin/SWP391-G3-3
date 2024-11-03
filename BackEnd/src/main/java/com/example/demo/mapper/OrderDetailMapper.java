@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class OrderDetailMapper {
 
     public static OrderDetailDTO mapToOrderDetailDTO(OrderDetail orderDetail) {
-        List<String> serviceIds = orderDetail.getServices().stream()
+        List<Integer> serviceIds = orderDetail.getServices().stream()
                 .map(Services::getServicesId)
                 .collect(Collectors.toList());
 

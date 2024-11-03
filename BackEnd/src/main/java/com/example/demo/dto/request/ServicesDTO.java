@@ -12,8 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ServicesDTO {
 
-    private String servicesId;
+    private Integer servicesId;
     private int price;
-    private String serviceStatus;
+    private String servicesStatus;
     private String servicesName;
 }

@@ -21,9 +21,9 @@ import java.util.Set;
 public class Services {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "services_id", columnDefinition = "CHAR(36)")
-    private String servicesId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "services_id")
+    private Integer servicesId;
 
     @Column(name = "services_name")
     private String servicesName;
@@ -31,8 +31,8 @@ public class Services {
     @Column(name = "price")
     private int price;
 
-    @Column(name = "service_status")
-    private String serviceStatus;
+    @Column(name = "services_status")
+    private String servicesStatus;
 
     @ManyToMany(mappedBy = "services")
     private Set<OrderDetail> orderDetails = new HashSet<>();

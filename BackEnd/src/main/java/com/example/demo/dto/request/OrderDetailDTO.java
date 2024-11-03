@@ -23,5 +23,5 @@ public class OrderDetailDTO {
     private String koiName;
     private int status;
     private int totalServicePrice;
-    private List<String> serviceIds;
+    private List<Integer> serviceIds;
 }

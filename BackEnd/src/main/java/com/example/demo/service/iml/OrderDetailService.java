@@ -6,11 +6,11 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.OrderDetailMapper;
 import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.repository.OrderRepository;
-import com.example.demo.repository.ServiceRepository;
+import com.example.demo.repository.ServicesRepository;
+import com.example.demo.repository.ServicesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,15 +23,15 @@ public class OrderDetailService {
 
     private final OrderDetailRepository orderDetailRepository;
     private final OrderRepository orderRepository;
-    private final ServiceRepository serviceRepository;
+    private final ServicesRepository servicesRepository;
 
     @Autowired
     public OrderDetailService(OrderDetailRepository orderDetailRepository,
                               OrderRepository orderRepository,
-                              ServiceRepository serviceRepository) {
+                              ServicesRepository servicesRepository) {
         this.orderDetailRepository = orderDetailRepository;
         this.orderRepository = orderRepository;
-        this.serviceRepository = serviceRepository; // Khởi tạo biến
+        this.servicesRepository = servicesRepository; // Khởi tạo biến
     }
 
     public OrderDetailDTO createOrderDetail(OrderDetailDTO orderDetailDTO) {
@@ -51,7 +51,9 @@ public class OrderDetailService {
         }
 
         if (orderDetailDTO.getServiceIds() != null && !orderDetailDTO.getServiceIds().isEmpty()) {
-            String serviceIdsString = String.join(",", orderDetailDTO.getServiceIds());
+            String serviceIdsString = orderDetailDTO.getServiceIds().stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
             orderDetail.setServiceIds(serviceIdsString);
         }
 
@@ -68,29 +70,36 @@ public class OrderDetailService {
         int totalServicePrice = 0;
         Set<Services> servicesSet = new HashSet<>();
 
-        Set<String> requestedServiceIds = new HashSet<>();
+        Set<Integer> requestedServiceIds = new HashSet<>();
         if (orderDetailDTO.getServiceIds() != null && !orderDetailDTO.getServiceIds().isEmpty()) {
-            List<String> serviceIdsList = orderDetailDTO.getServiceIds();
-            requestedServiceIds.addAll(serviceIdsList);
+            for (Integer serviceIdStr : orderDetailDTO.getServiceIds()) {
+                try {
+                    Integer serviceId = Integer.valueOf(serviceIdStr);
+                    requestedServiceIds.add(serviceId);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid service ID format: " + serviceIdStr);
+                }
+            }
         }
+
 
         int servicePrice1 = 0;
         int servicePrice2 = 0;
         int servicePrice3 = 0;
 
-        for (String serviceId : requestedServiceIds) {
-            Services service = serviceRepository.findById(serviceId)
+        for (Integer serviceId : requestedServiceIds) {
+            Services service = servicesRepository.findById(serviceId)
                     .orElseThrow(() -> new ResourceNotFoundException("Service not found with id " + serviceId));
             servicesSet.add(service);
 
             switch (serviceId) {
-                case "1":
+                case 1:
                     servicePrice1 = service.getPrice();
                     break;
-                case "2":
+                case 2:
                     servicePrice2 = service.getPrice();
                     break;
-                case "3":
+                case 3:
                     servicePrice3 = service.getPrice();
                     break;
                 default:
@@ -100,19 +109,20 @@ public class OrderDetailService {
             totalServicePrice += service.getPrice();
         }
 
-        if (!requestedServiceIds.contains("1")) {
+        if (!requestedServiceIds.contains(1)) {
             servicePrice1 = 0;
         }
-        if (!requestedServiceIds.contains("2")) {
+        if (!requestedServiceIds.contains(2)) {
             servicePrice2 = 0;
         }
-        if (!requestedServiceIds.contains("3")) {
+        if (!requestedServiceIds.contains(3)) {
             servicePrice3 = 0;
         }
 
         orderDetail.setServices(servicesSet);
         orderDetail.setTotalServicePrice(totalServicePrice);
     }
+
 
 
     public List<OrderDetailDTO> getOrderDetailsByOrderId(String orderId) {

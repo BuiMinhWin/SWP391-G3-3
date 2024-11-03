@@ -1,9 +1,10 @@
 package com.example.demo.service.iml;
 
+import com.example.demo.dto.request.ServicesDTO;
 import com.example.demo.entity.Services;
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.OrderDetailRepository;
-import com.example.demo.repository.ServiceRepository;
+import com.example.demo.mapper.ServicesMapper;
+import com.example.demo.repository.ServicesRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,20 +18,50 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class ServicesService {
 
-    private final ServiceRepository serviceRepository;
-    private final OrderDetailRepository orderDetailRepository;
+    private final ServicesRepository servicesRepository;
 
+
+    public ServicesDTO createService(ServicesDTO servicesDTO){
+
+        Services services = ServicesMapper.mapToServices(servicesDTO);
+
+        services.setServicesStatus("online");
+
+        int price = servicesDTO.getPrice();
+        if (price < 0) {
+            throw new IllegalArgumentException("Price must be greater than or equal to 0.");
+        }
+        services.setPrice(price);
+
+        Services saveService = servicesRepository.save(services);
+
+        return ServicesMapper.mapToServicesDTO(saveService);
+    }
+
+    public void deactivateService(Integer servicesId) {
+        Services services = servicesRepository.findById(servicesId)
+                .orElseThrow(() -> new ResourceNotFoundException("Service does not exist with id: " + servicesId));
+        services.setServicesStatus("offline");
+        servicesRepository.save(services);
+    }
+
+    public void activateService(Integer servicesId) {
+        Services services = servicesRepository.findById(servicesId)
+                .orElseThrow(() -> new ResourceNotFoundException("Service does not exist with id: " + servicesId));
+        services.setServicesStatus("online");
+        servicesRepository.save(services);
+    }
 
     @Transactional
-    public void updateServicePrice(String servicesId, int newPrice) {
-        Services service = serviceRepository.findById(servicesId)
+    public void updateServicePrice(Integer servicesId, int newPrice) {
+        Services service = servicesRepository.findById(servicesId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found with ID: " + servicesId));
         service.setPrice(newPrice);
-        serviceRepository.save(service);
+        servicesRepository.save(service);
     }
 
     public List<Map<String, Object>> getAllService() {
-        List<Services> servicesList = serviceRepository.findAll();
+        List<Services> servicesList = servicesRepository.findAll();
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (Services service : servicesList) {
@@ -40,7 +71,6 @@ public class ServicesService {
             serviceData.put("price", service.getPrice());
             result.add(serviceData);
         }
-
         return result;
     }
 
