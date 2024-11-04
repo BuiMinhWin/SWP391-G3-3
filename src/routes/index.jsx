@@ -34,7 +34,7 @@ import ServiceComponent from "../components/Manager/ServiceComponent";
 import RespondFeedBack from "../components/SaleStaff/ResponseFeedback";
 import AboutUs from "../pages/AboutUs/AboutUsComponent";
 import Support from "../pages/Support/SupportComponent";
-import PaymentOutcome from "../pages/CheckoutPage/PaymentOutcome";
+import DeliveryStatusPopup from "../components/DeliveryTracking";
 
 function index() {
   return (

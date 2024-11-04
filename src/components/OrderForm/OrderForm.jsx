@@ -10,8 +10,9 @@ import {
   Select,
   MenuItem,
   Divider,
+  Button,
 } from "@mui/material";
-import { Formik, Form } from "formik";
+import { Formik, Form, FieldArray } from "formik";
 import * as Yup from "yup";
 import TextFieldWrapper from "../FromUI/Textfield";
 import SelectWrapper from "../FromUI/Select";
@@ -31,6 +32,7 @@ import RadioGroupWrapper from "../FromUI/RadioGroup";
 import CustomRadioGroup from "../FromUI/CustomRadioGroup";
 import RocketIcon from "@mui/icons-material/Rocket";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import AddIcon from "@mui/icons-material/Add";
 import FileUpload from "../FromUI/FileUpload";
 import CheckboxWrapper from "../FromUI/Checkbox";
 import { useNavigate, useOutletContext } from "react-router-dom";
@@ -47,6 +49,15 @@ const buttonStyles = {
   maxWidth: "fit-content",
   display: "inline-flex",
   alignItems: "center",
+  justifyContent: "center",
+};
+const fishButtonStyles = {
+  backgroundColor: "#161A31",
+  color: "white",
+  "&:hover": { backgroundColor: "#727376" },
+  padding: "17px 16px",
+  borderRadius: "8px",
+  minWidth: "auto",
   justifyContent: "center",
 };
 
@@ -69,16 +80,20 @@ const INITIAL_FORM_STATE = {
   senderPhone: "",
   receiverNote: "",
   senderNote: "",
-  orderNote: "",
-  document_file: null,
   discount: "",
   koi_image: "",
-  koi_name: "",
-  koi_type: "",
-  quantity: 0,
-  weight: 0.0,
   freight: "",
   serviceIds: [],
+  orderDetails: [
+    {
+      koi_type: "",
+      koi_name: "",
+      weight: 0.0,
+      quantity: 0,
+      document_file: null,
+      orderNote: "",
+    },
+  ],
 };
 
 // Validation Schema with Yup
@@ -95,35 +110,39 @@ const FORM_VALIDATION = Yup.object().shape({
     .matches(/^[0-9]{10}$/, "Số điện thoại phải là số và có 10 số"),
   receiverNote: Yup.string().nullable(),
   senderNote: Yup.string().nullable(),
-  orderNote: Yup.string().nullable(),
   discount: Yup.string().nullable(),
-  cityS: Yup.string().required("Vui lòng chọn thành phố"), 
-  cityR: Yup.string().required("Vui lòng chọn thành phố"), 
-  koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"), 
-  koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"), 
-  quantity: Yup.number()
-    .min(1, "Số lượng phải lớn hơn 0")
-    .required("Vui lòng nhập số lượng"),
-  weight: Yup.number()
-    .min(0.1, "Cân nặng phải lớn hơn 0")
-    .max(50, "Cá Koi kỷ lục thể giới chỉ đạt 41kg bạn có chắc bạn có con cá lớn hơn chứ 0-o!?")
-    .required("Vui lòng nhập cân nặng"),
+  cityS: Yup.string().required("Vui lòng chọn thành phố"),
+  cityR: Yup.string().required("Vui lòng chọn thành phố"),
   freight: Yup.string().required("Vui lòng chọn phương thức vận chuyển"),
   termsOfService: Yup.boolean()
     .oneOf([true], "The terms and conditions must be accepted.")
     .required("The terms and conditions must be accepted."),
-  document_file: Yup.mixed()
-    .required("A file is required")
-    .test(
-      "fileSize",
-      "File size must be less than 8MB",
-      (value) => value && value.size <= 8 * 1024 * 1024
-    )
-    .test(
-      "fileFormat",
-      "Only PDF file are allowed",
-      (value) => value && value.type === "application/pdf"
-    ),
+  orderDetails: Yup.array().of(
+    Yup.object().shape({
+      koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"),
+      koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"),
+      weight: Yup.number()
+        .min(0.1, "Cân nặng phải lớn hơn 0")
+        .max(50, "Cá Koi kỷ lục thể giới chỉ đạt 41kg!")
+        .required("Vui lòng nhập cân nặng"),
+      quantity: Yup.number()
+        .min(1, "Số lượng phải lớn hơn 0")
+        .required("Vui lòng nhập số lượng"),
+      document_file: Yup.mixed()
+        .required("A file is required")
+        .test(
+          "fileSize",
+          "File size must be less than 8MB",
+          (value) => value && value.size <= 8 * 1024 * 1024
+        )
+        .test(
+          "fileFormat",
+          "Only PDF files are allowed",
+          (value) => value && value.type === "application/pdf"
+        ),
+      orderNote: Yup.string().nullable(),
+    })
+  ),
 });
 
 const OrderForm = () => {
@@ -368,27 +387,17 @@ const OrderForm = () => {
           );
           console.log("File uploaded successfully:", uploadResponse);
 
-          const orderDetails = await order(newOrderId);
-          console.log("Order Details:", orderDetails);
-
-          const orderDetailData = {
-            orderId: newOrderId,
-            quantity: Number(values.quantity),
-            weight: parseFloat(values.weight),
-            discount: values.discount,
-            koiName: values.koi_name,
-            koiType: values.koi_type,
-            serviceIds: values.serviceIds,
-          };
-          console.log("Service IDs being sent:", orderData.serviceIds);
-          const orderDetailResponse = await createOrderDetail(orderDetailData);
-          console.log(
-            "Order detail created successfully:",
-            orderDetailResponse
-          );
-
-          console.log("Order created successfully with ID:", newOrderId);
-
+          const orderDetails = values.orderDetails.map((detail) => ({
+            ...detail,
+            orderId: newOrderId, // Use the newly created orderId
+          }));
+          for (const detail of orderDetails) {
+            const orderDetailResponse = await createOrderDetail(detail);
+            console.log(
+              "Order detail created successfully:",
+              orderDetailResponse
+            );
+          }
           navigate("/checkout", { state: { orderId: newOrderId } });
         } catch (error) {
           enqueueSnackbar("Đã xảy ra lỗi trong quá trình tạo đơn", {
@@ -677,61 +686,113 @@ const OrderForm = () => {
                   </Grid>
                 </Paper>
 
-                {/* Paper 3: Order Information */}
+                {/* FishDetail */}
+                <FieldArray name="orderDetails">
+                  {({ push, remove }) => (
+                    <>
+                      {values.orderDetails.map((_, index) => (
+                        <Paper
+                          elevation={4}
+                          sx={{ padding: "20px", marginBottom: "20px" }}
+                          key={index}
+                        >
+                          <Typography variant="h6" gutterBottom>
+                            Thông tin cá Koi {index + 1}
+                          </Typography>
+                          <Grid container spacing={3}>
+                            <Grid item xs={6}>
+                              <SelectWrapper
+                                name={`orderDetails.${index}.koi_type`}
+                                label="Loại cá Koi"
+                                options={koi_type}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <SelectWrapper
+                                name={`orderDetails.${index}.koi_name`}
+                                label="Biến thể Koi"
+                                options={koi_name}
+                              />
+                            </Grid>
+                            <Grid item xs={3}>
+                              <TextFieldWrapper
+                                name={`orderDetails.${index}.weight`}
+                                label="Cân nặng trung bình"
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
+                                }}
+                              />
+                            </Grid>
+                            <Grid item xs={3}>
+                              <TextFieldWrapper
+                                name={`orderDetails.${index}.quantity`}
+                                label="Số lượng"
+                                type="number"
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <FileUpload
+                                name={`orderDetails.${index}.document_file`}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <TextFieldWrapper
+                                name={`orderDetails.${index}.description`}
+                                label="Ghi chú"
+                                multiline
+                                rows={4}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                sx={{
+                                  padding: "17px 16px",
+                                  borderRadius: "8px",
+                                }}
+                                onClick={() => remove(index)}
+                                disabled={values.orderDetails.length === 1} // Prevents removing the last section
+                              >
+                                Xóa thông tin cá Koi {index + 1}
+                              </Button>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Button
+                                variant="contained"
+                                sx={{ ...fishButtonStyles }}
+                                startIcon={<AddIcon />}
+                                onClick={() =>
+                                  push({
+                                    koi_type: "",
+                                    koi_name: "",
+                                    weight: 0.0,
+                                    quantity: 0,
+                                    document_file: null,
+                                    orderNote: "",
+                                  })
+                                }
+                              >
+                                Thêm thông tin cá Koi mới
+                              </Button>
+                            </Grid>
+                          </Grid>
+                        </Paper>
+                      ))}
+                    </>
+                  )}
+                </FieldArray>
+
+                {/* Order Information */}
                 <Paper elevation={4} sx={{ padding: "20px" }}>
                   <Typography variant="h6" gutterBottom>
-                    Thông tin bưu gửi
+                    Tùy chọn bưu gửi
                   </Typography>
                   <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                      <SelectWrapper
-                        name="koi_type"
-                        label="Loại cá Koi"
-                        options={koi_type}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <SelectWrapper
-                        name="koi_name"
-                        label="Biến thể Koi"
-                        options={koi_name}
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      <TextFieldWrapper
-                        name="weight"
-                        label="Cân nặng trung bình"
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">kg</InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      <TextFieldWrapper
-                        name="quantity"
-                        label="Số lượng"
-                        type="number"
-                        slotProps={{
-                          inputLabel: {
-                            shrink: true,
-                          },
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <FileUpload name="document_file" />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextFieldWrapper
-                        name="description"
-                        label="Ghi chú"
-                        multiline
-                        rows={4}
-                      />
-                    </Grid>
-
                     <Grid item xs={12}>
                       <CustomRadioGroup
                         name="freight"
@@ -784,15 +845,17 @@ const OrderForm = () => {
                       ))}
                     </Grid>
                   </Grid>
-                  <Divider sx={{ backgroundColor: "black", margin: "20px 50px" }} />
+                  <Divider
+                    sx={{ backgroundColor: "black", margin: "20px 50px" }}
+                  />
                   <Grid xs={12}>
-                  <CheckboxWrapper
-                    name="termsOfService"
-                    legend="Terms Of Service"
-                    label="Tôi đã đọc và đồng ý với các điều khoản"
-                  /></Grid>
+                    <CheckboxWrapper
+                      name="termsOfService"
+                      legend="Terms Of Service"
+                      label="Tôi đã đọc và đồng ý với các điều khoản"
+                    />
+                  </Grid>
                   <ButtonWrapper>Tạo đơn đặt hàng</ButtonWrapper>
-                  
                 </Paper>
               </Box>
             </>
