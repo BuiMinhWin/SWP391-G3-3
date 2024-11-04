@@ -295,9 +295,15 @@ const ServiceComponent = () => {
                 <div className="modal-content">
                   <div className="modal-header">
                     <h5 className="modal-title">Create New Service</h5>
-                    <button type="button" className="close" onClick={handleCloseCreateModal} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button 
+                    type="button" 
+                    className="close" 
+                    onClick={handleCloseCreateModal} 
+                    aria-label="Close" 
+                    style={{ marginLeft: '270px', backgroundColor: 'whitesmoke', cursor: 'pointer' }}
+                    >
+                    <span aria-hidden="true" style={{  fontSize: '20px',color: 'black' }}>&times;</span>
+                  </button>
                   </div>
                   <div className="modal-body">
                     <input
@@ -328,8 +334,14 @@ const ServiceComponent = () => {
               <div className="modal-content">
                 <div className="modal-header">
                   <h5 className="modal-title">Active Services</h5>
-                  <button type="button" className="close" onClick={handleCloseActiveModal} aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                  <button 
+                    type="button" 
+                    className="close" 
+                    onClick={handleCloseActiveModal} 
+                    aria-label="Close" 
+                    style={{ marginLeft: '300px', backgroundColor: 'whitesmoke', cursor: 'pointer' }}
+                    >
+                    <span aria-hidden="true" style={{  fontSize: '20px',color: 'black' }}>&times;</span>
                   </button>
                 </div>
                 <div className="modal-body">
