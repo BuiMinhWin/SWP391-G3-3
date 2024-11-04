@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const REST_API_SERVICE_URL = "http://koideliverysystem.id.vn:8080/api/services";
+
 const REST_API_ORDER_URL = "http://koideliverysystem.id.vn:8080/api/orders";
 const REST_API_ORDER_DETAIL_URL =
   "http://koideliverysystem.id.vn:8080/api/ordersDetail";

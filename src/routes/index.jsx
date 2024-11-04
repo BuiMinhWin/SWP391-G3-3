@@ -26,10 +26,9 @@ import OrderReport from "../pages/Order/OrderReport";
 import Authenticate from "../components/Member/Authenticate";
 import ResetPasswordComponent from "../components/Member/ResetPasswordComponent";
 import Map from "../components/Map";
-import PaymentOutcome from "../pages/CheckoutPage/PaymentOutcome";
 import DriverBooking from "../components/SaleStaff/AssignDriverComponent";
 import ConfirmDriver from "../components/SaleStaff/ConfirmDriver";
-import ListOrderManageComponent from "../components/Manager/ListOrderManageComponent";
+import ListOrderManageComponent from "../components/Manager/ListOrderManageComponent"
 import ServiceComponent from "../components/Manager/ServiceComponent";
 import RespondFeedBack from "../components/SaleStaff/ResponseFeedback";
 import AboutUs from "../pages/AboutUs/AboutUsComponent";
@@ -194,7 +193,7 @@ function index() {
       <Route
         path="/order/:orderId"
         element={
-          <Authenticate allowedRoles={["Delivery"]}>
+          <Authenticate allowedRoles={["Delivery","Manager"]}>
             <OrderDetailComponent />
           </Authenticate>
         }

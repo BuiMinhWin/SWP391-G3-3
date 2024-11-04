@@ -55,12 +55,12 @@ const FeedbackResponse = () => {
 
     return (
         <div className="feedback-response-container">
-            <h2>Customer Feedbacks</h2>
+            <h2>Feedback của khách hàng</h2>
             {feedbacks.length > 0 ? (
                 feedbacks.map(feedback => (
                     <div key={feedback.feedbackId} className="feedback-item">
-                        <p><strong>Rating:</strong> {feedback.rating}</p>
-                        <p><strong>Comment:</strong> {feedback.comment}</p>
+                        <p><strong>Xếp hạng:</strong> {feedback.rating}</p>
+                        <p><strong>Bình luận:</strong> {feedback.comment}</p>
                         <div>
                             <label>Phản hồi của Sale:</label>
                             <input

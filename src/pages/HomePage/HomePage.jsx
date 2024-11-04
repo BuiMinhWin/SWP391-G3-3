@@ -9,6 +9,7 @@ import { getOrder } from '../../services/CustomerService';
 import DeliveryStatus from '../../pages/DeliveryStatus/DeliveryStatus'; // Import component hiển thị trạng thái đơn hàng
 import { logout } from '../../components/Member/auth';
 import { getAvatar } from '../../services/CustomerService';
+import axios from "axios";
 const Homepage = () => {
 
   const [activeTab, setActiveTab] = useState('tracking'); // State để quản lý tab
@@ -17,6 +18,16 @@ const Homepage = () => {
   const navigate = useNavigate();
   const [avatar, setAvatar] = useState(null); 
 
+  //autocomplete
+
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeInput, setActiveInput] = useState(null); 
+  const [pickupAddress, setPickupAddress] = useState(''); 
+  const [destinationAddress, setDestinationAddress] = useState(''); 
+  const [price,setPrice]=useState('');
+ 
+
+  //Check authen
   const roleId = localStorage.getItem('roleId'); 
   console.log('Role ID:', roleId);
   const accountId = localStorage.getItem('accountId');
@@ -30,6 +41,118 @@ const Homepage = () => {
     logout();
     navigate("/");
   };
+
+  const handleSuggestionClick = (suggestion) => {
+    if (activeInput === 'pickup') {
+      setPickupAddress(suggestion.description); 
+    } else if (activeInput === 'destination') {
+      setDestinationAddress(suggestion.description); 
+    }
+    setSuggestions([]); 
+  };
+  
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [quantity,setQuantity] = useState('');
+  const [weight, setWeight] = useState('');
+  const handlePrice = async (pickupAddress, destinationAddress, weight, quantity) => {
+    const pickUpAddressGeo = await geocodeAddress(`${pickupAddress}`);
+    const destinationAddressGeo = await geocodeAddress(`${destinationAddress}`);
+    const pickup = `${pickUpAddressGeo.lat},${pickUpAddressGeo.lng}`;
+    const destination = `${destinationAddressGeo.lat},${destinationAddressGeo.lng}`;
+    const distance = await fetchDistanceData(pickup, destination);
+    let distancePrice = 0;
+    const ratePerKm = 10000; // Giả sử đây là giá tiền cho mỗi km
+    let totalPrice = 0; // Sử dụng let thay vì const
+
+    if (distance <= 10) {
+        distancePrice = Math.floor(distance * ratePerKm);
+        totalPrice = distancePrice + (weight * 5000) + (quantity * 1000);
+    } else if (distance <= 50) {
+        distancePrice = Math.floor(distance * ratePerKm * 0.2);
+        totalPrice = distancePrice + (weight * 5000) + (quantity * 10000);
+    } else if (distance <= 100) {
+        distancePrice = Math.floor((distance * ratePerKm * 1.2) / 10);
+        totalPrice = distancePrice + (weight * 5000) + (quantity * 10000);
+    } else if (distance <= 500) {
+        distancePrice = Math.floor((distance * ratePerKm * 1.4) / 10);
+        totalPrice = distancePrice + (weight * 5000) + (quantity * 10000);
+    } else {
+        distancePrice = Math.floor((distance * ratePerKm * 1.7) / 10);
+        totalPrice = distancePrice + (weight * 5000) + (quantity * 10000);
+    }
+
+      setPrice(totalPrice);
+}
+  
+  const API_KEY =import.meta.env.VITE_GOONG_API_KEY;
+
+  const autoComplete = async (inputValue, setSuggestions) => {
+    if (inputValue.length > 2) {
+      try {
+        const response = await axios.get('https://rsapi.goong.io/Place/AutoComplete', {
+          params: {
+            api_key: API_KEY,
+            location: '21.013715429594125,105.79829597455202', // tọa độ Hà Nội
+            input: inputValue 
+          }
+        });
+        console.log(response.data)
+        setSuggestions(response.data.predictions || []);
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+      }
+    } else {
+      setSuggestions([]);
+    }
+  };
+  const fetchDistanceData = async (origins, destinations) => {
+    try {
+      console.log(origins);
+      console.log(destinations);
+      const response = await axios.get(
+        `https://rsapi.goong.io/distancematrix?origins=${origins}&destinations=${destinations}&vehicle=car&api_key=${API_KEY}`
+      );
+
+      const data = response.data;
+      if (
+        data?.rows &&
+        data.rows.length > 0 &&
+        data.rows[0]?.elements[0]?.distance
+      ) {
+        const distanceInKm = data.rows[0].elements[0].distance.value / 1000;
+        return distanceInKm;
+      } else {
+        throw new Error("Invalid distance data");
+      }
+    } catch (error) {
+      console.error("Error fetching distance matrix:", error);
+      setErrorMessage("Có lỗi xảy ra khi lấy dữ liệu.");
+      return null;
+    }
+  };
+
+  const geocodeAddress = async (address) => {
+    console.log("địa chỉ để tính", address);
+    try {
+      const response = await axios.get(
+        `https://rsapi.goong.io/geocode?address=${encodeURIComponent(
+          address
+        )}&api_key=${API_KEY}`
+      );
+      const data = response.data;
+
+      if (data.results && data.results.length > 0) {
+        const location = data.results[0].geometry.location;
+        return { lat: location.lat, lng: location.lng };
+      } else {
+        throw new Error("No results found for the address.");
+      }
+    } catch (error) {
+      console.error("Error fetching geocode:", error);
+      throw new Error("Failed to fetch geocode.");
+    }
+  };
+
 
 
   const handleTrackingSubmit = () => {
@@ -119,10 +242,24 @@ const Homepage = () => {
 
       {/* Welcome section */}
       <header className="homepage-header">
-        <h1 className='title-1'>VẬN CHUYỂN CÁ KOI</h1>
-        <h1 className='title-2'>GẦN GŨI - TIN CẬY - HIỆU QUẢ</h1>
-        <button className="order-btn" onClick={() => navigate('/login')}>TẠO ĐƠN TẠI ĐÂY</button>  
-      </header>
+      <h1 className='title-1'>VẬN CHUYỂN CÁ KOI</h1>
+      <h1 className='title-2'>GẦN GŨI - TIN CẬY - HIỆU QUẢ</h1>
+      
+      <button 
+        className="order-btn" 
+        onClick={() => {
+          if (roleId) {
+            navigate('/form');  // Điều hướng đến trang /form nếu đã đăng nhập
+          } else {
+            navigate('/login'); // Điều hướng đến trang /login nếu chưa đăng nhập
+          }
+        }}
+      >
+        TẠO ĐƠN TẠI ĐÂY
+      </button>  
+
+    </header>
+
 
       {/* Main content */}
       <div className="homepage-main-content">
@@ -164,23 +301,58 @@ const Homepage = () => {
 
         </div>
         )}
-
+        
         {activeTab === 'estimate' && (
-          <div className="estimate-section">
-            <div className="estimate-input-row-holder">
-              <input type="text" placeholder="Điểm đi" className="estimate-input" />
-              <input type="text" placeholder="Điểm đến" className="estimate-input" />
-            </div>
+        <div className="estimate-section">
+          <div className="estimate-input-row-holder">
+          <input
+             type="text"
+             placeholder="Điểm đi"
+             className="estimate-input"
+             value={pickupAddress}
+             onFocus={() => setActiveInput("pickup")}
+             onChange={(e) => {
+               setPickupAddress(e.target.value);
+               autoComplete(e.target.value, setSuggestions);
+             }}
+          />
+          <input
+            type="text"
+            placeholder="Điểm đến"
+            className="estimate-input"
+            value={destinationAddress}
+            onFocus={() => setActiveInput("destination")}
+            onChange={(e) => {
+              setDestinationAddress(e.target.value);
+              autoComplete(e.target.value, setSuggestions);
+            }}
+          />
 
-            <div className="estimate-input-row">
-              <input type="number" placeholder="Số kg" className="estimate-input" />
-              <input type="number" placeholder="Số lượng cá" className="estimate-input" />
-            </div>
+          {/* Suggestions list */}
+          {suggestions.length > 0 && (
+            <ul className="suggestions-list">
+              {suggestions.map((suggestion, index) => (
+                <li key={index} onClick={() => handleSuggestionClick(suggestion)}>
+                  {suggestion.description}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-            <button className="estimate-btn">Tính Tiền</button>
+          <div className="estimate-input-row">
+            <input type="number" placeholder="Số kg" className="estimate-input" value = {weight}  onChange={(e) => setWeight(e.target.value)} />
+            <input type="number" placeholder="Số lượng cá" className="estimate-input" value = {quantity}  onChange={(e) => setQuantity(e.target.value)} />
+          </div>
 
-            <div className="estimate-result">
-              {/* Giá tiền sẽ hiện ở đây */}
+          <button className="estimate-btn" onClick={()=>handlePrice(pickupAddress,destinationAddress,weight,quantity)} >Tính Tiền</button>
+
+          <div className="estimate-result">
+                {price ? ( 
+            <>
+              Tổng tiền: {price} VND
+            </>
+           ) :null}
             </div>
           </div>
         )}
