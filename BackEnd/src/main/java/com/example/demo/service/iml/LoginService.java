@@ -29,6 +29,11 @@ public class LoginService {
             account = accountRepository.findByPhone(loginDTO.getPhone());
         }
         if (account != null) {
+            if(account.getStatus() == 0){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new LoginMessage("Login Failed", false, account.getRoleId(), null));
+            }
+
             String inputPassword = loginDTO.getPassword();
             String encodedPassword = account.getPassword();
 

@@ -1,5 +1,6 @@
 package com.example.demo.service.iml;
 
+import com.example.demo.Login.LoginMessage;
 import com.example.demo.dto.request.AccountDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.IdGenerator;
@@ -10,6 +11,8 @@ import com.example.demo.util.ImageUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.demo.exception.ResourceNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
@@ -139,6 +142,9 @@ public class AccountService {
     public AccountDTO createAccountGG(AccountDTO accountDTO) {
         Account existingAccount = accountRepository.findByEmail(accountDTO.getEmail());
         if (existingAccount != null) {
+            if(accountDTO.getStatus() == 0){
+                return null;
+            }
             return AccountMapper.maptoAccountDTO(existingAccount);
         }
 
@@ -168,6 +174,7 @@ public class AccountService {
         }
 
         account.setStatus(1);
+
         Account savedAccount = accountRepository.save(account);
 
         return AccountMapper.maptoAccountDTO(savedAccount);
