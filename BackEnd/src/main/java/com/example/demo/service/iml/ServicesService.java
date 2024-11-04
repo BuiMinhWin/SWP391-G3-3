@@ -69,6 +69,7 @@ public class ServicesService {
             serviceData.put("servicesId", service.getServicesId());
             serviceData.put("servicesName", service.getServicesName());
             serviceData.put("price", service.getPrice());
+            serviceData.put("servicesStatus", service.getServicesStatus());
             result.add(serviceData);
         }
         return result;
