@@ -11,6 +11,7 @@ import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { FaRegMessage } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 import { CiLogout } from "react-icons/ci";
+import { logout } from '../Member/auth'; 
 
 const ListEmployeeComponent = () => {
   const [accounts, setAccounts] = useState([]);
