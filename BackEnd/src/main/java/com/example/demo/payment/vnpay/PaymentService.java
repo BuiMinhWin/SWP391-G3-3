@@ -39,9 +39,6 @@ public class PaymentService {
 
             List<OrderDetail> orderDetails = orderService.getOrderDetailsByOrderId(orderId);
 
-            int totalServicePrice = orderDetails.stream()
-                    .mapToInt(OrderDetail::getTotalServicePrice)
-                    .sum();
             int totalQuantity = orderDetails.stream()
                     .mapToInt(OrderDetail::getQuantity)
                     .sum();
@@ -49,7 +46,7 @@ public class PaymentService {
                     .mapToDouble(OrderDetail::getWeight)
                     .sum();
 
-            int amount = (orderDTO.getTotalPrice() + totalServicePrice
+            int amount = (orderDTO.getTotalPrice()
                     + (totalQuantity * 10)
                     + (totalWeight * 5)) * 100;
 

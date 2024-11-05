@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -18,12 +19,12 @@ import java.util.Set;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) // UUID cho orderId
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "order_id", columnDefinition = "CHAR(36)")
     private String orderId;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Lazy loading cho Account
-    @JoinColumn(name = "account_id", nullable = false) // Khóa ngoại
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
     @Column(name = "order_date", nullable = false)
@@ -66,9 +67,6 @@ public class Order {
     private String orderNote;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Document> documents;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<OrderDetail> orderDetails;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -85,18 +83,6 @@ public class Order {
 
     @Column(name = "payment_status")
     private int paymentStatus;
-
-//    @Column(name = "origin_latitude")
-//    private double originLatitude;
-//
-//    @Column(name = "origin_longitude")
-//    private double originLongitude;
-//
-//    @Column(name = "destination_latitude")
-//    private double destinationLatitude;
-//
-//    @Column(name = "destination_longitude")
-//    private double destinationLongitude;
 
     @Column(name = "distance")
     private double distance;
@@ -119,4 +105,15 @@ public class Order {
         }
         return null;
     }
+
+    @Column(name = "service_ids")
+    private String serviceIds;
+
+    @OneToMany
+    @JoinTable(
+            name = "order_services",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "services_id")
+    )
+    private Set<Services> services = new HashSet<>();
 }

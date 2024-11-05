@@ -35,5 +35,5 @@ public class Services {
     private String servicesStatus;
 
     @ManyToMany(mappedBy = "services")
-    private Set<OrderDetail> orderDetails = new HashSet<>();
+    private Set<Order> orders = new HashSet<>();
 }

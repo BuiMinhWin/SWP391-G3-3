@@ -11,10 +11,6 @@ import java.util.stream.Collectors;
 public class OrderDetailMapper {
 
     public static OrderDetailDTO mapToOrderDetailDTO(OrderDetail orderDetail) {
-        List<Integer> serviceIds = orderDetail.getServices().stream()
-                .map(Services::getServicesId)
-                .collect(Collectors.toList());
-
         return new OrderDetailDTO(
                 orderDetail.getOrderDetailId(),
                 orderDetail.getOrder().getOrderId(),
@@ -24,9 +20,7 @@ public class OrderDetailMapper {
                 orderDetail.getKoiType(),
                 orderDetail.getCreatedAt(),
                 orderDetail.getKoiName(),
-                orderDetail.getStatus(),
-                orderDetail.getTotalServicePrice(),
-                serviceIds
+                orderDetail.getStatus()
         );
     }
 
@@ -41,8 +35,6 @@ public class OrderDetailMapper {
         orderDetail.setCreatedAt(orderDetailDTO.getCreatedAt());
         orderDetail.setKoiName(orderDetailDTO.getKoiName());
         orderDetail.setStatus(orderDetailDTO.getStatus());
-
-        // The services will be set later by the service layer based on the service IDs
         return orderDetail;
     }
 }

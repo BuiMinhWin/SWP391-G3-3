@@ -22,6 +22,4 @@ public class OrderDetailDTO {
     private LocalDateTime createdAt;
     private String koiName;
     private int status;
-    private int totalServicePrice;
-    private List<Integer> serviceIds;
 }

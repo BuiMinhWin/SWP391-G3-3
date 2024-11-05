@@ -4,10 +4,12 @@ import com.example.demo.dto.request.OrderDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderDetail;
+import com.example.demo.entity.Services;
 import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.OrderMapper;
 import com.example.demo.repository.*;
+import com.example.demo.util.DistanceCalculator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -18,8 +20,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,14 +35,15 @@ public class OrderService {
     private JavaMailSender mailSender;
 
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+    private static final int RATE_PER_KM = 14000;
 
     private final OrderRepository orderRepository;
     private final AccountRepository accountRepository;
-    private final DocumentRepository documentRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final TransactionRepository transactionRepository;
     private final DeliveryStatusRepository deliveryStatusRepository;
     private final OrderMapper orderMapper;
+    private final ServicesRepository servicesRepository;
 
     private static final int STATUS_CANCELLED = 9000;
     private static final int STATUS_WAITING_APPROVAL = 0;
@@ -69,6 +74,15 @@ public class OrderService {
             logger.debug("Order status was invalid, set to: {}", STATUS_WAITING_APPROVAL);
         }
 
+        if (orderDTO.getServiceIds() != null && !orderDTO.getServiceIds().isEmpty()) {
+            String serviceIdsString = orderDTO.getServiceIds().stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
+            order.setServiceIds(serviceIdsString);
+        }
+
+        setServicePrices(orderDTO, order);
+
         order.setPaymentStatus(0);
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
@@ -79,6 +93,27 @@ public class OrderService {
 
         return orderMapper.mapToOrderDTO(savedOrder);
     }
+
+    private void setServicePrices(OrderDTO orderDTO, Order order) {
+        int totalServicePrice = 0;
+        Set<Services> servicesSet = new HashSet<>();
+
+        Set<Integer> requestedServiceIds = new HashSet<>(orderDTO.getServiceIds());
+
+        for (Integer serviceId : requestedServiceIds) {
+            Services service = servicesRepository.findById(serviceId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Service not found with id " + serviceId));
+
+            servicesSet.add(service);
+            totalServicePrice += service.getPrice();
+        }
+
+        order.setServices(servicesSet);
+
+        int distancePrice = DistanceCalculator.calculateTotalPrice(order.getDistance(), RATE_PER_KM);
+        order.setTotalPrice(totalServicePrice + distancePrice);
+    }
+
 
     public OrderDTO cancelOrder(String orderId) {
         logger.info("Cancelling Order with ID: {}", orderId);
@@ -183,11 +218,6 @@ public class OrderService {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
-
-        if (order.getDocuments() != null && !order.getDocuments().isEmpty()) {
-            documentRepository.deleteAll(order.getDocuments());
-            logger.info("Deleted {} documents associated with Order ID: {}", order.getDocuments().size(), orderId);
-        }
 
         if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
             orderDetailRepository.deleteAll(order.getOrderDetails());

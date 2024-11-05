@@ -19,21 +19,21 @@ public class DocumentController {
     @Autowired
     private DocumentService documentService;
 
-    @PostMapping(value = "/{orderId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{orderDetailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImage(
             @Parameter(description = "File to upload", required = true)
             @RequestPart("document_file") MultipartFile file,
-            @PathVariable("orderId") String orderId) throws IOException {
+            @PathVariable("orderDetailId") String orderDetailId) throws IOException {
 
-        String uploadImage = documentService.uploadImage(file, orderId);
+        String uploadImage = documentService.uploadImage(file, orderDetailId);
         return ResponseEntity.status(HttpStatus.OK).body(uploadImage);
     }
 
 
 
-    @GetMapping("/download/order/{orderId}")
-    public ResponseEntity<ByteArrayResource> downloadImage(@PathVariable String orderId) {
-        byte[] imageData = documentService.downloadImage(orderId);
+    @GetMapping("/download/order/{orderDetailId}")
+    public ResponseEntity<ByteArrayResource> downloadImage(@PathVariable String orderDetailId) {
+        byte[] imageData = documentService.downloadImage(orderDetailId);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)

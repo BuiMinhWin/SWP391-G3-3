@@ -12,7 +12,7 @@ import lombok.Setter;
 
 public class DocumentDTO {
     private String documentId;
-    private String orderId;
+    private String orderDetailId;
     private byte[] imageData;
     private String fileType;
     private String fileName;

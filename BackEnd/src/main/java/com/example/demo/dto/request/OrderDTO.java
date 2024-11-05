@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,5 +41,6 @@ public class OrderDTO {
 //    private double destinationLongitude;
     private double distance;
     private String vnpTxnRef;
+    private List<Integer> serviceIds;
 
 }

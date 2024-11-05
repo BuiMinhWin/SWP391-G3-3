@@ -28,6 +28,9 @@ public class OrderDetail {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
+    @OneToOne(mappedBy = "orderDetail", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Document document;
+
     @Column(name = "quantity")
     private int quantity;
 
@@ -48,19 +51,5 @@ public class OrderDetail {
 
     @Column(name = "status")
     private int status;
-
-    @Column(name = "total_service_price", columnDefinition = "INTEGER DEFAULT 0")
-    private int totalServicePrice;
-
-    @Column(name = "service_ids")
-    private String serviceIds;
-
-    @ManyToMany
-    @JoinTable(
-            name = "order_detail_services",
-            joinColumns = @JoinColumn(name = "order_detail_id"),
-            inverseJoinColumns = @JoinColumn(name = "services_id")
-    )
-    private Set<Services> services = new HashSet<>();
 
 }

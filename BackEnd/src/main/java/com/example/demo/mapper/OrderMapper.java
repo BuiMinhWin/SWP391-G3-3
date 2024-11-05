@@ -4,16 +4,22 @@ import com.example.demo.dto.request.OrderDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderDetail;
+import com.example.demo.entity.Services;
 import com.example.demo.util.DistanceCalculator;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component
 public class OrderMapper {
 
-    private static final int RATE_PER_KM = 14000;
-
     public OrderDTO mapToOrderDTO(Order order) {
+        List<Integer> serviceIds = order.getServices().stream()
+                .map(Services::getServicesId)
+                .collect(Collectors.toList());
+
         return new OrderDTO(
                 order.getOrderId(),
                 order.getAccount().getAccountId(),
@@ -33,16 +39,11 @@ public class OrderMapper {
                 order.getTotalPrice(),
                 order.getStatus(),
                 order.getPaymentStatus(),
-
                 order.getSale(),
                 order.getDeliver(),
-
-//                order.getOriginLatitude(),
-//                order.getOriginLongitude(),
-//                order.getDestinationLatitude(),
-//                order.getDestinationLongitude()
                 order.getDistance(),
-                order.getVnpTxnRef()
+                order.getVnpTxnRef(),
+                serviceIds
         );
     }
 
@@ -64,27 +65,11 @@ public class OrderMapper {
         order.setOrderNote(orderDTO.getOrderNote());
         order.setDeliver(orderDTO.getDeliver());
         order.setSale(orderDTO.getSale());
-
-//        double distance = DistanceCalculator.calculateDistance(
-//                orderDTO.getOriginLatitude(),
-//                orderDTO.getOriginLongitude(),
-//                orderDTO.getDestinationLatitude(),
-//                orderDTO.getDestinationLongitude()
-//        );
         order.setDistance(orderDTO.getDistance());
-
-        int calculatedTotalPrice = DistanceCalculator.calculateTotalPrice(orderDTO.getDistance(), RATE_PER_KM);
-        order.setTotalPrice(calculatedTotalPrice);
-
-
+        order.setTotalPrice(orderDTO.getTotalPrice());
         order.setStatus(orderDTO.getStatus());
         order.setPaymentStatus(orderDTO.getPaymentStatus());
         order.setVnpTxnRef(orderDTO.getVnpTxnRef());
-
-//        order.setOriginLatitude(orderDTO.getOriginLatitude());
-//        order.setOriginLongitude(orderDTO.getOriginLongitude());
-//        order.setDestinationLatitude(orderDTO.getDestinationLatitude());
-//        order.setDestinationLongitude(orderDTO.getDestinationLongitude());
 
         return order;
     }

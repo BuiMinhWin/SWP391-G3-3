@@ -1,12 +1,11 @@
 package com.example.demo.service.iml;
 
 import com.example.demo.entity.Document;
-import com.example.demo.entity.Order;
+import com.example.demo.entity.OrderDetail;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.DocumentRepository;
-import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.util.ImageUtils;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,18 +17,18 @@ import java.io.IOException;
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
-    private final OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
-    public String uploadImage(MultipartFile file, String orderId) throws IOException {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+    public String uploadImage(MultipartFile file, String orderDetailId) throws IOException {
+        OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order detail not found with id: " + orderDetailId));
 
         Document imageData = documentRepository.save(
                 Document.builder()
                         .fileName(file.getOriginalFilename())
                         .fileType(file.getContentType())
                         .imageData(ImageUtils.compressImage(file.getBytes()))
-                        .order(order)
+                        .orderDetail(orderDetail)
                         .build()
         );
 
@@ -39,10 +38,10 @@ public class DocumentService {
         return null;
     }
 
-    public byte[] downloadImage(String orderId) {
+    public byte[] downloadImage(String orderDetailId) {
         // Find the document associated with the given orderId
-        Document document = documentRepository.findByOrderOrderId(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found for order with id: " + orderId));
+        Document document = documentRepository.findByOrderDetailOrderDetailId(orderDetailId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found for order with id: " + orderDetailId));
 
         // Decompress the image data before returning
         return ImageUtils.decompressImage(document.getImageData());

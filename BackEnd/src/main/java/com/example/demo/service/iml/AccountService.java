@@ -142,8 +142,8 @@ public class AccountService {
     public AccountDTO createAccountGG(AccountDTO accountDTO) {
         Account existingAccount = accountRepository.findByEmail(accountDTO.getEmail());
         if (existingAccount != null) {
-            if(accountDTO.getStatus() == 0){
-                return null;
+            if (existingAccount.getStatus() == 0) {
+                throw new IllegalArgumentException("Account status is not valid for creation.");
             }
             return AccountMapper.maptoAccountDTO(existingAccount);
         }

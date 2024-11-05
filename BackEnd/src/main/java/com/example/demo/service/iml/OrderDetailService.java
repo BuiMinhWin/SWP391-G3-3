@@ -50,77 +50,11 @@ public class OrderDetailService {
             orderDetail.setStatus(1);
         }
 
-        if (orderDetailDTO.getServiceIds() != null && !orderDetailDTO.getServiceIds().isEmpty()) {
-            String serviceIdsString = orderDetailDTO.getServiceIds().stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining(","));
-            orderDetail.setServiceIds(serviceIdsString);
-        }
-
-        setServicePrices(orderDetailDTO, orderDetail);
-
         System.out.println("Creating OrderDetail with Order ID: " + orderDetail.getOrder().getOrderId());
 
         OrderDetail savedOrderDetail = orderDetailRepository.save(orderDetail);
 
         return OrderDetailMapper.mapToOrderDetailDTO(savedOrderDetail);
-    }
-
-    private void setServicePrices(OrderDetailDTO orderDetailDTO, OrderDetail orderDetail) {
-        int totalServicePrice = 0;
-        Set<Services> servicesSet = new HashSet<>();
-
-        Set<Integer> requestedServiceIds = new HashSet<>();
-        if (orderDetailDTO.getServiceIds() != null && !orderDetailDTO.getServiceIds().isEmpty()) {
-            for (Integer serviceIdStr : orderDetailDTO.getServiceIds()) {
-                try {
-                    Integer serviceId = Integer.valueOf(serviceIdStr);
-                    requestedServiceIds.add(serviceId);
-                } catch (NumberFormatException e) {
-                    System.err.println("Invalid service ID format: " + serviceIdStr);
-                }
-            }
-        }
-
-
-        int servicePrice1 = 0;
-        int servicePrice2 = 0;
-        int servicePrice3 = 0;
-
-        for (Integer serviceId : requestedServiceIds) {
-            Services service = servicesRepository.findById(serviceId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Service not found with id " + serviceId));
-            servicesSet.add(service);
-
-            switch (serviceId) {
-                case 1:
-                    servicePrice1 = service.getPrice();
-                    break;
-                case 2:
-                    servicePrice2 = service.getPrice();
-                    break;
-                case 3:
-                    servicePrice3 = service.getPrice();
-                    break;
-                default:
-                    break;
-            }
-
-            totalServicePrice += service.getPrice();
-        }
-
-        if (!requestedServiceIds.contains(1)) {
-            servicePrice1 = 0;
-        }
-        if (!requestedServiceIds.contains(2)) {
-            servicePrice2 = 0;
-        }
-        if (!requestedServiceIds.contains(3)) {
-            servicePrice3 = 0;
-        }
-
-        orderDetail.setServices(servicesSet);
-        orderDetail.setTotalServicePrice(totalServicePrice);
     }
 
 
