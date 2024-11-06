@@ -132,10 +132,17 @@ public class AccountService {
         return AccountMapper.maptoAccountDTO(updatedAccount);
     }
 
-    public void deactivateAccount(String accountId) {
+    public void deActivateAccount(String accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
         account.setStatus(0);
+        accountRepository.save(account);
+    }
+
+    public void activateAccount(String accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account does not exist with id: " + accountId));
+        account.setStatus(1);
         accountRepository.save(account);
     }
 

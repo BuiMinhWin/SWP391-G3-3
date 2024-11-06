@@ -63,6 +63,10 @@ public class OrderService {
 
         logger.info("Account found: {}", account);
 
+        if (account.getStatus() == 0) {
+            throw new IllegalArgumentException("Account is inactive. Order creation is not allowed.");
+        }
+
         Order order = orderMapper.mapToOrder(orderDTO, account);
 
         if (order.getOrderDate() == null) {

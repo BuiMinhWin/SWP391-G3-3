@@ -39,11 +39,10 @@ public class DocumentService {
     }
 
     public byte[] downloadImage(String orderDetailId) {
-        // Find the document associated with the given orderId
+
         Document document = documentRepository.findByOrderDetailOrderDetailId(orderDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found for order with id: " + orderDetailId));
 
-        // Decompress the image data before returning
         return ImageUtils.decompressImage(document.getImageData());
     }
 

@@ -49,9 +49,15 @@ public class AccountController {
 
 
     @PatchMapping("/deActive/{accountId}")
-    public ResponseEntity<String> deactivateAccount(@PathVariable String accountId) {
-        accountService.deactivateAccount(accountId);
+    public ResponseEntity<String> deActivateAccount(@PathVariable String accountId) {
+        accountService.deActivateAccount(accountId);
         return ResponseEntity.ok("Account status set to inactive (soft delete) successfully.");
+    }
+
+    @PatchMapping("/active/{accountId}")
+    public ResponseEntity<String> activateAccount(@PathVariable String accountId) {
+        accountService.activateAccount(accountId);
+        return ResponseEntity.ok("Account status set to active successfully.");
     }
 
 

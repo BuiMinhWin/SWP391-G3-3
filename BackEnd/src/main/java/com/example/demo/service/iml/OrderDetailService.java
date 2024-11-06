@@ -7,13 +7,11 @@ import com.example.demo.mapper.OrderDetailMapper;
 import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ServicesRepository;
-import com.example.demo.repository.ServicesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import java.time.LocalDateTime;
@@ -34,30 +32,33 @@ public class OrderDetailService {
         this.servicesRepository = servicesRepository; // Khởi tạo biến
     }
 
-    public OrderDetailDTO createOrderDetail(OrderDetailDTO orderDetailDTO) {
-        System.out.println("Received OrderDetailDTO: " + orderDetailDTO);
+    public List<OrderDetailDTO> createOrderDetail(List<OrderDetailDTO> orderDetailDTOs) {
+        List<OrderDetailDTO> savedOrderDetails = new ArrayList<>();
 
-        Order order = orderRepository.findById(orderDetailDTO.getOrderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderDetailDTO.getOrderId()));
+        for (OrderDetailDTO orderDetailDTO : orderDetailDTOs) {
+            System.out.println("Received OrderDetailDTO: " + orderDetailDTO);
 
-        OrderDetail orderDetail = OrderDetailMapper.mapToOrderDetail(orderDetailDTO, order);
+            Order order = orderRepository.findById(orderDetailDTO.getOrderId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderDetailDTO.getOrderId()));
 
-        if (orderDetailDTO.getCreatedAt() == null) {
-            orderDetail.setCreatedAt(LocalDateTime.now());
+            OrderDetail orderDetail = OrderDetailMapper.mapToOrderDetail(orderDetailDTO, order);
+
+            if (orderDetailDTO.getCreatedAt() == null) {
+                orderDetail.setCreatedAt(LocalDateTime.now());
+            }
+
+            if (orderDetailDTO.getStatus() == 0) {
+                orderDetail.setStatus(1);
+            }
+
+            System.out.println("Creating OrderDetail with Order ID: " + orderDetail.getOrder().getOrderId());
+
+            OrderDetail savedOrderDetail = orderDetailRepository.save(orderDetail);
+
+            savedOrderDetails.add(OrderDetailMapper.mapToOrderDetailDTO(savedOrderDetail));
         }
-
-        if (orderDetailDTO.getStatus() == 0) {
-            orderDetail.setStatus(1);
-        }
-
-        System.out.println("Creating OrderDetail with Order ID: " + orderDetail.getOrder().getOrderId());
-
-        OrderDetail savedOrderDetail = orderDetailRepository.save(orderDetail);
-
-        return OrderDetailMapper.mapToOrderDetailDTO(savedOrderDetail);
+        return savedOrderDetails;
     }
-
-
 
     public List<OrderDetailDTO> getOrderDetailsByOrderId(String orderId) {
         List<OrderDetail> orderDetails = orderDetailRepository.findByOrder_OrderId(orderId);

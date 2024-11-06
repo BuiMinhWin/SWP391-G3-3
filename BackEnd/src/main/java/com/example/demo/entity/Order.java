@@ -109,7 +109,7 @@ public class Order {
     @Column(name = "service_ids")
     private String serviceIds;
 
-    @OneToMany
+    @ManyToMany
     @JoinTable(
             name = "order_services",
             joinColumns = @JoinColumn(name = "order_id"),

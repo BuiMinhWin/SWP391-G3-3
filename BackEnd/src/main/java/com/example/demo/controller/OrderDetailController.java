@@ -22,11 +22,9 @@ public class OrderDetailController {
     private ServicesService servicesService;
 
     @PostMapping("/create")
-    public ResponseEntity<OrderDetailDTO> createOrderDetail(@RequestBody OrderDetailDTO orderDetailDTO) {
-        OrderDetailDTO savedOrderDetail = orderDetailService.createOrderDetail(orderDetailDTO);
-
-        ServicesDTO servicesDTO = new ServicesDTO();
-        return new ResponseEntity<>(savedOrderDetail, HttpStatus.CREATED);
+    public ResponseEntity<List<OrderDetailDTO>> createMultipleOrderDetails(@RequestBody List<OrderDetailDTO> orderDetailDTOs) {
+        List<OrderDetailDTO> createdOrderDetails = orderDetailService.createOrderDetail(orderDetailDTOs);
+        return new ResponseEntity<>(createdOrderDetails, HttpStatus.CREATED);
     }
 
     @GetMapping("/order/{orderId}")
