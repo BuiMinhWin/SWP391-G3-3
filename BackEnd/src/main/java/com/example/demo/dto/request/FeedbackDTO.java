@@ -18,7 +18,7 @@ public class FeedbackDTO {
     private String orderId;
     private int rating;
     private String comment;
-    private List<FeedbackDTO> responses;
+    private FeedbackDTO responses;
     private LocalDateTime createdAt;
     private String accountId;
 }

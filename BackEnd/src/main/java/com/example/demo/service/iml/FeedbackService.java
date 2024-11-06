@@ -86,15 +86,7 @@ public class FeedbackService {
         responseFeedback.setCreatedAt(LocalDateTime.now());
 
         responseFeedback.setParentFeedback(customerFeedback);
-
-        Feedback savedResponseFeedback = feedbackRepository.save(responseFeedback);
-
-        List<Feedback> responses = customerFeedback.getResponses();
-        if (responses == null) {
-            responses = new ArrayList<>();
-        }
-        responses.add(savedResponseFeedback);
-        customerFeedback.setResponses(responses);
+        customerFeedback.setResponse(responseFeedback);
 
         feedbackRepository.save(customerFeedback);
 

@@ -19,12 +19,8 @@ public class FeedbackMapper {
         feedbackDTO.setCreatedAt(feedback.getCreatedAt());
         feedbackDTO.setAccountId(feedback.getAccount().getAccountId());
 
-        if (feedback.getResponses() != null && !feedback.getResponses().isEmpty()) {
-            feedbackDTO.setResponses(
-                    feedback.getResponses().stream()
-                            .map(FeedbackMapper::maptoFeedbackDTO)
-                            .collect(Collectors.toList())
-            );
+        if (feedback.getResponse() != null) {
+            feedbackDTO.setResponses(maptoFeedbackDTO(feedback.getResponse()));
         } else {
             feedbackDTO.setResponses(null);
         }
@@ -41,12 +37,12 @@ public class FeedbackMapper {
         feedback.setRating(feedbackDTO.getRating());
         feedback.setCreatedAt(feedbackDTO.getCreatedAt());
 
-        if (feedbackDTO.getResponses() != null && !feedbackDTO.getResponses().isEmpty()) {
-            List<Feedback> responses = feedbackDTO.getResponses().stream()
-                    .map(responseDTO -> mapToFeedback(responseDTO, order, account))
-                    .collect(Collectors.toList());
-            responses.forEach(response -> response.setParentFeedback(feedback));
-            feedback.setResponses(responses);
+        if (feedbackDTO.getResponses() != null) {
+            Feedback response = mapToFeedback(feedbackDTO.getResponses(), order, account);
+            response.setParentFeedback(feedback);
+            feedback.setResponse(response);
+        } else {
+            feedback.setResponse(null);
         }
 
         return feedback;

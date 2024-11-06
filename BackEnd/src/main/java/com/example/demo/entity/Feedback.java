@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,12 +39,12 @@ public class Feedback {
     @Column(name = "comment")
     private String comment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_feedback_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_feedback_id", unique = true)
     private Feedback parentFeedback;
 
     @OneToOne(mappedBy = "parentFeedback", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Feedback> responses = new ArrayList<>();
+    private Feedback response;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -17,7 +17,6 @@ public class Document {
     @Column(name = "document_id", columnDefinition = "CHAR(36)")
     private String documentId;
 
-    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_detail_id", nullable = false, unique = true)
     private OrderDetail orderDetail;

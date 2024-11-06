@@ -31,14 +31,11 @@ public class FeedbackController {
     }
 
     @GetMapping("/getAllFeedbackByOrderId/{orderId}")
-    public ResponseEntity<List<FeedbackDTO>> getServiceByOrderId(@PathVariable String orderId) {
+    public ResponseEntity<List<FeedbackDTO>> getFeedbacksByOrderId(@PathVariable String orderId) {
         List<Feedback> feedbacks = feedbackRepository.findByOrder_OrderId(orderId);
 
-        List<Feedback> parentFeedbacks = feedbacks.stream()
+        List<FeedbackDTO> parentFeedbackDTOs = feedbacks.stream()
                 .filter(feedback -> feedback.getParentFeedback() == null)
-                .collect(Collectors.toList());
-
-        List<FeedbackDTO> parentFeedbackDTOs = parentFeedbacks.stream()
                 .map(FeedbackMapper::maptoFeedbackDTO)
                 .collect(Collectors.toList());
 
