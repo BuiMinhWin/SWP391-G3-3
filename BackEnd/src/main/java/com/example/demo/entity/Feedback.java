@@ -42,7 +42,7 @@ public class Feedback {
     @JoinColumn(name = "parent_feedback_id")
     private Feedback parentFeedback;
 
-    @OneToMany(mappedBy = "parentFeedback", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "parentFeedback", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Feedback> responses = new ArrayList<>();
 
     @Column(name = "created_at")
