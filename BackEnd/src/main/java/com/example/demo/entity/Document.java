@@ -19,7 +19,7 @@ public class Document {
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_detail_id", nullable = false)
+    @JoinColumn(name = "order_detail_id", nullable = false, unique = true)
     private OrderDetail orderDetail;
 
     @Lob
