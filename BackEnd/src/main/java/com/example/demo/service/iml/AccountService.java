@@ -1,6 +1,5 @@
 package com.example.demo.service.iml;
 
-import com.example.demo.Login.LoginMessage;
 import com.example.demo.dto.request.AccountDTO;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.IdGenerator;
@@ -11,8 +10,6 @@ import com.example.demo.util.ImageUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.demo.exception.ResourceNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
@@ -150,7 +147,7 @@ public class AccountService {
         Account existingAccount = accountRepository.findByEmail(accountDTO.getEmail());
         if (existingAccount != null) {
             if (existingAccount.getStatus() == 0) {
-                throw new IllegalArgumentException("Account status is not valid for creation.");
+                throw new IllegalArgumentException("Your account have been deActive.");
             }
             return AccountMapper.maptoAccountDTO(existingAccount);
         }
