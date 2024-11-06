@@ -38,6 +38,7 @@ import CheckboxWrapper from "../FromUI/Checkbox";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import axios from "axios";
 import { useSnackbar } from "notistack";
+import ServiceSelect from "../FromUI/SelectServices";
 
 const buttonStyles = {
   backgroundColor: "#161A31",
@@ -84,14 +85,14 @@ const INITIAL_FORM_STATE = {
   koi_image: "",
   freight: "",
   serviceIds: [],
+  document_file: null,
+  orderNote: "",
   orderDetails: [
     {
-      koi_type: "",
-      koi_name: "",
+      koiType: "",
+      koiName: "",
       weight: 0.0,
       quantity: 0,
-      document_file: null,
-      orderNote: "",
     },
   ],
 };
@@ -117,10 +118,11 @@ const FORM_VALIDATION = Yup.object().shape({
   termsOfService: Yup.boolean()
     .oneOf([true], "The terms and conditions must be accepted.")
     .required("The terms and conditions must be accepted."),
+  orderNote: Yup.string().nullable(),
   orderDetails: Yup.array().of(
     Yup.object().shape({
-      koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"),
-      koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"),
+      koiType: Yup.string().required("Vui lòng nhập loại cá Koi"),
+      koiName: Yup.string().required("Vui lòng nhập tên cá Koi"),
       weight: Yup.number()
         .min(0.1, "Cân nặng phải lớn hơn 0")
         .max(50, "Cá Koi kỷ lục thể giới chỉ đạt 41kg!")
@@ -140,23 +142,19 @@ const FORM_VALIDATION = Yup.object().shape({
           "Only PDF files are allowed",
           (value) => value && value.type === "application/pdf"
         ),
-      orderNote: Yup.string().nullable(),
     })
   ),
 });
 
 const OrderForm = () => {
-  const services = [
-    { id: 1, label: "Bảo hiểm" },
-    { id: 2, label: "Chăm sóc cá" },
-    { id: 3, label: "Người nhận thanh toán" },
-  ];
-
   const navigate = useNavigate();
+  const orderDetailsToSend = [];
+
   // state lưu danh sáchh tỉnh, phường, quận người gửi
   const [provincesS, setProvincesS] = useState([]);
   const [districtsS, setDistrictsS] = useState([]);
   const [wardsS, setWardsS] = useState([]);
+
   // state lưu danh sáchh tỉnh, phường, quận người nhận
   const [provincesR, setProvincesR] = useState([]);
   const [districtsR, setDistrictsR] = useState([]);
@@ -369,6 +367,7 @@ const OrderForm = () => {
             senderNote: values.senderNote,
             orderNote: values.orderNote,
             distance: distance,
+            serviceIds: values.serviceIds,
           };
 
           const orderResponse = await createOrder(orderData);
@@ -381,23 +380,73 @@ const OrderForm = () => {
           const newOrderId = orderResponse.orderId;
           console.log("Order created with ID:", newOrderId);
 
-          const uploadResponse = await uploadDocument(
-            values.document_file,
-            newOrderId
-          );
-          console.log("File uploaded successfully:", uploadResponse);
+          for (const orderDetail of values.orderDetails) {
+            try {
+              const { document_file, ...orderDetailData } = orderDetail;
 
-          const orderDetails = values.orderDetails.map((detail) => ({
-            ...detail,
-            orderId: newOrderId, // Use the newly created orderId
-          }));
-          for (const detail of orderDetails) {
-            const orderDetailResponse = await createOrderDetail(detail);
-            console.log(
-              "Order detail created successfully:",
-              orderDetailResponse
-            );
+              const orderDetailToSend = {
+                ...orderDetailData,
+                orderId: newOrderId,
+              };
+
+              orderDetailsToSend.push(orderDetailToSend); // Add the prepared order detail to the array
+
+              console.log(
+                "Data prepared for createOrderDetail:",
+                orderDetailToSend
+              );
+
+              // Create the order detail (without document_file)
+              const orderDetailResponse = await createOrderDetail(
+                orderDetailsToSend
+              );
+
+              console.log(
+                "Order detail created successfully:",
+                orderDetailResponse
+              );
+
+              // Handle the document upload separately
+              for (let i = 0; i < orderDetailResponse.length; i++) {
+                try {
+                  const orderDetail = orderDetailResponse[i];
+                  const documentFile = values.orderDetails[i].document_file;
+
+                  // Log the file and corresponding orderDetailId for debugging
+                  console.log("Preparing file upload:", {
+                    orderDetailId: orderDetail.orderDetailId,
+                    file: documentFile,
+                  });
+
+                  if (documentFile) {
+                    const formData = new FormData();
+                    formData.append("document_file", documentFile);
+                    console.log("form data format being sent", formData);
+
+                    // Pass orderDetailId in the URL
+                    await uploadDocument(orderDetail.orderDetailId, formData);
+                    console.log(
+                      "Document uploaded successfully for order detail:",
+                      orderDetail.orderDetailId
+                    );
+                  }
+                } catch (error) {
+                  console.error(
+                    "Error uploading document for order detail:",
+                    error
+                  );
+                }
+              }
+            } catch (error) {
+              console.error("Error processing order detail:", error);
+            }
           }
+
+          console.log(
+            "All order details prepared for submission:",
+            orderDetailsToSend
+          );
+
           navigate("/checkout", { state: { orderId: newOrderId } });
         } catch (error) {
           enqueueSnackbar("Đã xảy ra lỗi trong quá trình tạo đơn", {
@@ -412,6 +461,8 @@ const OrderForm = () => {
       validateOnMount={true}
     >
       {({ handleSubmit, errors, setFieldValue, values }) => {
+        console.log("Form values on submit:", values);
+        console.log("OrderDetail value on submit:", values.orderDetails);
         console.log("Validation errors:", errors); // Log validation errors
         const handleSenderProvinceChange = (event) => {
           const selectedProvince = provincesS.find(
@@ -702,14 +753,14 @@ const OrderForm = () => {
                           <Grid container spacing={3}>
                             <Grid item xs={6}>
                               <SelectWrapper
-                                name={`orderDetails.${index}.koi_type`}
+                                name={`orderDetails.${index}.koiType`}
                                 label="Loại cá Koi"
                                 options={koi_type}
                               />
                             </Grid>
                             <Grid item xs={6}>
                               <SelectWrapper
-                                name={`orderDetails.${index}.koi_name`}
+                                name={`orderDetails.${index}.koiName`}
                                 label="Biến thể Koi"
                                 options={koi_name}
                               />
@@ -739,14 +790,6 @@ const OrderForm = () => {
                                 name={`orderDetails.${index}.document_file`}
                               />
                             </Grid>
-                            <Grid item xs={12}>
-                              <TextFieldWrapper
-                                name={`orderDetails.${index}.description`}
-                                label="Ghi chú"
-                                multiline
-                                rows={4}
-                              />
-                            </Grid>
                             <Grid item xs={6}>
                               <Button
                                 variant="outlined"
@@ -768,12 +811,10 @@ const OrderForm = () => {
                                 startIcon={<AddIcon />}
                                 onClick={() =>
                                   push({
-                                    koi_type: "",
-                                    koi_name: "",
+                                    koiType: "",
+                                    koiName: "",
                                     weight: 0.0,
                                     quantity: 0,
-                                    document_file: null,
-                                    orderNote: "",
                                   })
                                 }
                               >
@@ -793,6 +834,14 @@ const OrderForm = () => {
                     Tùy chọn bưu gửi
                   </Typography>
                   <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <TextFieldWrapper
+                        name="orderNote"
+                        label="Ghi chú"
+                        multiline
+                        rows={4}
+                      />
+                    </Grid>
                     <Grid item xs={12}>
                       <CustomRadioGroup
                         name="freight"
@@ -835,14 +884,12 @@ const OrderForm = () => {
                       justifyContent="center"
                       alignItems="center"
                     >
-                      {services.map((service) => (
-                        <RadioGroupWrapper
-                          key={service.id}
-                          service={service}
-                          serviceIds={values.serviceIds} // Pass serviceIds from Formik state
-                          setFieldValue={setFieldValue} // Ensure it can update the Formik state
-                        />
-                      ))}
+                      <ServiceSelect
+                        value={values.serviceIds}
+                        onChange={(event) =>
+                          setFieldValue("serviceIds", event.target.value)
+                        }
+                      />
                     </Grid>
                   </Grid>
                   <Divider

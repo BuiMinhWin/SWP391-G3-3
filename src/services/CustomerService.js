@@ -1,13 +1,15 @@
 import axios from "axios";
 
-
 const REST_API_ORDER_URL = "http://koideliverysystem.id.vn:8080/api/orders";
 const REST_API_ORDER_DETAIL_URL =
   "http://koideliverysystem.id.vn:8080/api/ordersDetail";
 const REST_API_DOCUMENT_URL =
   "http://koideliverysystem.id.vn:8080/api/documents";
 const REST_API_ACCOUNT_URL = "http://koideliverysystem.id.vn:8080/api/accounts";
-const REST_API_DELI_URL = "http://koideliverysystem.id.vn:8080/api/deliveryStatus"
+const REST_API_DELI_URL =
+  "http://koideliverysystem.id.vn:8080/api/deliveryStatus";
+const REST_API_SERVICES_URL =
+  "http://koideliverysystem.id.vn:8080/api/services";
 
 export const createOrder = async (orderData) => {
   try {
@@ -29,36 +31,30 @@ export const createOrder = async (orderData) => {
   }
 };
 
-export const uploadDocument = async (file, orderId) => {
-  const formData = new FormData();
-  formData.append("document_file", file);
-  formData.append("orderId", orderId); // Attach orderId to the form data
-
-  try {
-    const response = await axios.post(
-      `${REST_API_DOCUMENT_URL}/${orderId}`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("File upload failed:", error);
-    throw new Error("Upload failed");
-  }
+export const uploadDocument = (orderDetailId, formData) => {
+  return axios.post(`http://koideliverysystem.id.vn:8080/api/documents/${orderDetailId}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
+
+
 
 export const createOrderDetail = async (orderDetailData) => {
   try {
     const response = await axios.post(
       `${REST_API_ORDER_DETAIL_URL}/create`,
-      orderDetailData
+      orderDetailData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          // Add any other headers here, e.g., authorization if needed
+        },
+      }
     );
     console.log("Order detail created successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error creating order:", error.response || error.message);
+    console.error("Error creating order detail:", error.response || error.message);
     throw error;
   }
 };
@@ -214,5 +210,21 @@ export const getDeliveryStatusByOrderId = async (orderId) => {
   } catch (error) {
     console.error("Error fetching delivery status:", error);
     throw error;
+  }
+};
+
+
+export const fetchServices = async () => {
+  try {
+    const response = await fetch(`${REST_API_SERVICES_URL}`); 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const servicesData = await response.json();
+    console.log("Fetched Services Data:", servicesData);
+    return servicesData;
+  } catch (error) {
+    console.error("Error fetching services:", error);
+    return [];
   }
 };

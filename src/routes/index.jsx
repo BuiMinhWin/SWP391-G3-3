@@ -33,7 +33,7 @@ import ServiceComponent from "../components/Manager/ServiceComponent";
 import RespondFeedBack from "../components/SaleStaff/ResponseFeedback";
 import AboutUs from "../pages/AboutUs/AboutUsComponent";
 import Support from "../pages/Support/SupportComponent";
-import DeliveryStatusPopup from "../components/DeliveryTracking";
+import PaymentOutcome from "../pages/CheckoutPage/PaymentOutcome";
 
 function index() {
   return (
