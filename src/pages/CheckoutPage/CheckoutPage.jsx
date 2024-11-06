@@ -62,7 +62,7 @@ const CheckoutPage = () => {
 
   const [orderData, setOrderData] = useState(null);
   const [orderDetailData, setOrderDetailData] = useState([]);
-  const [serviceStatusData, setServiceStatusData] = useState([]);
+  // const [serviceStatusData, setServiceStatusData] = useState([]);
   const [error, setError] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
 

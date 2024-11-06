@@ -380,76 +380,56 @@ const OrderForm = () => {
           const newOrderId = orderResponse.orderId;
           console.log("Order created with ID:", newOrderId);
 
+          // Clear orderDetailsToSend array for each submission
+          const orderDetailsToSend = [];
+
           for (const orderDetail of values.orderDetails) {
-            try {
-              const { document_file, ...orderDetailData } = orderDetail;
+            const { document_file, ...orderDetailData } = orderDetail;
 
-              const orderDetailToSend = {
-                ...orderDetailData,
-                orderId: newOrderId,
-              };
+            const orderDetailToSend = {
+              ...orderDetailData,
+              orderId: newOrderId,
+            };
 
-              orderDetailsToSend.push(orderDetailToSend); // Add the prepared order detail to the array
+            orderDetailsToSend.push(orderDetailToSend);
+            console.log(
+              "Data prepared for createOrderDetail:",
+              orderDetailToSend
+            );
+          }
 
+          const orderDetailResponses = await createOrderDetail(
+            orderDetailsToSend
+          );
+          console.log(
+            "Order details created successfully:",
+            orderDetailResponses
+          );
+
+          // Handle document upload for each order detail
+          for (let i = 0; i < orderDetailResponses.length; i++) {
+            const orderDetailResponse = orderDetailResponses[i];
+            const documentFile = values.orderDetails[i]?.document_file;
+
+            if (documentFile) {
+              const formData = new FormData();
+              formData.append("document_file", documentFile);
+              console.log("Uploading document:", {
+                orderDetailId: orderDetailResponse.orderDetailId,
+                file: documentFile,
+              });
+
+              await uploadDocument(orderDetailResponse.orderDetailId, formData);
               console.log(
-                "Data prepared for createOrderDetail:",
-                orderDetailToSend
+                "Document uploaded for order detail:",
+                orderDetailResponse.orderDetailId
               );
-
-              // Create the order detail (without document_file)
-              const orderDetailResponse = await createOrderDetail(
-                orderDetailsToSend
-              );
-
-              console.log(
-                "Order detail created successfully:",
-                orderDetailResponse
-              );
-
-              // Handle the document upload separately
-              for (let i = 0; i < orderDetailResponse.length; i++) {
-                try {
-                  const orderDetail = orderDetailResponse[i];
-                  const documentFile = values.orderDetails[i].document_file;
-
-                  // Log the file and corresponding orderDetailId for debugging
-                  console.log("Preparing file upload:", {
-                    orderDetailId: orderDetail.orderDetailId,
-                    file: documentFile,
-                  });
-
-                  if (documentFile) {
-                    const formData = new FormData();
-                    formData.append("document_file", documentFile);
-                    console.log("form data format being sent", formData);
-
-                    // Pass orderDetailId in the URL
-                    await uploadDocument(orderDetail.orderDetailId, formData);
-                    console.log(
-                      "Document uploaded successfully for order detail:",
-                      orderDetail.orderDetailId
-                    );
-                  }
-                } catch (error) {
-                  console.error(
-                    "Error uploading document for order detail:",
-                    error
-                  );
-                }
-              }
-            } catch (error) {
-              console.error("Error processing order detail:", error);
             }
           }
 
-          console.log(
-            "All order details prepared for submission:",
-            orderDetailsToSend
-          );
-
           navigate("/checkout", { state: { orderId: newOrderId } });
         } catch (error) {
-          enqueueSnackbar("Đã xảy ra lỗi trong quá trình tạo đơn", {
+          enqueueSnackbar("An error occurred while creating the order", {
             variant: "error",
           });
           console.error("Error creating order:", error);
