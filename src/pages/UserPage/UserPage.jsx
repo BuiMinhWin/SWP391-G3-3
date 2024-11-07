@@ -1,220 +1,179 @@
-  import React, { useEffect, useState } from "react";
-  import { Box, Grid, Paper, Typography } from "@mui/material";
-  import { Formik, Form } from "formik";
-  import * as Yup from "yup";
-  import TextFieldWrapper from "../../components/FromUI/Textfield";
-  import ButtonWrapper from "../../components/FromUI/Button";
-  import { getAccountById, updateAccount } from "../../services/CustomerService";
-  import SelectWrapper from "../../components/FromUI/Select";
-  import { FaLongArrowAltLeft } from "react-icons/fa";
-  import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import { getAccountById, getAvatar, updateAccount, updateAvatar } from "../../services/CustomerService";
+import TextfieldWrapper from "../../components/FromUI/Textfield";
+import { Box, Paper, Typography, Divider, Grid, Avatar, Button } from "@mui/material";
+import ButtonWrapper from "../../components/FromUI/Button";
+import { useSnackbar } from "notistack";
 
-  
-  const INITIAL_FORM_STATE = {
-    firstName: "",
-    lastName: "",
-    userName: "",
-    password: "",
-    email: "",
-    phone: "",
-    avatar: "",
-    roleId: "",
+const INITIAL_FORM_STATE = {
+  firstName: "",
+  lastName: "",
+  userName: "",
+  email: "",
+  phone: "",
+};
+
+const FORM_VALIDATION = Yup.object().shape({
+  firstName: Yup.string().required("First name is required").max(50),
+  lastName: Yup.string().required("Last name is required").max(50),
+  userName: Yup.string()
+    .required("Username is required")
+    .max(30)
+    .matches(/^[a-zA-Z0-9]+$/, "Username can only contain letters and numbers"),
+  email: Yup.string().required("Email is required").email("Email is invalid"),
+  phone: Yup.string()
+    .required("Phone number is required")
+    .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
+});
+
+const AccountForm = () => {
+  const { enqueueSnackbar } = useSnackbar();
+  const [initialValues, setInitialValues] = useState(INITIAL_FORM_STATE);
+  const [avatar, setAvatar] = useState(null); // Avatar preview URL
+  const [newAvatar, setNewAvatar] = useState(null); // New avatar file
+  const [loading, setLoading] = useState(true);
+  const accountId = localStorage.getItem("accountId");
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      try {
+        const accountData = await getAccountById(accountId);
+        setInitialValues({
+          firstName: accountData.firstName,
+          lastName: accountData.lastName,
+          userName: accountData.userName,
+          email: accountData.email,
+          phone: accountData.phone,
+        });
+
+        const avatarUrl = await getAvatar(accountId);
+        
+        setAvatar(avatarUrl);
+      } catch (error) {
+        console.error("Error fetching account data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (accountId) fetchAccount();
+  }, [accountId]);
+
+  const handleAvatarChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setNewAvatar(file);
+      setAvatar(URL.createObjectURL(file));
+    }
   };
 
-  const FORM_VALIDATION = Yup.object().shape({
-    firstName: Yup.string().required("Vui lòng nhập tên"),
-    lastName: Yup.string().required("Vui lòng nhập họ"),
-    userName: Yup.string().required("Vui lòng nhập tên người dùng"),
-    password: Yup.string().required("Vui lòng nhập mật khẩu"),
-    email: Yup.string()
-      .email("Email không hợp lệ")
-      .required("Vui lòng nhập email"),
-    phone: Yup.string()
-      .matches(/^[0-9]+$/, "Số điện thoại phải là số")
-      .required("Vui lòng nhập số điện thoại"),
-    roleId: Yup.string().required("Vui lòng chọn vai trò người dùng"),
-  });
+  if (loading) return <div>Loading...</div>;
 
-  const AccountForm = () => {
-    const [initialValues, setInitialValues] = useState(INITIAL_FORM_STATE);
-    const accountId = localStorage.getItem("accountId"); // Get accountId from localStorage
-
-    useEffect(() => {
-      const fetchAccount = async () => {
+  return (
+    <Formik
+      enableReinitialize
+      initialValues={initialValues}
+      validationSchema={FORM_VALIDATION}
+      onSubmit={async (values, { setSubmitting, setErrors }) => {
         try {
-          console.log("Fetching account details for accountId:", accountId); // Debug log
-          const accountData = await getAccountById(accountId);
-          console.log("Account data fetched:", accountData); // Debug log
+          const accountUpdate = updateAccount(accountId, values);
+          let avatarUpdate = Promise.resolve();
 
-          setInitialValues({
-            firstName: accountData.firstName,
-            lastName: accountData.lastName,
-            userName: accountData.userName,
-            password: accountData.password,
-            email: accountData.email,
-            phone: accountData.phone,
-            avatar: accountData.avatar,
-            roleId:accountData.roleId,
-          });
-        } catch (error) {
-          console.error("Error fetching account:", error);
-        }
-      };
-
-      fetchAccount();
-    }, [accountId]);
-    const navigate = useNavigate();
-    const roleId = localStorage.getItem('roleId'); 
-    return (
-      <Formik
-        initialValues={initialValues}
-        enableReinitialize={true} // Ensures the form reinitializes when initialValues change
-        validationSchema={FORM_VALIDATION}
-        onSubmit={async (values, { setSubmitting, setErrors }) => {
-          console.log("Form values before submission:", values); // Debugging log
-
-          try {
-            console.log("Updating account with accountId:", accountId); // Debugging log
-            await updateAccount(accountId, values); // Call the update API
-            console.log("Account updated successfully with values:", values); // Success log
-          } catch (error) {
-            console.error("Error updating account:", error);
-            setErrors({ submit: error.message });
-          } finally {
-            setSubmitting(false);
+          if (newAvatar) {
+            avatarUpdate = updateAvatar(accountId, newAvatar);
           }
-        }}
-      >
-        {({ handleSubmit, isValid, errors, values }) => {
-          console.log("Current form values:", values); // Debugging log for form values
-          console.log("Validation errors:", errors); // Debugging log for validation errors
 
-          return (
-            
-            <Form onSubmit={handleSubmit}>
-            
-              {/* <Box
-                sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
-                component={"body"}
-              > */}
-              <Box
-                sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
-              >
-                
-                {
-                  (roleId === 'Manager') ? (
-                    <button
-                      onClick={() => navigate('/manager')}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        position: 'absolute',
-                        top: '10px',
-                        left: '25px', // Đẩy nút vào trong bằng cách chỉnh left
-                        padding: '5px',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <FaLongArrowAltLeft size={16} color="black" />
-                      <span style={{ marginLeft: '5px' }}></span>
-                    </button>
-                  ) : roleId === 'Delivery' ? (
-                    <button
-                      onClick={() => navigate('/delivery')}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        position: 'absolute',
-                        top: '10px',
-                        left: '25px', // Đẩy nút vào trong bằng cách chỉnh left
-                        padding: '5px',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <FaLongArrowAltLeft size={16} color="black" />
-                      <span style={{ marginLeft: '5px' }}></span>
-                    </button>
-                  ) : roleId === 'Sales' ? (
-                    <button
-                      onClick={() => navigate('/sales')}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        position: 'absolute',
-                        top: '10px',
-                        left: '25px', // Đẩy nút vào trong bằng cách chỉnh left
-                        padding: '5px',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <FaLongArrowAltLeft size={16} color="black" />
-                      <span style={{ marginLeft: '5px' }}></span>
-                    </button>
-                  ) : null
-                }
-                
-                 {/* <button
-                  type="button"
-                  onClick={() => navigate('/manager')}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                >
-                <FaLongArrowAltLeft size={24} />
-                back
-                </button> */}
-                
-                <Box sx={{ flex: 1, p: 3 }}>
-                  <Paper elevation={4} sx={{ padding: "20px" }}>
-                  
-                    <Typography variant="h6" gutterBottom>
-                      Cập nhật thông tin tài khoản
-                    </Typography>
-                    
-                    <Grid container spacing={3}>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper name="firstName" label="Tên" />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper name="lastName" label="Họ" />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper
-                          name="userName"
-                          label="Tên người dùng"
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper name="password" label="Mật khẩu" />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper name="email" label="Email" />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper name="phone" label="Số điện thoại" />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextFieldWrapper name="avatar" label="Avatar URL" />
-                      </Grid>
+          await Promise.all([accountUpdate, avatarUpdate]);
+
+          enqueueSnackbar("Cập nhật tài khoản thành công", { variant: "success" });
+        } catch (error) {
+          enqueueSnackbar("Cập nhật tài khoản thất bại", { variant: "error" });
+          console.error("Error updating account or avatar:", error);
+          setErrors({ submit: error.message });
+        } finally {
+          setSubmitting(false);
+        }
+      }}
+    >
+      {({ handleSubmit, isValid }) => (
+        <Form onSubmit={handleSubmit}>
+          <Box
+            sx={{
+              height: "auto", 
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              bgcolor: "#f5f5f5",
+              overflow: "hidden", 
+              p: 3, 
+            }}
+          >
+            <Paper elevation={3} sx={{ width: "100%", maxWidth: "1200px", padding: "20px" }}>
+              <Typography variant="h4" gutterBottom>
+                Hồ sơ của tôi
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                Quản lí thông tin hồ sơ để bảo mật tài khoản
+              </Typography>
+
+              <Divider sx={{ my: 2, backgroundColor: "#1976d2" }} />
+
+              <Grid container spacing={2} justifyContent="center" alignItems="center">
+                <Grid item xs={8}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextfieldWrapper name="firstName" label="First Name" />
                     </Grid>
-                    <ButtonWrapper disabled={!isValid}>
-                      Cập nhật tài khoản
-                    </ButtonWrapper>
-                  </Paper>
-                </Box>
-              </Box>
-            </Form>
-          );
-        }}
-      </Formik>
-    );
-  };
+                    <Grid item xs={12}>
+                      <TextfieldWrapper name="lastName" label="Last Name" />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextfieldWrapper name="userName" label="User Name" />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextfieldWrapper name="email" label="Email" />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextfieldWrapper name="phone" label="Phone" />
+                    </Grid>
+                  </Grid>
 
-  export default AccountForm;
+                  <ButtonWrapper disabled={!isValid}>Cập nhật tài khoản</ButtonWrapper>
+                </Grid>
+
+                <Grid item xs={1} sx={{ display: "flex", justifyContent: "center" }}>
+                  <Divider orientation="vertical" flexItem sx={{ backgroundColor: "#1976d2", height: "500px", width: "0.1px" }} />
+                </Grid>
+
+                <Grid item xs={3} container alignItems="center">
+                  <Box justifyContent="center">
+                    <Avatar
+                      alt="User Avatar"
+                      src={avatar}
+                      sx={{ width: 250, height: 250, cursor: "pointer" }}
+                      onClick={() => document.getElementById("avatarInput").click()}
+                    />
+                    <input
+                      type="file"
+                      id="avatarInput"
+                      style={{ display: "none" }}
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                    />
+                    <Typography variant="body2" sx={{ mt: 2, ml: 2 }}>
+                      Nhấn vào ảnh đại diện để thay đổi
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Box>
+        </Form>
+      )}
+    </Formik>
+  );
+};
+
+export default AccountForm;

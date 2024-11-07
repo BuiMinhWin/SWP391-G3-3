@@ -1,21 +1,47 @@
-
 import React, { useEffect, useState } from 'react';
-import { listOrder, updateStatus } from '../../services/SaleStaffService';
+import { listOrder } from '../../services/DeliveryService';
+import { FaLongArrowAltLeft } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-import './SaleStaff.css';
+
 
 const ListOrderOfSales = () => {
   const [orders, setOrders] = useState([]);
-  const [editedStatuses, setEditedStatuses] = useState({});
   const navigate = useNavigate();
+  const accountId = localStorage.getItem("accountId");
+  const formatCurrency = (value) => {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const statusLabels = [
+    "Đang chờ xét duyệt",
+    "Đơn đã được duyệt",
+    "Đã chọn tài xế",
+    "Tài xế đã nhận đơn và đang vận chuyển",
+    "Đã vận chuyển",
+    "Đã nhận hàng"
+  ];
+
   useEffect(() => {
     getAllOrders();
   }, []);
+
   const getAllOrders = () => {
     listOrder()
       .then((response) => {
         if (Array.isArray(response.data)) {
-          setOrders(response.data);
+          const filteredOrders = response.data.filter(order => order.sale === accountId);
+        
+          // Separate express orders and non-express orders, then sort by orderDate descending
+          const sortedOrders = filteredOrders.sort((a, b) => {
+            // First, prioritize express orders
+            if (a.freight === "Dịch vụ hỏa tốc" && b.freight !== "Dịch vụ hỏa tốc") return -1;
+            if (a.freight !== "Dịch vụ hỏa tốc" && b.freight === "Dịch vụ hỏa tốc") return 1;
+            
+  
+            return new Date(b.orderDate) - new Date(a.orderDate);
+          });
+  
+          setOrders(sortedOrders);
         } else {
           console.error("API response is not an array", response.data);
           setOrders([]);
@@ -25,46 +51,35 @@ const ListOrderOfSales = () => {
         console.error("Error fetching orders: ", error);
       });
   };
-  const handleStatusChange = (orderId, newStatus) => {
-    // console.log("Before update:", editedStatuses);
-  
-    const updatedStatuses = {
-      ...editedStatuses,  
-      [orderId]: newStatus,  
-    };
-  
-    // console.log("After update:", updatedStatuses);
-  
-    setEditedStatuses(updatedStatuses); 
+
+  const handleViewOrder = (orderId) => {
+    navigate(`/confirmDetail/${orderId}`);
   };
-  const updateOrderStatus = (orderId) => {
-    const newStatus = editedStatuses[orderId] ?? orders.status;
-    if (newStatus) {
-      console.log('New status to update:', newStatus);
-      updateStatus(orderId, newStatus)  
-        .then((response) => {
-          console.log('Status updated successfully:', response);
-          getAllOrders();  
-        })
-        .catch((error) => {
-          console.error('Error updating status:', error);
-        });
-    }
+
+  const handleViewFeedback = (orderId) => {
+    navigate(`/salestaff/respondFeedback/${orderId}`);
   };
+
   return (
     <div className="container">
-      <h2 className="text-center">List of Orders</h2>
+      
+
+      <h2 className="text-center">Danh Sách Đơn Hàng</h2>
       <table className="table table-striped table-bordered">
         <thead>
           <tr>
-          <th>Order ID</th>
-            <th>Receiver Name</th>
-            <th>Sender Name</th>
-            <th>Origin</th>
-            <th>Destination</th>
-            <th>Total Price</th>
-            <th>Status</th>
-            <th>Action</th>
+          <th>OrderId</th>
+            <th>Điểm đi</th>
+            <th>Điểm đến</th>
+            <th>Phương tiện</th>
+            <th>Ngày đặt hàng</th>
+            <th>Ngày nhận hàng</th>
+            <th>Tổng giá tiền</th>
+            <th>Sale</th>
+            <th>Delivery</th>
+            <th>Trạng thái</th>
+            <th>Chi tiết đơn hàng</th>
+            <th>Feedback</th> {/* Thêm cột Feedback */}
           </tr>
         </thead>
         <tbody>
@@ -72,32 +87,37 @@ const ListOrderOfSales = () => {
             orders.map(order => (
               <tr key={order.orderId}>
                 <td>{order.orderId}</td>
-                <td>{order.receiverName}</td>
-                <td>{order.senderName}</td>
                 <td>{order.origin}</td>
                 <td>{order.destination}</td>
-                <td>{order.totalPrice}</td>
-                <td>{order.status}</td>
+                <td style={{ color: order.freight === "Dịch vụ hỏa tốc" ? "red" : "green"}}>
+                  {order.freight}</td>
+                <td>{order.orderDate}</td>
+                <td>{order.shippedDate}</td>
+                <td>{formatCurrency(order.totalPrice)}</td>   
+                <td>{order.sale}</td>
+                <td>{order.deliver}</td>
+                <td>{statusLabels[order.status]}</td>
                 <td>
-                  <input
-                    type="text"
-                    value={editedStatuses[order.orderId] ?? order.status}
-                    onChange={(e) => handleStatusChange(order.orderId, e.target.value)}
-                  />
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleViewOrder(order.orderId)}
+                  >
+                    Chi tiết
+                  </button>
                 </td>
                 <td>
                   <button
-                    className="btn btn-info"
-                    onClick={() => updateOrderStatus(order.orderId)}
+                    className="btn btn-secondary"
+                    onClick={() => handleViewFeedback(order.orderId)}
                   >
-                    Update Status
+                    Xem Feedback
                   </button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="9" className="text-center">No Orders Found</td>
+              <td colSpan="11" className="text-center">No Orders Found</td>
             </tr>
           )}
         </tbody>
@@ -106,4 +126,4 @@ const ListOrderOfSales = () => {
   );
 };
 
-export default ListOrderOfSales
+export default ListOrderOfSales;
