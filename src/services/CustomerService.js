@@ -100,14 +100,29 @@ export const cancelOrder = async (orderId) => {
   return data;
 };
 
-export const getOrderPDF = async (orderId) => {
-  const response = await fetch(
-    `${REST_API_DOCUMENT_URL}/download/order/${orderId}`
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch PDF");
+// export const getOrderPDF = async (orderIdDetail) => {
+//   const response = await fetch(
+//     `${REST_API_DOCUMENT_URL}/download/order/${orderIdDetail}`
+//   );
+//   if (!response.ok) {
+//     throw new Error("Failed to fetch PDF");
+//   }
+//   return response.blob();
+// };
+
+export const getOrderPDF = async (orderDetailId) => {
+  try {
+    const response = await fetch(`${REST_API_DOCUMENT_URL}/download/order/${orderDetailId}`);
+    
+    if (!response.ok) {
+      throw new Error("Failed to fetch PDF");
+    }
+    
+    return await response.blob(); // Return blob for use as PDF in the UI
+  } catch (error) {
+    console.error("Error fetching PDF:", error);
+    throw error; // Re-throw error for handling in the calling function
   }
-  return response.blob();
 };
 
 export const getAccountById = async (accountId) => {
