@@ -109,10 +109,8 @@ public class Order {
     @Column(name = "service_ids")
     private String serviceIds;
 
-    @Column(name = "total_quantity", nullable = false)
     private int totalQuantity;
 
-    @Column(name = "total_weight", nullable = false)
     private float totalWeight;
 
     @Column(name = "discount")

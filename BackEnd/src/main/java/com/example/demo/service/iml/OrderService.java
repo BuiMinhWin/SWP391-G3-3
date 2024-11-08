@@ -54,6 +54,7 @@ public class OrderService {
     private static final int STATUS_DELIVERED = 5;
     private static final int STATUS_OTHER = 6;
 
+    private static final int ADDITIONAL_FEE = 500000;
 
     public OrderDTO createOrder(OrderDTO orderDTO) {
         logger.info("Received OrderDTO: {}", orderDTO);
@@ -106,10 +107,19 @@ public class OrderService {
         String discountCode = order.getDiscount();
         if ("10PKL".equals(discountCode)) {
             double discountAmount = order.getTotalPrice() * 0.10;
-            double newTotalPrice = order.getTotalPrice() + order.getTotalQuantity() + order.getTotalWeight() - discountAmount;
+            double newTotalPrice = order.getTotalPrice() + order.getTotalQuantity() * 10 + order.getTotalWeight() * 10 - discountAmount;
             order.setTotalPrice((int) newTotalPrice);
             order.setDiscount("10PKL");
             logger.info("Applied discount code '10PKL'. New total price: {}", order.getTotalPrice());
+        }
+
+        if ("Narita".equalsIgnoreCase(order.getOrigin()) ||
+                "Haneda".equalsIgnoreCase(order.getOrigin()) ||
+                "Kansai".equalsIgnoreCase(order.getOrigin())) {
+
+            int updatedTotalPrice = order.getTotalPrice() + ADDITIONAL_FEE;
+            order.setTotalPrice(updatedTotalPrice);
+            logger.info("Additional fee of {} applied due to origin. Updated total price: {}", ADDITIONAL_FEE, updatedTotalPrice);
         }
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
@@ -142,8 +152,6 @@ public class OrderService {
 
         logger.debug("Total service price: {}, Total distance price: {}", totalServicePrice, distancePrice);
     }
-
-
 
 
     public OrderDTO cancelOrder(String orderId) {

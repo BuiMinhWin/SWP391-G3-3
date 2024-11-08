@@ -35,18 +35,7 @@ public class PaymentService {
             OrderDTO orderDTO = orderService.getOrderByIdV2(orderId);
             log.info("Total price for orderId {}: {} VND", orderId, orderDTO.getTotalPrice());
 
-            List<OrderDetail> orderDetails = orderService.getOrderDetailsByOrderId(orderId);
-
-            int totalQuantity = orderDetails.stream()
-                    .mapToInt(OrderDetail::getQuantity)
-                    .sum();
-            int totalWeight = (int) orderDetails.stream()
-                    .mapToDouble(OrderDetail::getWeight)
-                    .sum();
-
-            int amount = (orderDTO.getTotalPrice()
-                    + (totalQuantity * 10)
-                    + (totalWeight * 5)) * 100;
+            int amount = (orderDTO.getTotalPrice()) * 100;
 
             transactionService.createTransaction(orderDTO.getOrderId(), amount);
 
