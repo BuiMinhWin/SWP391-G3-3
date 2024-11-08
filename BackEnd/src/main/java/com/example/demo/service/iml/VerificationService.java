@@ -48,17 +48,14 @@ public class VerificationService {
     }
 
     public ResponseEntity<String> resetPassword(String email, String code, String newPassword, String confirmPassword) {
-        // Verify the code first
         if (!verifyCode(email, code)) {
             return new ResponseEntity<>("Invalid or expired verification code.", HttpStatus.BAD_REQUEST);
         }
 
-        // Check if passwords match
         if (!newPassword.equals(confirmPassword)) {
             return new ResponseEntity<>("Passwords do not match. Please enter the same password in both fields.", HttpStatus.BAD_REQUEST);
         }
 
-        // Validate password strength
         if (newPassword.length() < 8) {
             return new ResponseEntity<>("Password must be at least 8 characters long.", HttpStatus.BAD_REQUEST);
         }
@@ -66,18 +63,15 @@ public class VerificationService {
             return new ResponseEntity<>("Password must contain at least one uppercase letter, one lowercase letter, and one number.", HttpStatus.BAD_REQUEST);
         }
 
-        // Retrieve account by email
         Account account = accountRepository.findByEmail(email);
         if (account == null) {
             return new ResponseEntity<>("Account not found with the provided email.", HttpStatus.NOT_FOUND);
         }
 
-        // Check if the account is active
         if (account.getStatus() == 0) {
             return new ResponseEntity<>("Account is inactive and cannot reset the password.", HttpStatus.FORBIDDEN);
         }
 
-        // Update password and save to the database
         account.setPassword(newPassword);
         accountRepository.save(account);
 
