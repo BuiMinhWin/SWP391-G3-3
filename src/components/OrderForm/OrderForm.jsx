@@ -10,43 +10,41 @@ import {
   Select,
   MenuItem,
   Divider,
+  Button,
 } from "@mui/material";
-import { Formik, Form } from "formik";
+import { Formik, Form, FieldArray } from "formik";
 import * as Yup from "yup";
 import TextFieldWrapper from "../FromUI/Textfield";
 import SelectWrapper from "../FromUI/Select";
-// import countries from "../../data/countries.json";
 import ButtonWrapper from "../FromUI/Button";
 import koi_type from "../../data/koiTypes.json";
 import koi_name from "../../data/koiVarieties.json";
-import {
-  createOrder,
-  order,
-  uploadDocument,
-} from "../../services/CustomerService";
+import airport from "../../data/airport.json";
+import { createOrder, uploadDocument } from "../../services/CustomerService";
 import { createOrderDetail } from "../../services/CustomerService";
-// import SideBar from "../SideBar/SideBar";
-// import HeaderBar from "../Header/Header/Nguyen";
-import RadioGroupWrapper from "../FromUI/RadioGroup";
 import CustomRadioGroup from "../FromUI/CustomRadioGroup";
 import RocketIcon from "@mui/icons-material/Rocket";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import AddIcon from "@mui/icons-material/Add";
 import FileUpload from "../FromUI/FileUpload";
 import CheckboxWrapper from "../FromUI/Checkbox";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSnackbar } from "notistack";
+import ServiceSelect from "../FromUI/SelectServices";
 
-const buttonStyles = {
+const labelStyle = {
+  fontSize: "1.5rem", // Adjust size as needed
+  fontWeight: "600", // Demi-bold?
+  textDecoration: "underline", // Underlined
+};
+const fishButtonStyles = {
   backgroundColor: "#161A31",
   color: "white",
   "&:hover": { backgroundColor: "#727376" },
   padding: "17px 16px",
   borderRadius: "8px",
   minWidth: "auto",
-  maxWidth: "fit-content",
-  display: "inline-flex",
-  alignItems: "center",
   justifyContent: "center",
 };
 
@@ -69,75 +67,101 @@ const INITIAL_FORM_STATE = {
   senderPhone: "",
   receiverNote: "",
   senderNote: "",
-  orderNote: "",
-  document_file: null,
   discount: "",
   koi_image: "",
-  koi_name: "",
-  koi_type: "",
-  quantity: 0,
-  weight: 0.0,
   freight: "",
   serviceIds: [],
+  document_file: null,
+  orderNote: "",
+  orderDetails: [
+    {
+      koiType: "",
+      koiName: "",
+      weight: 0.0,
+      quantity: 0,
+    },
+  ],
 };
 
 // Validation Schema with Yup
 const FORM_VALIDATION = Yup.object().shape({
   origin: Yup.string().required("Vui lòng nhập địa điểm xuất phát"),
   destination: Yup.string().required("Vui lòng nhập địa điểm đến"),
-  receiverName: Yup.string().required("Vui lòng nhập tên người nhận"),
-  senderName: Yup.string().required("Vui lòng nhập tên người gửi"),
+  receiverName: Yup.string()
+    .matches(/^[A-Za-zÀ-ỹ\s]+$/, "Vui lòng chỉ nhập chữ cái")
+    .required("Vui lòng nhập tên người nhận"),
+  senderName: Yup.string()
+    .matches(/^[A-Za-zÀ-ỹ\s]+$/, "Vui lòng chỉ nhập chữ cái")
+    .required("Vui lòng nhập tên người gửi"),
   receiverPhone: Yup.string()
     .required("Vui lòng nhập số điện thoại người nhận")
     .matches(/^[0-9]{10}$/, "Số điện thoại phải là số và có 10 số"),
   senderPhone: Yup.string()
     .required("Vui lòng nhập số điện thoại người gửi")
     .matches(/^[0-9]{10}$/, "Số điện thoại phải là số và có 10 số"),
-  receiverNote: Yup.string().nullable(),
-  senderNote: Yup.string().nullable(),
-  orderNote: Yup.string().nullable(),
+  receiverNote: Yup.string()
+    .nullable()
+    .max(500, "Ghi chú cần phải dưới 500 kí tự"),
+  senderNote: Yup.string()
+    .nullable()
+    .max(500, "Ghi chú cần phải dưới 500 kí tự"),
   discount: Yup.string().nullable(),
-  cityS: Yup.string().required("Vui lòng chọn thành phố"), 
-  cityR: Yup.string().required("Vui lòng chọn thành phố"), 
-  koi_name: Yup.string().required("Vui lòng nhập tên cá Koi"), 
-  koi_type: Yup.string().required("Vui lòng nhập loại cá Koi"), 
-  quantity: Yup.number()
-    .min(1, "Số lượng phải lớn hơn 0")
-    .required("Vui lòng nhập số lượng"),
-  weight: Yup.number()
-    .min(0.1, "Cân nặng phải lớn hơn 0")
-    .max(50, "Cá Koi kỷ lục thể giới chỉ đạt 41kg bạn có chắc bạn có con cá lớn hơn chứ 0-o!?")
-    .required("Vui lòng nhập cân nặng"),
+  // cityS: Yup.string().required("Vui lòng chọn thành phố"),
+  // cityR: Yup.string().required("Vui lòng chọn thành phố"),
   freight: Yup.string().required("Vui lòng chọn phương thức vận chuyển"),
   termsOfService: Yup.boolean()
     .oneOf([true], "The terms and conditions must be accepted.")
     .required("The terms and conditions must be accepted."),
-  document_file: Yup.mixed()
-    .required("A file is required")
-    .test(
-      "fileSize",
-      "File size must be less than 8MB",
-      (value) => value && value.size <= 8 * 1024 * 1024
-    )
-    .test(
-      "fileFormat",
-      "Only PDF file are allowed",
-      (value) => value && value.type === "application/pdf"
-    ),
+  orderNote: Yup.string()
+    .nullable()
+    .max(500, "Ghi chú cần phải dưới 500 kí tự"),
+  orderDetails: Yup.array().of(
+    Yup.object().shape({
+      koiType: Yup.string().required("Vui lòng chọn loại cá Koi"),
+      koiName: Yup.string().required("Vui lòng chọn tên cá Koi"),
+      weight: Yup.number()
+        .min(0.1, "Cân nặng phải lớn hơn 0")
+        .max(50, "Trọng lượng không vượt quá 50kg")
+        .required("Vui lòng nhập cân nặng"),
+      quantity: Yup.number()
+        .min(1, "Số lượng phải lớn hơn 0")
+        .required("Vui lòng nhập số lượng"),
+      document_file: Yup.mixed()
+        .required("A file is required")
+        .test(
+          "fileSize",
+          "File cần phải nhỏ hơn 8MB",
+          (value) => value && value.size <= 8 * 1024 * 1024
+        )
+        .test(
+          "fileFormat",
+          "Chỉ chấp nhận định dạng file PDF",
+          (value) => value && value.type === "application/pdf"
+        ),
+    })
+  ),
 });
 
 const OrderForm = () => {
-  const services = [
-    { id: 1, label: "Bảo hiểm" },
-    { id: 2, label: "Chăm sóc cá" },
-    { id: 3, label: "Người nhận thanh toán" },
-  ];
-
   const navigate = useNavigate();
+  const orderDetailsToSend = [];
+  const location = useLocation();
+  const { japan } = location.state || {};
+  const HAN = "Noi Bai International Airport, Hanoi, Vietnam";
+
+  const handleAirportChange = (event, setFieldValue) => {
+    const selectedCode = event.target.value;
+    const selectedAirport = airport[selectedCode];
+    const formattedValue = `${selectedAirport.split(",")[0]} - ${HAN}`;
+    setOriginAirport(formattedValue); // Updates local state, if needed
+    setFieldValue("origin", formattedValue); // Updates Formik field value
+  };
+
   // state lưu danh sáchh tỉnh, phường, quận người gửi
   const [provincesS, setProvincesS] = useState([]);
   const [districtsS, setDistrictsS] = useState([]);
   const [wardsS, setWardsS] = useState([]);
+
   // state lưu danh sáchh tỉnh, phường, quận người nhận
   const [provincesR, setProvincesR] = useState([]);
   const [districtsR, setDistrictsR] = useState([]);
@@ -315,16 +339,19 @@ const OrderForm = () => {
     <Formik
       initialValues={{
         ...INITIAL_FORM_STATE,
-        cityS: selectedProvinceS,
         cityR: selectedProvinceR,
+        cityS: selectedProvinceS,
+        districtS: selectedDistrictSId,
+        wardS: selectedWardSId,
       }}
       validationSchema={FORM_VALIDATION}
       onSubmit={async (values, { setSubmitting, setErrors }) => {
         try {
           const accountId = localStorage.getItem("accountId");
-
           const originCoordinates = await geocodeAddress(
-            `${values.origin}, ${values.wardS}, ${values.districtS} ,${values.cityS}`
+            japan === "Nhật Bản"
+              ? "Noi Bai International Airport, Phú Minh, Sóc Sơn, Hà Nội"
+              : `${values.origin}, ${values.wardS}, ${values.districtS} ,${values.cityS}`
           );
           const destinationCoordinates = await geocodeAddress(
             `${values.destination}, ${values.wardR}, ${values.districtR} ,${values.cityR}`
@@ -336,10 +363,14 @@ const OrderForm = () => {
           const distance = await fetchDistanceData(origins, destinations);
           console.log("Khoảng cách tính được: ", distance);
 
+          console.log("Current origin value:", values.origin);
+
           const orderData = {
             ...values,
             accountId,
-            origin: `${values.origin}, ${values.wardS}, ${values.districtS} ,${values.cityS}`,
+            origin: `${values.origin}, ${values.wardS || "Phú Minh"}, ${
+              values.districtS || "Sóc Sơn"
+            } ,${values.cityS || "Hà Nội"}`,
             destination: `${values.destination}, ${values.wardR}, ${values.districtR} ,${values.cityR}`,
             freight: values.freight,
             receiverName: values.receiverName,
@@ -350,7 +381,21 @@ const OrderForm = () => {
             senderNote: values.senderNote,
             orderNote: values.orderNote,
             distance: distance,
+            serviceIds: values.serviceIds,
           };
+          if (!orderData.cityS || !orderData.districtS || !orderData.wardS) {
+            if (!orderData.cityS) orderData.cityS = "Hà Nội";
+            if (!orderData.districtS) orderData.districtS = "Sóc Sơn";
+            if (!orderData.wardS) orderData.wardS = "Phú Minh";
+          }
+
+          if (japan === "Trong nước") {
+            // If 'Trong nước', adjust origin with specific values
+            orderData.origin = `${values.origin}`;
+            orderData.cityS = "Hà Nội";
+            orderData.districtS = "Sóc Sơn";
+            orderData.wardS = "Phú Minh";
+          }
 
           const orderResponse = await createOrder(orderData);
           console.log("Order data created successfully:", orderResponse);
@@ -362,36 +407,58 @@ const OrderForm = () => {
           const newOrderId = orderResponse.orderId;
           console.log("Order created with ID:", newOrderId);
 
-          const uploadResponse = await uploadDocument(
-            values.document_file,
-            newOrderId
+          // Clear orderDetailsToSend array for each submission
+          const orderDetailsToSend = [];
+
+          for (const orderDetail of values.orderDetails) {
+            const { document_file, ...orderDetailData } = orderDetail;
+
+            const orderDetailToSend = {
+              ...orderDetailData,
+              orderId: newOrderId,
+            };
+
+            orderDetailsToSend.push(orderDetailToSend);
+            console.log(
+              "Data prepared for createOrderDetail:",
+              orderDetailToSend
+            );
+          }
+
+          const orderDetailResponses = await createOrderDetail(
+            orderDetailsToSend
           );
-          console.log("File uploaded successfully:", uploadResponse);
-
-          const orderDetails = await order(newOrderId);
-          console.log("Order Details:", orderDetails);
-
-          const orderDetailData = {
-            orderId: newOrderId,
-            quantity: Number(values.quantity),
-            weight: parseFloat(values.weight),
-            discount: values.discount,
-            koiName: values.koi_name,
-            koiType: values.koi_type,
-            serviceIds: values.serviceIds,
-          };
-          console.log("Service IDs being sent:", orderData.serviceIds);
-          const orderDetailResponse = await createOrderDetail(orderDetailData);
           console.log(
-            "Order detail created successfully:",
-            orderDetailResponse
+            "Order details created successfully:",
+            orderDetailResponses
           );
 
-          console.log("Order created successfully with ID:", newOrderId);
+          // Handle document upload for each order detail
+          for (let i = 0; i < orderDetailResponses.length; i++) {
+            const orderDetailResponse = orderDetailResponses[i];
+            const documentFile = values.orderDetails[i]?.document_file;
 
+            if (documentFile) {
+              const formData = new FormData();
+              formData.append("document_file", documentFile);
+              console.log("Uploading document:", {
+                orderDetailId: orderDetailResponse.orderDetailId,
+                file: documentFile,
+              });
+
+              await uploadDocument(orderDetailResponse.orderDetailId, formData);
+              console.log(
+                "Document uploaded for order detail:",
+                orderDetailResponse.orderDetailId
+              );
+            }
+          }
+          enqueueSnackbar("Đơn của bạn đã được tạo thành công", {
+            variant: "success",
+          });
           navigate("/checkout", { state: { orderId: newOrderId } });
         } catch (error) {
-          enqueueSnackbar("Đã xảy ra lỗi trong quá trình tạo đơn", {
+          enqueueSnackbar("Đã có lỗi xảy ra khi tạo đơn, vui lòng thử lại", {
             variant: "error",
           });
           console.error("Error creating order:", error);
@@ -403,7 +470,9 @@ const OrderForm = () => {
       validateOnMount={true}
     >
       {({ handleSubmit, errors, setFieldValue, values }) => {
-        console.log("Validation errors:", errors); // Log validation errors
+        console.log("Form values on submit:", values);
+        console.log("OrderDetail value on submit:", values.orderDetails);
+        console.log("Validation errors:", errors);
         const handleSenderProvinceChange = (event) => {
           const selectedProvince = provincesS.find(
             (province) => province.value === event.target.value
@@ -492,99 +561,151 @@ const OrderForm = () => {
             <>
               <Box sx={{ p: 4, bgcolor: "#eeeeee" }}>
                 {/* Paper 1: Receiver Information */}
-                <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
-                    Địa chỉ lấy hàng *
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="senderName"
-                        label="Tên người gửi"
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper name="senderPhone" label="Điện thoại" />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <FormControl fullWidth>
-                        <InputLabel>Tỉnh (người gửi)</InputLabel>
-                        <Select
-                          name="cityS"
-                          value={selectedProvinceS}
-                          onChange={handleSenderProvinceChange}
-                          label="Tỉnh (người gửi)"
-                        >
-                          {provincesS.map((province) => (
-                            <MenuItem
-                              key={province.value}
-                              value={province.value}
-                            >
-                              {province.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <FormControl fullWidth>
-                        <InputLabel>Quận (người gửi)</InputLabel>
-                        <Select
-                          name="districtS"
-                          value={selectedDistrictSId}
-                          onChange={handleSenderDistrictChange}
-                          label="Quận (người gửi)"
-                        >
-                          {districtsS.map((district) => (
-                            <MenuItem
-                              key={district.value}
-                              value={district.value}
-                            >
-                              {district.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
 
-                    <Grid item xs={6}>
-                      <FormControl fullWidth>
-                        <InputLabel>Phường (người gửi)</InputLabel>
-                        <Select
-                          name="wards"
-                          label="Phường (người gửi)"
-                          value={selectedWardSId} // Nếu bạn có state để lưu phường đã chọn
-                          onChange={handleSenderWardChange} // Nếu bạn có hàm xử lý cho phường
-                        >
-                          {wardsS.map((ward) => (
-                            <MenuItem key={ward.value} value={ward.value}>
-                              {ward.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
+                {japan === "Trong nước" ? (
+                  <Paper elevation={4} sx={{ padding: "20px" }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ ...labelStyle }}
+                    >
+                      Địa chỉ lấy hàng
+                    </Typography>
+                    <Grid container spacing={3}>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderName"
+                          label="Tên người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderPhone"
+                          label="Điện thoại"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Tỉnh (người gửi)</InputLabel>
+                          <Select
+                            name="cityS"
+                            value={selectedProvinceS}
+                            onChange={handleSenderProvinceChange}
+                            label="Tỉnh (người gửi)"
+                          >
+                            {provincesS.map((province) => (
+                              <MenuItem
+                                key={province.value}
+                                value={province.value}
+                              >
+                                {province.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Quận (người gửi)</InputLabel>
+                          <Select
+                            name="districtS"
+                            value={selectedDistrictSId}
+                            onChange={handleSenderDistrictChange}
+                            label="Quận (người gửi)"
+                          >
+                            {districtsS.map((district) => (
+                              <MenuItem
+                                key={district.value}
+                                value={district.value}
+                              >
+                                {district.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
 
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="origin"
-                        label="Địa chỉ người gửi"
-                      />
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Phường (người gửi)</InputLabel>
+                          <Select
+                            name="wards"
+                            label="Phường (người gửi)"
+                            value={selectedWardSId} // Nếu bạn có state để lưu phường đã chọn
+                            onChange={handleSenderWardChange} // Nếu bạn có hàm xử lý cho phường
+                          >
+                            {wardsS.map((ward) => (
+                              <MenuItem key={ward.value} value={ward.value}>
+                                {ward.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="origin"
+                          label="Địa chỉ người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextFieldWrapper
+                          name="senderNote"
+                          label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                      <TextFieldWrapper
-                        name="senderNote"
-                        label="Hướng dẫn giao hàng"
-                        multiline
-                        rows={3}
-                      />
+                  </Paper>
+                ) : japan === "Nhật Bản" ? (
+                  <Paper elevation={4} sx={{ padding: "20px" }}>
+                    <Typography variant="h6" gutterBottom>
+                      Địa chỉ lấy hàng *
+                    </Typography>
+                    <Grid container spacing={3}>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderName"
+                          label="Tên người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderPhone"
+                          label="Điện thoại"
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <SelectWrapper
+                          name="origin"
+                          label="Chọn sân bay tại Nhật Bản"
+                          options={airport}
+                          value={values.origin} // Ensure Formik is using the correct value here
+                          onChange={(event) =>
+                            handleAirportChange(event, setFieldValue)
+                          }
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <TextFieldWrapper
+                          name="receiverNote"
+                          label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
+                        />
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Paper>
+                  </Paper>
+                ) : (
+                  <p>Please select a shipping destination.</p>
+                )}
 
                 {/* Paper 2: Receiver Information */}
                 <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
+                  <Typography variant="h6" gutterBottom sx={{ ...labelStyle }}>
                     Địa chỉ người nhận
                   </Typography>
                   <Grid container spacing={3}>
@@ -677,64 +798,119 @@ const OrderForm = () => {
                   </Grid>
                 </Paper>
 
-                {/* Paper 3: Order Information */}
+                {/* FishDetail */}
+                <FieldArray name="orderDetails">
+                  {({ push, remove }) => (
+                    <>
+                      {values.orderDetails.map((_, index) => (
+                        <Paper
+                          elevation={4}
+                          sx={{ padding: "20px", marginBottom: "20px" }}
+                          key={index}
+                        >
+                          <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={{ ...labelStyle }}
+                          >
+                            Thông tin cá Koi {index + 1}
+                          </Typography>
+                          <Grid container spacing={3}>
+                            <Grid item xs={6}>
+                              <SelectWrapper
+                                name={`orderDetails.${index}.koiType`}
+                                label="Loại cá Koi"
+                                options={koi_type}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <SelectWrapper
+                                name={`orderDetails.${index}.koiName`}
+                                label="Biến thể Koi"
+                                options={koi_name}
+                              />
+                            </Grid>
+                            <Grid item xs={3}>
+                              <TextFieldWrapper
+                                name={`orderDetails.${index}.weight`}
+                                label="Cân nặng trung bình"
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
+                                }}
+                              />
+                            </Grid>
+                            <Grid item xs={3}>
+                              <TextFieldWrapper
+                                name={`orderDetails.${index}.quantity`}
+                                label="Số lượng"
+                                type="number"
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <FileUpload
+                                name={`orderDetails.${index}.document_file`}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                sx={{
+                                  padding: "17px 16px",
+                                  borderRadius: "8px",
+                                }}
+                                onClick={() => remove(index)}
+                                disabled={values.orderDetails.length === 1} // Prevents removing the last section
+                              >
+                                Xóa thông tin cá Koi {index + 1}
+                              </Button>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Button
+                                variant="contained"
+                                sx={{ ...fishButtonStyles }}
+                                startIcon={<AddIcon />}
+                                onClick={() =>
+                                  push({
+                                    koiType: "",
+                                    koiName: "",
+                                    weight: 0.0,
+                                    quantity: 0,
+                                  })
+                                }
+                              >
+                                Thêm thông tin cá Koi mới
+                              </Button>
+                            </Grid>
+                          </Grid>
+                        </Paper>
+                      ))}
+                    </>
+                  )}
+                </FieldArray>
+
+                {/* Order Information */}
                 <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
-                    Thông tin bưu gửi
+                  <Typography variant="h6" gutterBottom sx={{ ...labelStyle }}>
+                    Tùy chọn bưu gửi
                   </Typography>
                   <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                      <SelectWrapper
-                        name="koi_type"
-                        label="Loại cá Koi"
-                        options={koi_type}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <SelectWrapper
-                        name="koi_name"
-                        label="Biến thể Koi"
-                        options={koi_name}
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      <TextFieldWrapper
-                        name="weight"
-                        label="Cân nặng trung bình"
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">kg</InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      <TextFieldWrapper
-                        name="quantity"
-                        label="Số lượng"
-                        type="number"
-                        slotProps={{
-                          inputLabel: {
-                            shrink: true,
-                          },
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <FileUpload name="document_file" />
-                    </Grid>
                     <Grid item xs={12}>
                       <TextFieldWrapper
-                        name="description"
+                        name="orderNote"
                         label="Ghi chú"
                         multiline
                         rows={4}
                       />
                     </Grid>
-
                     <Grid item xs={12}>
                       <CustomRadioGroup
                         name="freight"
+                        selectedCountry={japan}
                         options={[
                           {
                             value: "Dịch vụ tiêu chuẩn",
@@ -770,29 +946,29 @@ const OrderForm = () => {
                     <Grid item xs={3.5}></Grid>
                     <Grid
                       item
-                      xs={5}
+                      xs={5.6}
                       justifyContent="center"
                       alignItems="center"
                     >
-                      {services.map((service) => (
-                        <RadioGroupWrapper
-                          key={service.id}
-                          service={service}
-                          serviceIds={values.serviceIds} // Pass serviceIds from Formik state
-                          setFieldValue={setFieldValue} // Ensure it can update the Formik state
-                        />
-                      ))}
+                      <ServiceSelect
+                        value={values.serviceIds}
+                        onChange={(event) =>
+                          setFieldValue("serviceIds", event.target.value)
+                        }
+                      />
                     </Grid>
                   </Grid>
-                  <Divider sx={{ backgroundColor: "black", margin: "20px 50px" }} />
+                  <Divider
+                    sx={{ backgroundColor: "black", margin: "20px 50px" }}
+                  />
                   <Grid xs={12}>
-                  <CheckboxWrapper
-                    name="termsOfService"
-                    legend="Terms Of Service"
-                    label="Tôi đã đọc và đồng ý với các điều khoản"
-                  /></Grid>
+                    <CheckboxWrapper
+                      name="termsOfService"
+                      legend="Terms Of Service"
+                      label="Tôi đã đọc và đồng ý với các điều khoản"
+                    />
+                  </Grid>
                   <ButtonWrapper>Tạo đơn đặt hàng</ButtonWrapper>
-                  
                 </Paper>
               </Box>
             </>

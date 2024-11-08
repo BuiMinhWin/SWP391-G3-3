@@ -12,6 +12,7 @@ import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { FaRegMessage } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 import { CiLogout } from "react-icons/ci";
+import { logout } from '../Member/auth'; 
 
 const ListEmployeeComponent = () => {
   const [accounts, setAccounts] = useState([]);
@@ -20,6 +21,8 @@ const ListEmployeeComponent = () => {
   const navigate = useNavigate();
   const accountId = localStorage.getItem("accountId");
   const [roleIdFilter, setRoleIdFilter] = useState('');
+  const [isAccountDropdownOpen, setAccountDropdownOpen] = useState(false);
+  const [showActiveModal, setShowActiveModal] = useState(false); 
 
   const filteredAccounts = accounts.filter(account => {
     const matchesRoleId = roleIdFilter ? account.roleId.includes(roleIdFilter) : true;
@@ -80,19 +83,33 @@ const ListEmployeeComponent = () => {
     navigate(`/edit-account/${accountId}`);
   };
 
-  const removeAccount = (accountId) => {
-    console.log(accountId)
-    deleteAccount(accountId)
-      .then(() => {
-        getAllAccounts();
-      })
-      .catch((error) => {
-        console.error("Error deleting employee: ", error);
-      });
-  };
+
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
+  };
+  const toggleAccountDropdown = () => {
+    setAccountDropdownOpen(!isAccountDropdownOpen);
+  };
+
+  const handleOpenActiveModal = () => {
+    setShowActiveModal(true);
+    getAllAccounts(); 
+  };
+
+  const handleDeactivateService = (accountId)=>{
+    if(accountId){
+      deleteAccount(accountId)
+      .then(()=>{
+        getAllAccounts();
+        
+      })
+      .catch((error) => console.error("Error creating service:", error));
+    }
+  }
+
+  const handleCloseActiveModal = () => {
+    setShowActiveModal(false);
   };
 
 
@@ -121,16 +138,42 @@ const ListEmployeeComponent = () => {
         
         <h6>List</h6>
         <li>
-          <a href="/manager"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i>Dashboard</a>
+          <a href="/manager"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i>Dashboard</a> 
         </li>
 
         <li>
           <a  href="/listcustomers"><i className="bi bi-people me-2"><FiUsers /></i> Customers</a>
         </li>
+
+        <li onClick={toggleAccountDropdown} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+             < a href="#"><i className="bi bi-person-badge me-2"><FiUsers /></i> Employees</a>
+            </li>
+            {isAccountDropdownOpen && (
+              <ul className="list-unstyled ms-3">
+                 <li>
+                 
+                 <a href="#" onClick={addNewAccount}>
+                   <i className="bi bi-person-badge me-2"> <IoMdAddCircle  /> </i> New Accounts
+                 </a>
+               </li>
+             
+               <li>
+              
+                 <a href="#" onClick={handleOpenActiveModal}>
+                   <i className="bi bi-person-badge me-2"> <IoMdAddCircle  /> </i> Deactive
+                 </a>
+               </li>
+             
+              </ul>
+            )}
+
         
          <li>
             <a href="/service"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Services</a>
           </li>
+
+          
+      
         
         <h6>General</h6>
         <li>
@@ -148,6 +191,8 @@ const ListEmployeeComponent = () => {
         <li>
           <a href="#"><i className="bi bi-gear me-2"><IoSettingsOutline /></i> Settings</a>
          </li>
+
+      
        
       </ul>
       </nav>
@@ -203,11 +248,6 @@ const ListEmployeeComponent = () => {
               <option value="Delivery">Delivery</option>
             </select>
             
-            <div className="ms-auto">
-            <button className="add-btn" onClick={addNewAccount}>
-              <IoMdAddCircle style={{ color: 'white' }} />
-          </button>
-            </div>
           </div>
 
           <table className="table table-striped table-bordered">
@@ -222,29 +262,90 @@ const ListEmployeeComponent = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredAccounts.length > 0 ? (
-                filteredAccounts.map(account => (
-                  <tr key={account.accountId}>
-                    <td>{account.accountId}</td>
-                    <td>{account.roleId}</td>
-                    <td>{account.firstName}</td>
-                    <td>{account.lastName}</td>
-                    <td>{account.email}</td>
-                    <td>
-                      <button className="btn btn-info" onClick={() => updateAccount(account.accountId)}>Update</button>
-                      <button className="btn btn-danger" onClick={() => removeAccount(account.accountId)}>Delete</button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center">No Employees Found</td>
+            {filteredAccounts.filter(account => account.status === 1).length > 0 ? (
+              filteredAccounts.filter(account => account.status === 1).map(account => (
+                <tr key={account.accountId}>
+                  <td>{account.accountId}</td>
+                  <td>{account.roleId}</td>
+                  <td>{account.firstName}</td>
+                  <td>{account.lastName}</td>
+                  <td>{account.email}</td>
+                  <td>
+                    <button className="btn btn-info" onClick={() => updateAccount(account.accountId)}>Update</button>
+                  </td>
                 </tr>
-              )}
-            </tbody>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="text-center">No Employees Found</td>
+              </tr>
+            )}
+          </tbody>
           </table>
         </div>
       </section>
+
+      {showActiveModal && (
+      <div className="modal show d-block" role="dialog">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Active Accounts</h5>
+              <button 
+                type="button" 
+                className="close" 
+                onClick={handleCloseActiveModal} 
+                aria-label="Close" 
+                style={{ marginLeft: '300px', backgroundColor: 'whitesmoke', cursor: 'pointer' }}
+              >
+                <span aria-hidden="true" style={{ fontSize: '20px', color: 'black' }}>&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th>RoleID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {accounts.map((account) => (
+                    <tr key={account.accountId}>
+                      <td>{account.roleId}</td>
+                      <td>{account.firstName}</td>
+                      <td>{account.lastName}</td>
+                      <td>
+                        {account.status === 1 ? ( 
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => handleDeactivateService(account.accountId)}
+                          >
+                            Deactivate
+                          </button>
+                        ) : ( 
+                          <button
+                            className="btn btn-secondary btn-sm" 
+                            disabled 
+                          >
+                            Deactivate
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={handleCloseActiveModal}>Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
       </main>
       </div>
     </div>
