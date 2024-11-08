@@ -16,41 +16,27 @@ import { Formik, Form, FieldArray } from "formik";
 import * as Yup from "yup";
 import TextFieldWrapper from "../FromUI/Textfield";
 import SelectWrapper from "../FromUI/Select";
-// import countries from "../../data/countries.json";
 import ButtonWrapper from "../FromUI/Button";
 import koi_type from "../../data/koiTypes.json";
 import koi_name from "../../data/koiVarieties.json";
-import {
-  createOrder,
-  order,
-  uploadDocument,
-} from "../../services/CustomerService";
+import airport from "../../data/airport.json";
+import { createOrder, uploadDocument } from "../../services/CustomerService";
 import { createOrderDetail } from "../../services/CustomerService";
-// import SideBar from "../SideBar/SideBar";
-// import HeaderBar from "../Header/Header/Nguyen";
-import RadioGroupWrapper from "../FromUI/RadioGroup";
 import CustomRadioGroup from "../FromUI/CustomRadioGroup";
 import RocketIcon from "@mui/icons-material/Rocket";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import AddIcon from "@mui/icons-material/Add";
 import FileUpload from "../FromUI/FileUpload";
 import CheckboxWrapper from "../FromUI/Checkbox";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSnackbar } from "notistack";
 import ServiceSelect from "../FromUI/SelectServices";
 
-const buttonStyles = {
-  backgroundColor: "#161A31",
-  color: "white",
-  "&:hover": { backgroundColor: "#727376" },
-  padding: "17px 16px",
-  borderRadius: "8px",
-  minWidth: "auto",
-  maxWidth: "fit-content",
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
+const labelStyle = {
+  fontSize: "1.5rem", // Adjust size as needed
+  fontWeight: "600", // Demi-bold?
+  textDecoration: "underline", // Underlined
 };
 const fishButtonStyles = {
   backgroundColor: "#161A31",
@@ -120,8 +106,8 @@ const FORM_VALIDATION = Yup.object().shape({
     .nullable()
     .max(500, "Ghi chú cần phải dưới 500 kí tự"),
   discount: Yup.string().nullable(),
-  cityS: Yup.string().required("Vui lòng chọn thành phố"),
-  cityR: Yup.string().required("Vui lòng chọn thành phố"),
+  // cityS: Yup.string().required("Vui lòng chọn thành phố"),
+  // cityR: Yup.string().required("Vui lòng chọn thành phố"),
   freight: Yup.string().required("Vui lòng chọn phương thức vận chuyển"),
   termsOfService: Yup.boolean()
     .oneOf([true], "The terms and conditions must be accepted.")
@@ -159,6 +145,17 @@ const FORM_VALIDATION = Yup.object().shape({
 const OrderForm = () => {
   const navigate = useNavigate();
   const orderDetailsToSend = [];
+  const location = useLocation();
+  const { japan } = location.state || {};
+  const HAN = "Noi Bai International Airport, Hanoi, Vietnam";
+
+  const handleAirportChange = (event, setFieldValue) => {
+    const selectedCode = event.target.value;
+    const selectedAirport = airport[selectedCode];
+    const formattedValue = `${selectedAirport.split(",")[0]} - ${HAN}`;
+    setOriginAirport(formattedValue); // Updates local state, if needed
+    setFieldValue("origin", formattedValue); // Updates Formik field value
+  };
 
   // state lưu danh sáchh tỉnh, phường, quận người gửi
   const [provincesS, setProvincesS] = useState([]);
@@ -342,16 +339,19 @@ const OrderForm = () => {
     <Formik
       initialValues={{
         ...INITIAL_FORM_STATE,
-        cityS: selectedProvinceS,
         cityR: selectedProvinceR,
+        cityS: selectedProvinceS,
+        districtS: selectedDistrictSId,
+        wardS: selectedWardSId,
       }}
       validationSchema={FORM_VALIDATION}
       onSubmit={async (values, { setSubmitting, setErrors }) => {
         try {
           const accountId = localStorage.getItem("accountId");
-
           const originCoordinates = await geocodeAddress(
-            `${values.origin}, ${values.wardS}, ${values.districtS} ,${values.cityS}`
+            japan === "Nhật Bản"
+              ? "Noi Bai International Airport, Phú Minh, Sóc Sơn, Hà Nội"
+              : `${values.origin}, ${values.wardS}, ${values.districtS} ,${values.cityS}`
           );
           const destinationCoordinates = await geocodeAddress(
             `${values.destination}, ${values.wardR}, ${values.districtR} ,${values.cityR}`
@@ -363,10 +363,14 @@ const OrderForm = () => {
           const distance = await fetchDistanceData(origins, destinations);
           console.log("Khoảng cách tính được: ", distance);
 
+          console.log("Current origin value:", values.origin);
+
           const orderData = {
             ...values,
             accountId,
-            origin: `${values.origin}, ${values.wardS}, ${values.districtS} ,${values.cityS}`,
+            origin: `${values.origin}, ${values.wardS || "Phú Minh"}, ${
+              values.districtS || "Sóc Sơn"
+            } ,${values.cityS || "Hà Nội"}`,
             destination: `${values.destination}, ${values.wardR}, ${values.districtR} ,${values.cityR}`,
             freight: values.freight,
             receiverName: values.receiverName,
@@ -379,6 +383,19 @@ const OrderForm = () => {
             distance: distance,
             serviceIds: values.serviceIds,
           };
+          if (!orderData.cityS || !orderData.districtS || !orderData.wardS) {
+            if (!orderData.cityS) orderData.cityS = "Hà Nội";
+            if (!orderData.districtS) orderData.districtS = "Sóc Sơn";
+            if (!orderData.wardS) orderData.wardS = "Phú Minh";
+          }
+
+          if (japan === "Trong nước") {
+            // If 'Trong nước', adjust origin with specific values
+            orderData.origin = `${values.origin}`;
+            orderData.cityS = "Hà Nội";
+            orderData.districtS = "Sóc Sơn";
+            orderData.wardS = "Phú Minh";
+          }
 
           const orderResponse = await createOrder(orderData);
           console.log("Order data created successfully:", orderResponse);
@@ -455,7 +472,7 @@ const OrderForm = () => {
       {({ handleSubmit, errors, setFieldValue, values }) => {
         console.log("Form values on submit:", values);
         console.log("OrderDetail value on submit:", values.orderDetails);
-        console.log("Validation errors:", errors); 
+        console.log("Validation errors:", errors);
         const handleSenderProvinceChange = (event) => {
           const selectedProvince = provincesS.find(
             (province) => province.value === event.target.value
@@ -544,99 +561,151 @@ const OrderForm = () => {
             <>
               <Box sx={{ p: 4, bgcolor: "#eeeeee" }}>
                 {/* Paper 1: Receiver Information */}
-                <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
-                    Địa chỉ lấy hàng *
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="senderName"
-                        label="Tên người gửi"
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextFieldWrapper name="senderPhone" label="Điện thoại" />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <FormControl fullWidth>
-                        <InputLabel>Tỉnh (người gửi)</InputLabel>
-                        <Select
-                          name="cityS"
-                          value={selectedProvinceS}
-                          onChange={handleSenderProvinceChange}
-                          label="Tỉnh (người gửi)"
-                        >
-                          {provincesS.map((province) => (
-                            <MenuItem
-                              key={province.value}
-                              value={province.value}
-                            >
-                              {province.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <FormControl fullWidth>
-                        <InputLabel>Quận (người gửi)</InputLabel>
-                        <Select
-                          name="districtS"
-                          value={selectedDistrictSId}
-                          onChange={handleSenderDistrictChange}
-                          label="Quận (người gửi)"
-                        >
-                          {districtsS.map((district) => (
-                            <MenuItem
-                              key={district.value}
-                              value={district.value}
-                            >
-                              {district.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
 
-                    <Grid item xs={6}>
-                      <FormControl fullWidth>
-                        <InputLabel>Phường (người gửi)</InputLabel>
-                        <Select
-                          name="wards"
-                          label="Phường (người gửi)"
-                          value={selectedWardSId} // Nếu bạn có state để lưu phường đã chọn
-                          onChange={handleSenderWardChange} // Nếu bạn có hàm xử lý cho phường
-                        >
-                          {wardsS.map((ward) => (
-                            <MenuItem key={ward.value} value={ward.value}>
-                              {ward.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
+                {japan === "Trong nước" ? (
+                  <Paper elevation={4} sx={{ padding: "20px" }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ ...labelStyle }}
+                    >
+                      Địa chỉ lấy hàng
+                    </Typography>
+                    <Grid container spacing={3}>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderName"
+                          label="Tên người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderPhone"
+                          label="Điện thoại"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Tỉnh (người gửi)</InputLabel>
+                          <Select
+                            name="cityS"
+                            value={selectedProvinceS}
+                            onChange={handleSenderProvinceChange}
+                            label="Tỉnh (người gửi)"
+                          >
+                            {provincesS.map((province) => (
+                              <MenuItem
+                                key={province.value}
+                                value={province.value}
+                              >
+                                {province.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Quận (người gửi)</InputLabel>
+                          <Select
+                            name="districtS"
+                            value={selectedDistrictSId}
+                            onChange={handleSenderDistrictChange}
+                            label="Quận (người gửi)"
+                          >
+                            {districtsS.map((district) => (
+                              <MenuItem
+                                key={district.value}
+                                value={district.value}
+                              >
+                                {district.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
 
-                    <Grid item xs={6}>
-                      <TextFieldWrapper
-                        name="origin"
-                        label="Địa chỉ người gửi"
-                      />
+                      <Grid item xs={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Phường (người gửi)</InputLabel>
+                          <Select
+                            name="wards"
+                            label="Phường (người gửi)"
+                            value={selectedWardSId} // Nếu bạn có state để lưu phường đã chọn
+                            onChange={handleSenderWardChange} // Nếu bạn có hàm xử lý cho phường
+                          >
+                            {wardsS.map((ward) => (
+                              <MenuItem key={ward.value} value={ward.value}>
+                                {ward.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="origin"
+                          label="Địa chỉ người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextFieldWrapper
+                          name="senderNote"
+                          label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                      <TextFieldWrapper
-                        name="senderNote"
-                        label="Hướng dẫn giao hàng"
-                        multiline
-                        rows={3}
-                      />
+                  </Paper>
+                ) : japan === "Nhật Bản" ? (
+                  <Paper elevation={4} sx={{ padding: "20px" }}>
+                    <Typography variant="h6" gutterBottom>
+                      Địa chỉ lấy hàng *
+                    </Typography>
+                    <Grid container spacing={3}>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderName"
+                          label="Tên người gửi"
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextFieldWrapper
+                          name="senderPhone"
+                          label="Điện thoại"
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <SelectWrapper
+                          name="origin"
+                          label="Chọn sân bay tại Nhật Bản"
+                          options={airport}
+                          value={values.origin} // Ensure Formik is using the correct value here
+                          onChange={(event) =>
+                            handleAirportChange(event, setFieldValue)
+                          }
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <TextFieldWrapper
+                          name="receiverNote"
+                          label="Hướng dẫn giao hàng"
+                          multiline
+                          rows={3}
+                        />
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Paper>
+                  </Paper>
+                ) : (
+                  <p>Please select a shipping destination.</p>
+                )}
 
                 {/* Paper 2: Receiver Information */}
                 <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
+                  <Typography variant="h6" gutterBottom sx={{ ...labelStyle }}>
                     Địa chỉ người nhận
                   </Typography>
                   <Grid container spacing={3}>
@@ -739,7 +808,11 @@ const OrderForm = () => {
                           sx={{ padding: "20px", marginBottom: "20px" }}
                           key={index}
                         >
-                          <Typography variant="h6" gutterBottom>
+                          <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={{ ...labelStyle }}
+                          >
                             Thông tin cá Koi {index + 1}
                           </Typography>
                           <Grid container spacing={3}>
@@ -822,7 +895,7 @@ const OrderForm = () => {
 
                 {/* Order Information */}
                 <Paper elevation={4} sx={{ padding: "20px" }}>
-                  <Typography variant="h6" gutterBottom>
+                  <Typography variant="h6" gutterBottom sx={{ ...labelStyle }}>
                     Tùy chọn bưu gửi
                   </Typography>
                   <Grid container spacing={3}>
@@ -837,6 +910,7 @@ const OrderForm = () => {
                     <Grid item xs={12}>
                       <CustomRadioGroup
                         name="freight"
+                        selectedCountry={japan}
                         options={[
                           {
                             value: "Dịch vụ tiêu chuẩn",
@@ -872,7 +946,7 @@ const OrderForm = () => {
                     <Grid item xs={3.5}></Grid>
                     <Grid
                       item
-                      xs={5}
+                      xs={5.6}
                       justifyContent="center"
                       alignItems="center"
                     >
