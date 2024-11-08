@@ -214,12 +214,14 @@
               <div>
                 <h6>List</h6>
                 <li>
-                  <a  href="/listcustomers"><i className="bi bi-people me-2"><FiUsers /></i> Customers</a>
+                  <a  href="/listcustomers"><i className="bi bi-people me-2"><FiUsers /></i> Danh sách nhân viên</a>
                 </li>
 
                 <li>
-                  <a href="/accounts"><i className="bi bi-person-badge me-2"><FiUsers /></i> Employees</a>
-                </li>
+                <a href="/accounts">
+                  <i className="bi bi-person-badge me-2"><FiUsers /></i>Danh sách nhân viên
+                </a>
+              </li>
 
                 <li>
                   <a href="/ordersM"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Orders</a>
@@ -257,7 +259,7 @@
             <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
                 <h4 className="title">Dashboard</h4>
     
-                <header className="d-flex justify-content-between align-items-center mb-4  ">
+                <header className="d-flex justify-content-between align-items-center mb-4" style={{ marginRight: '50px' }}>
                 <div className="d-flex align-items-center search-container">
                   <input 
                   className="form-control me-5"
@@ -272,8 +274,8 @@
                       <img src={avatar || '/default-avatar.png'} alt="Avatar" className="avatar" />
                         {isDropdownOpen && ( 
                           <div className="dropdown-content">
-                              <a  href="employee-page"><CgProfile /> View Profile</a>
-                            <a  onClick={handleLogout}><CiLogout /> Logout</a>
+                                <a  href="employee-page"><CgProfile /> Thông tin tài khoản</a>
+                              <a  onClick={handleLogout}><CiLogout /> Logout</a>
                           </div>
                         )}
                       </div>

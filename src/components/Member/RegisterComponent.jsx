@@ -17,36 +17,46 @@ const RegisterComponent = () => {
   const navigate = useNavigate();
   
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  
-    if (password !== confirmPassword) {
-      enqueueSnackbar('Passwords do not match!', { variant: 'error', autoHideDuration: 1000 });
-      return;
-    }
-  
-    const account = { 
-      firstName, 
-      lastName, 
-      userName, 
-      password, 
-      email, 
-      phone, 
-      roleId: 'Customer', 
-      createAt: new Date().toISOString() 
-    };
-  
-    createAccount(account)
-      .then((response) => {
-        console.log('Account created:', response.data.message);
-        enqueueSnackbar('Register success.', { variant: 'success', autoHideDuration: 1000 });
-        navigate('/login');
-      })
-      .catch((error) => {
-        const errorMessage = error.response?.data?.message ;
-        enqueueSnackbar(errorMessage, { variant: 'error', autoHideDuration: 1000 });
-      });
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  if (password.length < 8 || !/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)/.test(password)) {
+    enqueueSnackbar('Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số.', { variant: 'error', autoHideDuration: 1000 });
+    return;
+  }
+
+  if (!/^0\d{9}$/.test(phone)) {
+    enqueueSnackbar('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0.', { variant: 'error', autoHideDuration: 1000 });
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    enqueueSnackbar('Mật khẩu không khớp', { variant: 'error', autoHideDuration: 1000 });
+    return;
+  }
+
+  const account = { 
+    firstName, 
+    lastName, 
+    userName, 
+    password, 
+    email, 
+    phone, 
+    roleId: 'Customer', 
+    createAt: new Date().toISOString() 
   };
+
+  createAccount(account)
+    .then((response) => {
+      const successMessage = response?.data?.message || 'Tạo tài khoản thành công!';
+      enqueueSnackbar(successMessage, { variant: 'success', autoHideDuration: 1000 });
+      navigate('/login');
+    })
+    .catch((error) => {
+      const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi. Vui lòng thử lại!';
+      enqueueSnackbar(errorMessage, { variant: 'error', autoHideDuration: 1000 });
+    });
+};
 
   return (
     <div className="background-section">
@@ -54,7 +64,7 @@ const RegisterComponent = () => {
         <div className="background-giphy"></div>
         <div className="register-form-container">
           <div className="register-form-box">
-            <h2>Create Your Account</h2>
+            <h2>Tạo tài</h2>
             <form onSubmit={handleSubmit} className="form-grid">
               <div className="left-column">
                 <div className="input-group">
@@ -68,7 +78,7 @@ const RegisterComponent = () => {
                   />
                 </div>
                 <div className="input-group">
-                  <label>Password</label>
+                  <label>Mật khẩu</label>
                   <input 
                     type="password" 
                     value={password} 
@@ -78,7 +88,7 @@ const RegisterComponent = () => {
                   />
                 </div>
                 <div className="input-group">
-                  <label>Confirm Password</label>
+                  <label>Xác nhận mật khẩu</label>
                   <input 
                     type="password" 
                     value={confirmPassword} 
@@ -97,12 +107,12 @@ const RegisterComponent = () => {
                     placeholder="Email"
                   />
                 </div>
-                <button type="submit" className="submit-btn">Sign Up</button>
+                <button type="submit" className="submit-btn">Đăng Kí</button>
               </div>
 
               <div className="right-column">
                 <div className="input-group">
-                  <label>First Name</label>
+                  <label>Họ </label>
                   <input 
                     type="text" 
                     value={firstName} 
@@ -112,7 +122,7 @@ const RegisterComponent = () => {
                   />
                 </div>
                 <div className="input-group">
-                  <label>Last Name</label> 
+                  <label>Tên</label> 
                   <input 
                     type="text"  
                     value={lastName} 
@@ -122,7 +132,7 @@ const RegisterComponent = () => {
                   />
                 </div>
                 <div className="input-group">
-                  <label>Phone Number</label>
+                  <label>Số điện thoại</label>
                   <input 
                     type="tel" 
                     value={phone} 
@@ -131,20 +141,7 @@ const RegisterComponent = () => {
                     placeholder="Phone Number"
                   />
                 </div>
-                {/* <div className="input-group">
-                  <label>Gender</label>
-                  <select 
-                    value={gender} 
-                    onChange={(e) => setGender(e.target.value)} 
-                    required
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div> */}
-                {/* <button type="button" className="google-login">Sign Up with Google</button> */}
+               
               </div>
             </form>
           </div>

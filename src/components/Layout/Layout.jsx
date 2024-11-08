@@ -22,6 +22,7 @@ import HelpIcon from "@mui/icons-material/Help";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
 import { getAccountById, getAvatar } from "../../services/CustomerService";
+import { logout } from "../Member/auth";
 import JapanDialog from "../FromUI/Japan";
 
 const drawerWidth = 240;
@@ -63,7 +64,7 @@ const handleCloseDialog = () => {
   const handleClose = () => setAnchorEl(null);
 
   const handleLogout = () => {
-    localStorage.removeItem("accountId");
+    logout();
     setAnchorEl(null);
     navigate("/");
   };

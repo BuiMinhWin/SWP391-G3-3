@@ -60,7 +60,7 @@ const FeedbackResponse = () => {
             );
             setResponses(prevResponses => ({
                 ...prevResponses,
-                [feedbackId]: "" // Clear the specific response text after submission
+                [feedbackId]: "" 
             }));
             alert("Phản hồi đã được gửi thành công!");
         } catch (error) {

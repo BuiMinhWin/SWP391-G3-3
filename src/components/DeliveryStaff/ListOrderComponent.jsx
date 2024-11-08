@@ -23,9 +23,6 @@ import { trackingOrderState } from '../../services/DeliveryStatusService';
 import { useSnackbar } from 'notistack';
 import axios from "axios";
 
-
-
-
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler );
 
 
@@ -48,42 +45,22 @@ const toggleDropdown = () => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
-  // const [hoveredOrder, setHoveredOrder] = useState(null); 
   const [searchQuery, setSearchQuery] = useState('');
-  const [orderDetail, setOrderDetail] = useState(null);
   const [avatar, setAvatar] = useState(null); 
 
-  // const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [monthFilter, setMonthFilter] = useState('');
   const [provinceFilter, setProvinceFilter] = useState('');
   const [provinces, setProvinces] = useState([]);
   const [statusFilter, setStatusFilter] = useState('');
   const [transportationFilter, setTransportationFilter] = useState('');
 
-  const [currentPage, setCurrentPage] = useState(1);  // Trang hiện tại
-  const ordersPerPage = 10; 
 
-  const [isDropdownOpen, setDropdownOpen] = useState(true); //drop down
+  const [isDropdownOpen, setDropdownOpen] = useState(true); 
 
   const accountId = localStorage.getItem("accountId");
       console.log("accountId:", accountId);
 
-  
-  const getOrderCounts = () => {
-    const totalOrders = orders.length;
-    const delivering = orders.filter(order => order.status >= 1 && order.status <= 3).length;
-    const approving = orders.filter(order => order.status === 0).length;
-    const fail = orders.filter(order => order.status === 4).length;
-  
-    return {
-      totalOrders,
-      delivering,
-      approving,
-      fail,
-    };
-  };
 
-  const { totalOrders, delivering, approving, fail } = getOrderCounts();
   
   const GHN_API_KEY=import.meta.env.VITE_GHN_API_KEY;
   useEffect(() => {
@@ -136,27 +113,9 @@ const toggleDropdown = () => {
   };
 
   const handleSearch = async (event) => {
-    const orderId = event.target.value;
-    setSearchQuery(orderId);
-  
-    if (orderId) {
-      try {
-        
-        const response = await getOrderDetail(orderId);
-        
-        if (response.data) {
-          setOrderDetail(response.data);  
-        } else {
-          setOrderDetail(null);  
-        }
-      } catch (error) {
-        console.error("Error fetching order details:", error);
-        setOrderDetail(null);  
-      }
-    } else {
-      setOrderDetail(null);  
-    }
+    setSearchQuery(event.target.value.toLowerCase());
   };
+
   const API_KEY =import.meta.env.VITE_GOONG_API_KEY; // Thay bằng API Key của bạn
 
   const reverseGeocodeAddress = async (lat, long) => {
@@ -185,56 +144,13 @@ const toggleDropdown = () => {
     const matchesTransportation = transportationFilter ? order.orderNote === transportationFilter : true;
 
     return matchesMonth && matchesProvince && matchesStatus && matchesTransportation;
-  });
+  })
+  .filter(order => 
+    (order.orderId && order.orderId.toString().toLowerCase().includes(searchQuery)) ||
+    (order.customerName && order.customerName.toLowerCase().includes(searchQuery)) ||
+    (order.destination && order.destination.toLowerCase().includes(searchQuery))
+  );
 
-  const indexOfLastOrder = currentPage * ordersPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
-
-  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const updateOrderStatus = async (orderId) => {
-  
-    const currentOrder = orders.find(order => order.orderId === orderId);
-    let newStatus = currentOrder.status;
-
-    if (newStatus < 5) {
-      newStatus += 1;
-    } else {
-      enqueueSnackbar("Trạng thái không thể tăng thêm nữa!", { variant: "warning", autoHideDuration: 1000 });
-      return;
-    }
-    
-    if (newStatus) {
-      updateStatus(orderId, newStatus);
-    
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          try {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            const currentLocate = await reverseGeocodeAddress(latitude, longitude);
-            const trackingData = { orderId, currentLocate, status: newStatus };
-            const response = await trackingOrderState(trackingData);
-            const result = response?.data;
-    
-            if (result) {
-              enqueueSnackbar("Cập nhật trạng thái thành công", { variant: "success", autoHideDuration: 1000 });
-              getAllOrders();
-            }
-          } catch (error) {
-            enqueueSnackbar("Cập nhật thất bại. Vui lòng thử lại.", { variant: "error", autoHideDuration: 1000 });
-          }
-        }, () => {
-          enqueueSnackbar("Không thể lấy vị trí hiện tại.", { variant: "error", autoHideDuration: 1000 });
-        });
-      } else {
-        alert("Geolocation fail.");
-      }
-    }
-  };
 
   return (
     <div className="container-fluid">
@@ -299,11 +215,11 @@ const toggleDropdown = () => {
             <div className="header-content" style={{ width: '%' }}> 
             <div className="d-flex align-items-center justify-content-center search-container">
             <input
-                className="search-bar"
-                type="text"
-                value={searchQuery}
-                onChange={handleSearch}
-                placeholder="Search Order"
+              className="search-bar"
+              type="text"
+              value={searchQuery}
+              onChange={handleSearch}
+              placeholder="Search Order"
             />
            </div>
 
@@ -324,7 +240,7 @@ const toggleDropdown = () => {
 
             <div className="notification-icon m-4">
                 <IoIosNotificationsOutline />
-                {/* <span className="notification-text">somethinghere</span> */}
+               
               </div>
           </header>
 
@@ -390,9 +306,10 @@ const toggleDropdown = () => {
                   </tr>
                 </thead>
                 <tbody>
-                {currentOrders.length > 0 ? (
-                  currentOrders
+                {filteredOrders.length > 0 ? (
+                  filteredOrders
                   .filter(order => order.deliver ===accountId&& order.status > 1 ) 
+                  .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
                   .map((order) => (
                     <tr key={order.orderId}>
                       <td>{order.orderId}</td>
@@ -422,29 +339,12 @@ const toggleDropdown = () => {
               </tbody>
               </table>
 
-              <nav>
-              <ul className="pagination">
-              {Array.from({ length: totalPages }).map((_, index) => (
-                <li key={index} className="page-item">
-                  <button onClick={() => paginate(index + 1)} className="page-link">
-                    {index + 1}
-                  </button>
-                </li>
-              ))}
-            </ul>
-            </nav>
+    
 
             </div>
           
           </section>
 
-          {/* <section className="statistics mt-4 d-flex justify-content-between border-top pt-3">
-            
-            <div className="container">
-              <h2>Orders by Status</h2>
-              <Line data={ordersByStatusChartData} options={chartOptions} />
-            </div>
-          </section> */}
         </main>
       </div>
     </div>
