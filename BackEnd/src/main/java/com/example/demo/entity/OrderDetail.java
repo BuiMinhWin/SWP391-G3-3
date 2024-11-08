@@ -34,9 +34,6 @@ public class OrderDetail {
     @Column(name = "weight")
     private float weight;
 
-    @Column(name = "discount")
-    private String discount;
-
     @Column(name = "koi_type")
     private String koiType;
 

@@ -12,7 +12,6 @@ public class OrderDetailMapper {
                 orderDetail.getOrder().getOrderId(),
                 orderDetail.getQuantity(),
                 orderDetail.getWeight(),
-                orderDetail.getDiscount(),
                 orderDetail.getKoiType(),
                 orderDetail.getCreatedAt(),
                 orderDetail.getKoiName(),
@@ -26,7 +25,6 @@ public class OrderDetailMapper {
         orderDetail.setOrder(order);
         orderDetail.setQuantity(orderDetailDTO.getQuantity());
         orderDetail.setWeight(orderDetailDTO.getWeight());
-        orderDetail.setDiscount(orderDetailDTO.getDiscount());
         orderDetail.setKoiType(orderDetailDTO.getKoiType());
         orderDetail.setCreatedAt(orderDetailDTO.getCreatedAt());
         orderDetail.setKoiName(orderDetailDTO.getKoiName());

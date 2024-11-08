@@ -86,9 +86,18 @@ public class OrderService {
         }
 
         setServicePrices(orderDTO, order);
+
         calculateAndSetOrderDetailsTotals(order);
 
         order.setPaymentStatus(0);
+
+        String discountCode = order.getDiscount();
+        if ("10PKL".equals(discountCode)) {
+            double discountAmount = order.getTotalPrice() * 0.10;
+            double newTotalPrice = order.getTotalPrice() - discountAmount;
+            order.setTotalPrice((int) newTotalPrice);
+            order.setDiscount("10PKL");
+        }
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
 
@@ -122,29 +131,15 @@ public class OrderService {
     private void calculateAndSetOrderDetailsTotals(Order order) {
         int totalQuantity = 0;
         float totalWeight = 0;
-        String discountCode = null;
 
         for (OrderDetail detail : order.getOrderDetails()) {
             totalQuantity += detail.getQuantity();
             totalWeight += detail.getWeight();
-
-            if (detail.getDiscount() != null && !detail.getDiscount().isEmpty()) {
-                discountCode = detail.getDiscount();
-            }
         }
 
         order.setTotalQuantity(totalQuantity);
         order.setTotalWeight(totalWeight);
-
-        if ("10PKL".equals(discountCode)) {
-            double discountAmount = order.getTotalPrice() * 0.10;
-            double newTotalPrice = order.getTotalPrice() - discountAmount;
-            order.setTotalPrice((int) newTotalPrice);
-        }
-
-        order.setTotalDiscount(discountCode != null ? discountCode : "No Discount");
     }
-
 
 
     public OrderDTO cancelOrder(String orderId) {

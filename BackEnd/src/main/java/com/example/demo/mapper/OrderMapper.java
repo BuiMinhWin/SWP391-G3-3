@@ -26,18 +26,6 @@ public class OrderMapper {
                 .mapToDouble(OrderDetail::getWeight)
                 .sum();
 
-        String totalDiscount = "No Discount";
-        if (!order.getOrderDetails().isEmpty()) {
-            StringBuilder discountBuilder = new StringBuilder();
-            for (OrderDetail detail : order.getOrderDetails()) {
-                if (!discountBuilder.isEmpty()) {
-                    discountBuilder.append(", ");
-                }
-                discountBuilder.append(detail.getDiscount());
-            }
-            totalDiscount = discountBuilder.toString();
-        }
-
 
         return new OrderDTO(
                 order.getOrderId(),
@@ -65,7 +53,7 @@ public class OrderMapper {
                 serviceIds,
                 totalWeight,
                 totalQuantity,
-                totalDiscount
+                order.getDiscount()
         );
     }
 
@@ -92,6 +80,7 @@ public class OrderMapper {
         order.setStatus(orderDTO.getStatus());
         order.setPaymentStatus(orderDTO.getPaymentStatus());
         order.setVnpTxnRef(orderDTO.getVnpTxnRef());
+        order.setDiscount(orderDTO.getDiscount());
 
         return order;
     }

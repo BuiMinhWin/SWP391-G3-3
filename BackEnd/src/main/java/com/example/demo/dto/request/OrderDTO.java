@@ -45,6 +45,6 @@ public class OrderDTO {
 
     private float totalWeight;
     private int totalQuantity;
-    private String totalDiscount;
+    private String discount;
 
 }

@@ -115,8 +115,8 @@ public class Order {
     @Column(name = "total_weight")
     private float totalWeight;
 
-    @Column(name = "total_discount")
-    private String totalDiscount;
+    @Column(name = "discount")
+    private String discount;
 
 
     @ManyToMany
