@@ -4,7 +4,6 @@ import com.example.demo.repository.AccountRepository;
 import com.example.demo.service.iml.MailService;
 import com.example.demo.service.iml.VerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

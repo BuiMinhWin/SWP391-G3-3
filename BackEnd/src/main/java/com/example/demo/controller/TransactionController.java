@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.request.TransactionDTO;
-import com.example.demo.dto.request.UpdateStatusDTO;
 import com.example.demo.entity.Transaction;
 import com.example.demo.mapper.TransactionMapper;
 import com.example.demo.service.iml.TransactionService;
