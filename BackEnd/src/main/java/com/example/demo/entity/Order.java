@@ -66,16 +66,16 @@ public class Order {
     @Column(name = "order_note")
     private String orderNote;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<OrderDetail> orderDetails = new HashSet<>();
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<DeliveryStatus> deliveryStatus = new HashSet<>();
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Feedback> feedBack = new HashSet<>();
 
     @Column(name = "status")
@@ -109,10 +109,10 @@ public class Order {
     @Column(name = "service_ids")
     private String serviceIds;
 
-    @Column(name = "total_quantity")
+    @Column(name = "total_quantity", nullable = false)
     private int totalQuantity;
 
-    @Column(name = "total_weight")
+    @Column(name = "total_weight", nullable = false)
     private float totalWeight;
 
     @Column(name = "discount")

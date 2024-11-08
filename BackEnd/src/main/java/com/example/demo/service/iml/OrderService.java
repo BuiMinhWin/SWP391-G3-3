@@ -74,7 +74,7 @@ public class OrderService {
         }
 
         if (order.getStatus() < 0 || order.getStatus() > 1) {
-            order.setStatus(STATUS_WAITING_APPROVAL);  // Default status when invalid
+            order.setStatus(STATUS_WAITING_APPROVAL);
             logger.debug("Order status was invalid, set to: {}", STATUS_WAITING_APPROVAL);
         }
 
@@ -86,7 +86,6 @@ public class OrderService {
         }
 
         setServicePrices(orderDTO, order);
-
         calculateAndSetOrderDetailsTotals(order);
 
         order.setPaymentStatus(0);
@@ -253,24 +252,10 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 
-        if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
-            orderDetailRepository.deleteAll(order.getOrderDetails());
-            logger.info("Deleted {} order details associated with Order ID: {}", order.getOrderDetails().size(), orderId);
-        }
-
-        if (order.getTransactions() != null && !order.getTransactions().isEmpty()) {
-            transactionRepository.deleteAll(order.getTransactions());
-            logger.info("Deleted {} transactions associated with Order ID: {}", order.getTransactions().size(), orderId);
-        }
-
-        if (order.getDeliveryStatus() != null && !order.getDeliveryStatus().isEmpty()) {
-            deliveryStatusRepository.deleteAll(order.getDeliveryStatus());
-            logger.info("Deleted {} deliveryStatus associated with Order ID: {}", order.getDeliveryStatus().size(), orderId);
-        }
-
         orderRepository.delete(order);
         logger.info("Order with ID: {} and its related entities have been deleted.", orderId);
     }
+
 
 
     public OrderDTO updateOrderStatus(String orderId, int newStatus) {
