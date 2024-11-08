@@ -97,6 +97,7 @@ public class OrderService {
             logger.debug("Added order detail: Quantity: {}, Weight: {}", detail.getQuantity(), detail.getWeight());
         }
 
+        order.setOrderDetails(orderDetails);
         order.setTotalQuantity(totalQuantity);
         order.setTotalWeight(totalWeight);
 
