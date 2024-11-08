@@ -67,16 +67,16 @@ public class Order {
     private String orderNote;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<OrderDetail> orderDetails;
+    private Set<OrderDetail> orderDetails = new HashSet<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Transaction> transactions;
+    private Set<Transaction> transactions = new HashSet<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<DeliveryStatus> deliveryStatus;
+    private Set<DeliveryStatus> deliveryStatus = new HashSet<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Feedback> feedBack;
+    private Set<Feedback> feedBack = new HashSet<>();
 
     @Column(name = "status")
     private int status;
@@ -117,7 +117,6 @@ public class Order {
 
     @Column(name = "discount")
     private String discount;
-
 
     @ManyToMany
     @JoinTable(

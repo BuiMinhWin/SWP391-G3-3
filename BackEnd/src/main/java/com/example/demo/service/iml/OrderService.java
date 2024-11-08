@@ -74,7 +74,7 @@ public class OrderService {
         }
 
         if (order.getStatus() < 0 || order.getStatus() > 1) {
-            order.setStatus(STATUS_WAITING_APPROVAL);
+            order.setStatus(STATUS_WAITING_APPROVAL);  // Default status when invalid
             logger.debug("Order status was invalid, set to: {}", STATUS_WAITING_APPROVAL);
         }
 
@@ -97,6 +97,7 @@ public class OrderService {
             double newTotalPrice = order.getTotalPrice() - discountAmount;
             order.setTotalPrice((int) newTotalPrice);
             order.setDiscount("10PKL");
+            logger.info("Applied discount code '10PKL'. New total price: {}", order.getTotalPrice());
         }
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
@@ -126,6 +127,8 @@ public class OrderService {
 
         int distancePrice = DistanceCalculator.calculateTotalPrice(order.getDistance(), RATE_PER_KM);
         order.setTotalPrice(totalServicePrice + distancePrice);
+
+        logger.debug("Total service price: {}, Total distance price: {}", totalServicePrice, distancePrice);
     }
 
     private void calculateAndSetOrderDetailsTotals(Order order) {
@@ -135,11 +138,15 @@ public class OrderService {
         for (OrderDetail detail : order.getOrderDetails()) {
             totalQuantity += detail.getQuantity();
             totalWeight += detail.getWeight();
+            logger.debug("Added order detail: Quantity: {}, Weight: {}", detail.getQuantity(), detail.getWeight());
         }
 
         order.setTotalQuantity(totalQuantity);
         order.setTotalWeight(totalWeight);
+
+        logger.debug("Total quantity: {}, Total weight: {}", totalQuantity, totalWeight);
     }
+
 
 
     public OrderDTO cancelOrder(String orderId) {
