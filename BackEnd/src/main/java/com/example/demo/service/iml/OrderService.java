@@ -105,9 +105,9 @@ public class OrderService {
         order.setPaymentStatus(0);
 
         String discountCode = order.getDiscount();
-        if ("10PKL".equals(discountCode)) {
+        if ("10PKL".equals(discountCode) && order.getTotalWeight() >= 5) {
             double discountAmount = order.getTotalPrice() * 0.10;
-            double newTotalPrice = order.getTotalPrice() + order.getTotalQuantity() * 10 + order.getTotalWeight() * 10 - discountAmount;
+            double newTotalPrice = order.getTotalPrice() + order.getTotalQuantity() * 1000 + order.getTotalWeight() * 1000 - discountAmount;
             order.setTotalPrice((int) newTotalPrice);
             order.setDiscount("10PKL");
             logger.info("Applied discount code '10PKL'. New total price: {}", order.getTotalPrice());
