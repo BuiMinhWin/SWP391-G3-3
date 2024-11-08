@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.request.FeedbackDTO;
 import com.example.demo.entity.Feedback;
-import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.FeedbackMapper;
 import com.example.demo.repository.FeedbackRepository;
 import com.example.demo.service.iml.FeedbackService;

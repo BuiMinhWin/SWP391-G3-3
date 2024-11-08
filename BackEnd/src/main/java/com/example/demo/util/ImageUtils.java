@@ -1,10 +1,6 @@
 package com.example.demo.util;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
