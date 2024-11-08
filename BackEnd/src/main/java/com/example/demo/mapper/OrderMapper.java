@@ -5,12 +5,10 @@ import com.example.demo.entity.Account;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderDetail;
 import com.example.demo.entity.Services;
-import com.example.demo.util.DistanceCalculator;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Component
 public class OrderMapper {
@@ -19,6 +17,27 @@ public class OrderMapper {
         List<Integer> serviceIds = order.getServices().stream()
                 .map(Services::getServicesId)
                 .collect(Collectors.toList());
+
+        int totalQuantity = order.getOrderDetails().stream()
+                .mapToInt(OrderDetail::getQuantity)
+                .sum();
+
+        float totalWeight = (float) order.getOrderDetails().stream()
+                .mapToDouble(OrderDetail::getWeight)
+                .sum();
+
+        String totalDiscount = "No Discount";
+        if (!order.getOrderDetails().isEmpty()) {
+            StringBuilder discountBuilder = new StringBuilder();
+            for (OrderDetail detail : order.getOrderDetails()) {
+                if (!discountBuilder.isEmpty()) {
+                    discountBuilder.append(", ");
+                }
+                discountBuilder.append(detail.getDiscount());
+            }
+            totalDiscount = discountBuilder.toString();
+        }
+
 
         return new OrderDTO(
                 order.getOrderId(),
@@ -43,7 +62,10 @@ public class OrderMapper {
                 order.getDeliver(),
                 order.getDistance(),
                 order.getVnpTxnRef(),
-                serviceIds
+                serviceIds,
+                totalWeight,
+                totalQuantity,
+                totalDiscount
         );
     }
 
@@ -73,6 +95,7 @@ public class OrderMapper {
 
         return order;
     }
+
     public OrderDTO convertToDTO(Order order) {
         return mapToOrderDTO(order);
     }

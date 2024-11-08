@@ -35,8 +35,8 @@ public class OrderController {
     }
 
     @PatchMapping("/update/{orderId}")
-    public ResponseEntity<OrderDTO> updateOrderWhenCanceled(@PathVariable String orderId, @RequestBody OrderDTO orderDTO) {
-        OrderDTO updatedOrder = orderService.updateOrderWhenCanceled(orderId, orderDTO);
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable String orderId, @RequestBody OrderDTO orderDTO) {
+        OrderDTO updatedOrder = orderService.updateOrder(orderId, orderDTO);
         return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
     }
 

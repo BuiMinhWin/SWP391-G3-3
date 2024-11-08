@@ -109,6 +109,16 @@ public class Order {
     @Column(name = "service_ids")
     private String serviceIds;
 
+    @Column(name = "total_quantity")
+    private int totalQuantity;
+
+    @Column(name = "total_weight")
+    private float totalWeight;
+
+    @Column(name = "total_discount")
+    private String totalDiscount;
+
+
     @ManyToMany
     @JoinTable(
             name = "order_services",

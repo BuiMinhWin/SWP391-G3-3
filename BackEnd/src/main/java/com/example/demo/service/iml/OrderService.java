@@ -86,6 +86,7 @@ public class OrderService {
         }
 
         setServicePrices(orderDTO, order);
+        calculateAndSetOrderDetailsTotals(order);
 
         order.setPaymentStatus(0);
 
@@ -118,6 +119,33 @@ public class OrderService {
         order.setTotalPrice(totalServicePrice + distancePrice);
     }
 
+    private void calculateAndSetOrderDetailsTotals(Order order) {
+        int totalQuantity = 0;
+        float totalWeight = 0;
+        String discountCode = null;
+
+        for (OrderDetail detail : order.getOrderDetails()) {
+            totalQuantity += detail.getQuantity();
+            totalWeight += detail.getWeight();
+
+            if (detail.getDiscount() != null && !detail.getDiscount().isEmpty()) {
+                discountCode = detail.getDiscount();
+            }
+        }
+
+        order.setTotalQuantity(totalQuantity);
+        order.setTotalWeight(totalWeight);
+
+        if ("10PKL".equals(discountCode)) {
+            double discountAmount = order.getTotalPrice() * 0.10;
+            double newTotalPrice = order.getTotalPrice() - discountAmount;
+            order.setTotalPrice((int) newTotalPrice);
+        }
+
+        order.setTotalDiscount(discountCode != null ? discountCode : "No Discount");
+    }
+
+
 
     public OrderDTO cancelOrder(String orderId) {
         logger.info("Cancelling Order with ID: {}", orderId);
@@ -137,7 +165,7 @@ public class OrderService {
         }
     }
 
-    public OrderDTO updateOrderWhenCanceled(String orderId, OrderDTO orderDTO) {
+    public OrderDTO updateOrder(String orderId, OrderDTO orderDTO) {
         logger.info("Updating Order with ID: {}", orderId);
 
         Order order = orderRepository.findById(orderId)

@@ -43,4 +43,8 @@ public class OrderDTO {
     private String vnpTxnRef;
     private List<Integer> serviceIds;
 
+    private float totalWeight;
+    private int totalQuantity;
+    private String totalDiscount;
+
 }
