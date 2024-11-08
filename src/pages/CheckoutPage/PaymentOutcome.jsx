@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { order, updatePaymentStatus } from "../../services/CustomerService";
 import CreditCardOffIcon from "@mui/icons-material/CreditCardOff";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const PaymentOutcome = () => {
   const navigate = useNavigate();
@@ -35,13 +36,13 @@ const PaymentOutcome = () => {
     backgroundColor: "#161A31",
     color: "white",
     "&:hover": { backgroundColor: "#727376" },
-    padding: "17px 16px", 
-    borderRadius: "8px", 
-    minWidth: "auto", 
-    maxWidth: "fit-content", 
-    display: "inline-flex", 
-    alignItems: "center", 
-    justifyContent: "center", 
+    padding: "17px 16px",
+    borderRadius: "8px",
+    minWidth: "auto",
+    maxWidth: "fit-content",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
   };
 
   useEffect(() => {
@@ -153,7 +154,20 @@ const PaymentOutcome = () => {
 
   // Successful payment outcome with order details
   return (
-    <Box sx={{ height: "100vh" }}>
+    <Box sx={{ height: "100vh", position: "relative" }}>
+      {/* Success check icon */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 20,
+          left: "50%",
+          transform: "translateX(-50%)",
+          color: "green",
+        }}
+      >
+        <CheckCircleIcon sx={{ fontSize: 60 }} />
+      </Box>
+
       <Box
         sx={{ p: 4, bgcolor: "#f5f5f5", height: "75vh", overflow: "hidden" }}
       >
