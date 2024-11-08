@@ -86,7 +86,19 @@ public class OrderService {
         }
 
         setServicePrices(orderDTO, order);
-        calculateAndSetOrderDetailsTotals(order);
+
+        int totalQuantity = 0;
+        float totalWeight = 0;
+
+        Set<OrderDetail> orderDetails = order.getOrderDetails();
+        for (OrderDetail detail : orderDetails) {
+            totalQuantity += detail.getQuantity();
+            totalWeight += detail.getWeight();
+            logger.debug("Added order detail: Quantity: {}, Weight: {}", detail.getQuantity(), detail.getWeight());
+        }
+
+        order.setTotalQuantity(totalQuantity);
+        order.setTotalWeight(totalWeight);
 
         order.setPaymentStatus(0);
 
@@ -130,21 +142,6 @@ public class OrderService {
         logger.debug("Total service price: {}, Total distance price: {}", totalServicePrice, distancePrice);
     }
 
-    private void calculateAndSetOrderDetailsTotals(Order order) {
-        int totalQuantity = 0;
-        float totalWeight = 0;
-
-        for (OrderDetail detail : order.getOrderDetails()) {
-            totalQuantity += detail.getQuantity();
-            totalWeight += detail.getWeight();
-            logger.debug("Added order detail: Quantity: {}, Weight: {}", detail.getQuantity(), detail.getWeight());
-        }
-
-        order.setTotalQuantity(totalQuantity);
-        order.setTotalWeight(totalWeight);
-
-        logger.debug("Total quantity: {}, Total weight: {}", totalQuantity, totalWeight);
-    }
 
 
 
