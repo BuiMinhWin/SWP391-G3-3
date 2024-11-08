@@ -9,21 +9,32 @@ const FeedbackResponse = () => {
     const [responses, setResponses] = useState({}); // Manage responses by feedbackId
 
     useEffect(() => {
-        if (orderId) {
-            getAllFeedbackByOrderId(orderId)
-                .then((response) => {
+        const fetchFeedbacks = async () => {
+            try {
+                if (orderId) {
+                    const response = await getAllFeedbackByOrderId(orderId);
                     if (Array.isArray(response)) {
                         setFeedbacks(response);
+
+                        // Initialize responses for any feedback with existing responses
+                        const initialResponses = {};
+                        response.forEach((feedback) => {
+                            if (feedback.response) {
+                                initialResponses[feedback.feedbackId] = feedback.response;
+                            }
+                        });
+                        setResponses(initialResponses);
                     } else {
                         console.error("Unexpected response format:", response);
                     }
-                })
-                .catch((error) => {
-                    console.error("Error fetching feedbacks:", error);
-                });
-        } else {
-            console.log("Order ID not found");
-        }
+                } else {
+                    console.log("Order ID not found");
+                }
+            } catch (error) {
+                console.error("Error fetching feedbacks:", error);
+            }
+        };
+        fetchFeedbacks();
     }, [orderId]);
 
     const handleInputChange = (feedbackId, value) => {
@@ -42,6 +53,11 @@ const FeedbackResponse = () => {
             };
     
             await respondToFeedback(feedbackId, payload);
+            setFeedbacks(prevFeedbacks =>
+                prevFeedbacks.map(fb =>
+                    fb.feedbackId === feedbackId ? { ...fb, response: responses[feedbackId] } : fb
+                )
+            );
             setResponses(prevResponses => ({
                 ...prevResponses,
                 [feedbackId]: "" // Clear the specific response text after submission
@@ -63,15 +79,21 @@ const FeedbackResponse = () => {
                         <p><strong>Bình luận:</strong> {feedback.comment}</p>
                         <div>
                             <label>Phản hồi của Sale:</label>
-                            <input
-                                type="text"
-                                value={responses[feedback.feedbackId] || ""}
-                                onChange={(e) => handleInputChange(feedback.feedbackId, e.target.value)}
-                                placeholder="Điền phản hồi của bạn..."
-                            />
-                            <button onClick={() => handleResponseSubmit(feedback.feedbackId)}>
-                                Gửi Phản Hồi
-                            </button>
+                            {feedback.response ? (
+                                <p>{feedback.response}</p>
+                            ) : (
+                                <>
+                                    <input
+                                        type="text"
+                                        value={responses[feedback.feedbackId] || ""}
+                                        onChange={(e) => handleInputChange(feedback.feedbackId, e.target.value)}
+                                        placeholder="Điền phản hồi của bạn..."
+                                    />
+                                    <button onClick={() => handleResponseSubmit(feedback.feedbackId)}>
+                                        Gửi Phản Hồi
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 ))
