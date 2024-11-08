@@ -18,14 +18,24 @@ import {
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import HelpIcon from "@mui/icons-material/Help";
-import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+// import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
 import { getAccountById, getAvatar } from "../../services/CustomerService";
+import JapanDialog from "../FromUI/Japan";
 
 const drawerWidth = 240;
 
 const Layout = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+const handleOpenDialog = () => {
+  setDialogOpen(true);
+};
+
+const handleCloseDialog = () => {
+  setDialogOpen(false);
+};
   const [account, setAccount] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -102,12 +112,12 @@ const Layout = () => {
             bgcolor: "#F8A02F",
             ":hover": { bgcolor: "#1565C0" },
           }}
-          component={Link}
-          to="/form"
+          onClick={handleOpenDialog}
           startIcon={<AddCircleOutlineRoundedIcon />}
         >
           Tạo đơn
         </Button>
+        <JapanDialog open={dialogOpen} onClose={handleCloseDialog} />
 
         <List sx={{ width: "100%" }}>
           <ListItem
@@ -179,7 +189,11 @@ const Layout = () => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
                 transformOrigin={{ vertical: "top", horizontal: "left" }}
               >
-                <MenuItem component={Link} to="/user-page" onClick={handleClose}>
+                <MenuItem
+                  component={Link}
+                  to="/user-page"
+                  onClick={handleClose}
+                >
                   <Typography>{account?.userName || "Unknown User"}</Typography>
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>

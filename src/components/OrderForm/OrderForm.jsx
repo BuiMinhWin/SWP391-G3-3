@@ -436,10 +436,12 @@ const OrderForm = () => {
               );
             }
           }
-
+          enqueueSnackbar("Đơn của bạn đã được tạo thành công", {
+            variant: "success",
+          });
           navigate("/checkout", { state: { orderId: newOrderId } });
         } catch (error) {
-          enqueueSnackbar("An error occurred while creating the order", {
+          enqueueSnackbar("Đã có lỗi xảy ra khi tạo đơn, vui lòng thử lại", {
             variant: "error",
           });
           console.error("Error creating order:", error);
@@ -453,7 +455,7 @@ const OrderForm = () => {
       {({ handleSubmit, errors, setFieldValue, values }) => {
         console.log("Form values on submit:", values);
         console.log("OrderDetail value on submit:", values.orderDetails);
-        console.log("Validation errors:", errors); // Log validation errors
+        console.log("Validation errors:", errors); 
         const handleSenderProvinceChange = (event) => {
           const selectedProvince = provincesS.find(
             (province) => province.value === event.target.value
