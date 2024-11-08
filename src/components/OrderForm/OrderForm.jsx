@@ -101,16 +101,24 @@ const INITIAL_FORM_STATE = {
 const FORM_VALIDATION = Yup.object().shape({
   origin: Yup.string().required("Vui lòng nhập địa điểm xuất phát"),
   destination: Yup.string().required("Vui lòng nhập địa điểm đến"),
-  receiverName: Yup.string().required("Vui lòng nhập tên người nhận"),
-  senderName: Yup.string().required("Vui lòng nhập tên người gửi"),
+  receiverName: Yup.string()
+    .matches(/^[A-Za-zÀ-ỹ\s]+$/, "Vui lòng chỉ nhập chữ cái")
+    .required("Vui lòng nhập tên người nhận"),
+  senderName: Yup.string()
+    .matches(/^[A-Za-zÀ-ỹ\s]+$/, "Vui lòng chỉ nhập chữ cái")
+    .required("Vui lòng nhập tên người gửi"),
   receiverPhone: Yup.string()
     .required("Vui lòng nhập số điện thoại người nhận")
     .matches(/^[0-9]{10}$/, "Số điện thoại phải là số và có 10 số"),
   senderPhone: Yup.string()
     .required("Vui lòng nhập số điện thoại người gửi")
     .matches(/^[0-9]{10}$/, "Số điện thoại phải là số và có 10 số"),
-  receiverNote: Yup.string().nullable(),
-  senderNote: Yup.string().nullable(),
+  receiverNote: Yup.string()
+    .nullable()
+    .max(500, "Ghi chú cần phải dưới 500 kí tự"),
+  senderNote: Yup.string()
+    .nullable()
+    .max(500, "Ghi chú cần phải dưới 500 kí tự"),
   discount: Yup.string().nullable(),
   cityS: Yup.string().required("Vui lòng chọn thành phố"),
   cityR: Yup.string().required("Vui lòng chọn thành phố"),
@@ -118,14 +126,16 @@ const FORM_VALIDATION = Yup.object().shape({
   termsOfService: Yup.boolean()
     .oneOf([true], "The terms and conditions must be accepted.")
     .required("The terms and conditions must be accepted."),
-  orderNote: Yup.string().nullable(),
+  orderNote: Yup.string()
+    .nullable()
+    .max(500, "Ghi chú cần phải dưới 500 kí tự"),
   orderDetails: Yup.array().of(
     Yup.object().shape({
-      koiType: Yup.string().required("Vui lòng nhập loại cá Koi"),
-      koiName: Yup.string().required("Vui lòng nhập tên cá Koi"),
+      koiType: Yup.string().required("Vui lòng chọn loại cá Koi"),
+      koiName: Yup.string().required("Vui lòng chọn tên cá Koi"),
       weight: Yup.number()
         .min(0.1, "Cân nặng phải lớn hơn 0")
-        .max(50, "Cá Koi kỷ lục thể giới chỉ đạt 41kg!")
+        .max(50, "Trọng lượng không vượt quá 50kg")
         .required("Vui lòng nhập cân nặng"),
       quantity: Yup.number()
         .min(1, "Số lượng phải lớn hơn 0")
@@ -134,12 +144,12 @@ const FORM_VALIDATION = Yup.object().shape({
         .required("A file is required")
         .test(
           "fileSize",
-          "File size must be less than 8MB",
+          "File cần phải nhỏ hơn 8MB",
           (value) => value && value.size <= 8 * 1024 * 1024
         )
         .test(
           "fileFormat",
-          "Only PDF files are allowed",
+          "Chỉ chấp nhận định dạng file PDF",
           (value) => value && value.type === "application/pdf"
         ),
     })
