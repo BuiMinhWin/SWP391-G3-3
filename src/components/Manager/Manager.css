@@ -37,7 +37,11 @@
   margin-bottom: 10px;
 }
 
-
+.sidebar a {
+  display: flex; 
+  align-items: center; 
+  white-space: nowrap; 
+}
 
 .sidebar nav ul li {
   margin-bottom: 15px;
