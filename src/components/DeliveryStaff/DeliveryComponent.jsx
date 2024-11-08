@@ -22,6 +22,7 @@
 
   const DeliveryComponent = () => {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    
 
     const handleLogout = () => {
       logout(); 
@@ -51,9 +52,6 @@
     const [statusFilter, setStatusFilter] = useState('');
     const [transportationFilter, setTransportationFilter] = useState('');
 
-    const [currentPage, setCurrentPage] = useState(1);  // Trang hiện tại
-    const ordersPerPage = 10; 
-  
     const [isDropdownOpen, setDropdownOpen] = useState(true); //drop down
 
     const accountId = localStorage.getItem("accountId");
@@ -130,27 +128,9 @@
 
 
     const handleSearch = async (event) => {
-      const orderId = event.target.value;
-      setSearchQuery(orderId);
-    
-      if (orderId) {
-        try {
-          
-          const response = await getOrderDetail(orderId);
-          
-          if (response.data) {
-            setOrderDetail(response.data);  
-          } else {
-            setOrderDetail(null);  
-          }
-        } catch (error) {
-          console.error("Error fetching order details:", error);
-          setOrderDetail(null);  
-        }
-      } else {
-        setOrderDetail(null);  
-      }
+      setSearchQuery(event.target.value.toLowerCase());
     };
+    
     const API_KEY =import.meta.env.VITE_GOONG_API_KEY; // Thay bằng API Key của bạn
 
     const reverseGeocodeAddress = async (lat, long) => {
@@ -177,22 +157,22 @@
 
     const handleDirection = async ( destination) => {
       navigate('/map', { state: { destination } });
-      // console.log(destination);
-      // if (navigator.geolocation) {
-      //   navigator.geolocation.getCurrentPosition(async (position) => {
+      console.log(destination);
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
          
-      //       const latitude = position.coords.latitude;
-      //       const longitude = position.coords.longitude;
-      //       const currentLocate = await reverseGeocodeAddress(latitude, longitude);
-      //       setSelectedOrigin(currentLocate);
-      //       setSelectedDestination(destination);
-      //       setShowMap(true);
-      //   }, () => {
-      //     enqueueSnackbar("Không thể lấy vị trí hiện tại.", { variant: "error", autoHideDuration: 1000 });
-      //   });
-      // } else {
-      //   enqueueSnackbar("Không thể lấy vị trí hiện tại.", { variant: "error", autoHideDuration: 1000 });
-      // }
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const currentLocate = await reverseGeocodeAddress(latitude, longitude);
+            setSelectedOrigin(currentLocate);
+            setSelectedDestination(destination);
+            setShowMap(true);
+        }, () => {
+          enqueueSnackbar("Không thể lấy vị trí hiện tại.", { variant: "error", autoHideDuration: 1000 });
+        });
+      } else {
+        enqueueSnackbar("Không thể lấy vị trí hiện tại.", { variant: "error", autoHideDuration: 1000 });
+      }
     };
    
     const filteredOrders = orders.filter(order => {
@@ -203,15 +183,15 @@
       const matchesTransportation = transportationFilter ? order.orderNote === transportationFilter : true;
   
       return matchesMonth && matchesProvince && matchesStatus && matchesTransportation;
-    });
+  })
+  .filter(order => 
+    (order.orderId && order.orderId.toString().toLowerCase().includes(searchQuery)) ||
+    (order.customerName && order.customerName.toLowerCase().includes(searchQuery)) ||
+    (order.destination && order.destination.toLowerCase().includes(searchQuery))
+  );
   
-    const indexOfLastOrder = currentPage * ordersPerPage;
-    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-    const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
 
-    const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
-  
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
 
     const updateOrderStatus = async (orderId) => {
     
@@ -351,13 +331,14 @@
               <div className="header-content" style={{ width: '%' }}> 
               <div className="d-flex align-items-center justify-content-center search-container">
               <input
-                  className="search-bar"
-                  type="text"
-                  value={searchQuery}
-                  onChange={handleSearch}
-                  placeholder="Search Order"
-              />
-             </div>
+              className="search-bar"
+              type="text"
+              value={searchQuery}
+              onChange={handleSearch}
+              placeholder="Search Order"
+            />
+           </div>
+
 
                 <div className="navbar-cus-right">
                   <div className="dropdown" onClick={toggleDropdown}>
@@ -469,9 +450,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {currentOrders.length > 0 ? (
-                    currentOrders
+                  {filteredOrders.length > 0 ? (
+                    filteredOrders
                       .filter(order => order.deliver === accountId && order.status > 1 && order.status < 5)
+                      .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
                       .map((order) => (
                         <tr key={order.orderId}>
                           <td>{order.orderId}</td>
@@ -533,18 +515,7 @@
               )}
 
 
-                <nav>
-                <ul className="pagination">
-                {Array.from({ length: totalPages }).map((_, index) => (
-                  <li key={index} className="page-item">
-                    <button onClick={() => paginate(index + 1)} className="page-link">
-                      {index + 1}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              </nav>
-
+           
               </div>
             
             </section>
