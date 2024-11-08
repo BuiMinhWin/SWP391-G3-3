@@ -25,6 +25,7 @@
     
 
     const handleLogout = () => {
+  
       logout(); 
       navigate('/'); 
     };
@@ -105,32 +106,68 @@
    
       if (accountId) fetchAccount();
 
+      const getAllOrders = () => {
+        listOrder()
+          .then((response) => {
+            if (Array.isArray(response.data)) {
+              setOrders(response.data);
+              const filteredOrders = response.data.filter(order => order.deliver === accountId);
+              localStorage.setItem("orders", JSON.stringify(filteredOrders));
+              console.log("Orders from localStorage:", JSON.parse(localStorage.getItem("orders")));
+            } else {
+              console.error("API response is not an array", response.data);
+              setOrders([]);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching : ", error);
+          });
+      };
       
   
       fetchProvinces();
       getAllOrders();
     }, []);
-  
-    const getAllOrders = () => {
-      listOrder()
-        .then((response) => {
-          if (Array.isArray(response.data)) {
-            setOrders(response.data);
-          } else {
-            console.error("API response is not an array", response.data);
-            setOrders([]);
+
+    useEffect(() => {
+      const storedOrders1 = JSON.parse(localStorage.getItem("orders")) || [];
+      const accountId = localStorage.getItem("accountId");
+    
+      const checkForNewOrders = async () => {
+        try {
+          const response = await listOrder(); 
+          const newOrders = response.data || [];
+    
+   
+          const filteredNewOrders = newOrders.filter(order => order.deliver === accountId);
+          
+       
+          const newOrderCount = filteredNewOrders.length;
+          const storedOrderCount = storedOrders1.length;
+    
+          if (newOrderCount > storedOrderCount) {
+            enqueueSnackbar(`Có ${newOrderCount - storedOrderCount} đơn hàng mới!`, { variant: "info" });
           }
-        })
-        .catch((error) => {
-          console.error("Error fetching : ", error);
-        });
-    };
+    
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+        }
+      };
+    
+      const intervalId = setInterval(checkForNewOrders, 5000);
+
+      
+      return () => clearInterval(intervalId);
+    }, []);
+ 
+  
+   
 
 
     const handleSearch = async (event) => {
       setSearchQuery(event.target.value.toLowerCase());
     };
-    
+
     const API_KEY =import.meta.env.VITE_GOONG_API_KEY; // Thay bằng API Key của bạn
 
     const reverseGeocodeAddress = async (lat, long) => {
