@@ -85,7 +85,7 @@ const CheckoutPage = () => {
   const [error, setError] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [selectedOrderDetailId, setSelectedOrderDetailId] = useState(null);
-  const servicesData = []; 
+
 
   const { enqueueSnackbar } = useSnackbar();
 
