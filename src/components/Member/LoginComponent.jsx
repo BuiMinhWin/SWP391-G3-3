@@ -47,7 +47,7 @@ const LoginComponent = () => {
           navigate('/delivery');
           break;
         case 'Customer':
-          navigate('/customer');
+          navigate('/');
           break;
         case 'Sales':
           navigate('/salestaff');
@@ -117,7 +117,7 @@ const LoginComponent = () => {
 
       if (result.roleId === 'Customer') {
         enqueueSnackbar('Google login successful', { variant: 'success', autoHideDuration: 1000 });
-        navigate('/customer');
+        navigate('/');
       } else {
         enqueueSnackbar('Unexpected roleId. Please try again.', { variant: 'warning', autoHideDuration: 1000 });
       }
