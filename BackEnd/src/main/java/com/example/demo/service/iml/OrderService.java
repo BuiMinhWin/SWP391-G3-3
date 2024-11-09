@@ -88,9 +88,9 @@ public class OrderService {
 
         setServicePrices(orderDTO, order);
 
-        if ("Narita".equalsIgnoreCase(order.getOrigin()) ||
-                "Haneda".equalsIgnoreCase(order.getOrigin()) ||
-                "Kansai".equalsIgnoreCase(order.getOrigin())) {
+        if ("Narita".contains(order.getOrigin()) ||
+                "Haneda".contains(order.getOrigin()) ||
+                "Kansai".contains(order.getOrigin())) {
 
             int updatedTotalPrice = order.getTotalPrice() + ADDITIONAL_FEE;
             order.setTotalPrice(updatedTotalPrice);
@@ -111,12 +111,15 @@ public class OrderService {
         order.setTotalQuantity(totalQuantity);
         order.setTotalWeight(totalWeight);
 
+        int amount = (int) (order.getTotalPrice() + order.getTotalQuantity() * 1000 + order.getTotalWeight() * 1000);
+        order.setTotalPrice(amount);
+
         order.setPaymentStatus(0);
 
         String discountCode = order.getDiscount();
         if ("10PKL".equals(discountCode) && order.getTotalWeight() >= 5) {
             double discountAmount = order.getTotalPrice() * 0.10;
-            double newTotalPrice = order.getTotalPrice() + order.getTotalQuantity() * 1000 + order.getTotalWeight() * 1000 - discountAmount;
+            double newTotalPrice = order.getTotalPrice() - discountAmount;
             order.setTotalPrice((int) newTotalPrice);
             order.setDiscount("10PKL");
             logger.info("Applied discount code '10PKL'. New total price: {}", order.getTotalPrice());
