@@ -24,6 +24,7 @@ import {
   orderDetail,
   cancelOrder,
   getOrderPDF,
+  fetchServices,
 } from "../../services/CustomerService";
 import axios from "axios";
 import FeedbackForm from "../../components/FeedbackForm";
@@ -82,11 +83,23 @@ const CheckoutPage = () => {
 
   const [orderData, setOrderData] = useState(null);
   const [orderDetailData, setOrderDetailData] = useState([]);
-  // const servicesData = useState([]);
+
   const [error, setError] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [selectedOrderDetailId, setSelectedOrderDetailId] = useState(null);
 
+  const [servicesData, setServicesData] = useState([]);
+  useEffect(() => {
+    const getServicesData = async () => {
+      const data = await fetchServices();
+      setServicesData(data);
+    };
+    getServicesData();
+  }, []);
+  const serviceIdToName = servicesData.reduce((acc, service) => {
+    acc[service.servicesId] = service.servicesName;
+    return acc;
+  }, {});
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -239,22 +252,17 @@ const CheckoutPage = () => {
   ];
 
   const getActiveStep = (status, paymentStatus) => {
-    if (status === 0) return 1; // "Đang xử lí"
-    if (status === 1) return 2; // "Đã duyệt"
-    if (status === 2) return 3; // "Tài xế nhận đơn"
-    if (status === 3) return 4; // "Đã lấy hàng"
-    if (status === 4) return 5; //"Đang giao"
+    if (status === 0) return 0; // "Đang xử lí"
+    if (status === 1) return 1; // "Đã duyệt"
+    if (status === 2) return 2; // "Tài xế nhận đơn"
+    if (status === 3) return 3; // "Đã lấy hàng"
+    if (status === 4) return 4; //"Đang giao"
     if (status === 5) return paymentStatus === 0 ? 5 : 6;
     return 0; // Default case
   };
 
   const activeStep = getActiveStep(orderData?.status, orderData?.paymentStatus);
   const hasError = orderData?.status === 6;
-
-  // const serviceIdToName = servicesData.reduce((acc, service) => {
-  //   acc[service.servicesId] = service.servicesName;
-  //   return acc;
-  // }, {});
 
   return (
     <Box
@@ -377,18 +385,23 @@ const CheckoutPage = () => {
               </Paper>
               <Typography>
                 Dịch vụ áp dụng:{" "}
-                {orderData.serviceIds && orderData.serviceIds.length > 0 ? (
-                orderData.serviceIds
-                  .sort((a, b) => a - b)
-                  .map((id, index) => (
-                    <span key={index}>
-                      {serviceIdToName[id] || `Dịch vụ không xác định (${id})`}
-                      {index < orderData.serviceIds.length - 1 && ", "}
-                    </span>
-                  ))
-              ) : (
-                <span>Không có dịch vụ</span>
-              )}
+                {orderData.serviceIds && orderData.serviceIds.length > 0
+                  ? orderData.serviceIds
+                      .sort((a, b) => a - b) // Sort IDs in ascending order
+                      .map((id, index) => (
+                        <span key={index}>
+                          {serviceIdToName[id] ||
+                            `Dịch vụ không xác định (${id})`}
+                          {index < orderData.serviceIds.length - 1 && ", "}
+                        </span>
+                      ))
+                  : "Không có dịch vụ nào được áp dụng"}
+              </Typography>
+              <Typography>
+                Mã giảm giá:{" "}
+                {orderData.discount && orderData.discount.trim() !== ""
+                  ? orderData.discount
+                  : "Không có mã giảm giá nào được áp dụng cho đơn hàng này"}
               </Typography>
               <Typography variant="h6">
                 Tổng giá:
@@ -431,12 +444,6 @@ const CheckoutPage = () => {
                           <Typography>Biến thể: {detail.koiName}</Typography>
                           <Typography>Số lượng: {detail.quantity}</Typography>
                           <Typography>Cân nặng: {detail.weight} kg</Typography>
-                          <Typography>
-                            Mã giảm giá:{" "}
-                            {detail.discount && detail.discount.trim() !== ""
-                              ? detail.discount
-                              : "Không có mã giảm giá nào được áp dụng cho đơn hàng này"}
-                          </Typography>
                           <Typography>
                             Tình trạng cá:{" "}
                             {detail.status === 0 ? "Bất thường" : "Khỏe mạnh"}

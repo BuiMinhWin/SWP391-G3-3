@@ -169,7 +169,13 @@ const PaymentOutcome = () => {
       </Box>
 
       <Box
-        sx={{ p: 4, bgcolor: "#f5f5f5", height: "75vh", overflow: "hidden" }}
+        sx={{
+          p: 4,
+          bgcolor: "#f5f5f5",
+          height: "75vh",
+          overflow: "hidden",
+          mt: 8, // Adds top margin to avoid overlap with the icon
+        }}
       >
         <Typography variant="h4" align="center" gutterBottom>
           Cảm ơn bạn đã tin tưởng và sử dụng dịch vụ!
