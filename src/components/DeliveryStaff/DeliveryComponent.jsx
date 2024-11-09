@@ -177,8 +177,8 @@
         );
         const data = response.data;
         if (data.results && data.results.length > 0) {
-          const address = data.results[0].formatted_address; // Get the formatted address
-          return address; // Return the full address
+          const address = data.results[0].formatted_address; 
+          return address; 
         } else {
           throw new Error('No results found for the address.');
         }
@@ -197,7 +197,6 @@
       console.log(destination);
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (position) => {
-         
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             const currentLocate = await reverseGeocodeAddress(latitude, longitude);
@@ -236,7 +235,7 @@
       let newStatus = currentOrder.status;
       console.log(newStatus);
   
-      if (newStatus < 7) {
+      if (newStatus < 5) {
         newStatus += 1;
       } else {
         enqueueSnackbar("Trạng thái không thể tăng thêm nữa!", { variant: "warning", autoHideDuration: 1000 });
