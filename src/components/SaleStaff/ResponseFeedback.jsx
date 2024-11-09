@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAllFeedbackByOrderId, respondToFeedback } from '../../services/ResponseFeedback';
 import { useParams } from 'react-router-dom';
 import './ResponseFeedback.css';
+import { colors } from '@mui/material';
 
 const FeedbackResponse = () => {
     const { orderId } = useParams();
@@ -70,7 +71,7 @@ const FeedbackResponse = () => {
     };
 
     return (
-        <div className="feedback-response-container">
+        <div className="feedback-response-container" >
             <h2>Feedback của khách hàng</h2>
             {feedbacks.length > 0 ? (
                 feedbacks.map(feedback => (
@@ -78,7 +79,7 @@ const FeedbackResponse = () => {
                         <p><strong>Xếp hạng:</strong> {feedback.rating}</p>
                         <p><strong>Bình luận:</strong> {feedback.comment}</p>
                         <div>
-                            <label>Phản hồi của Sale:</label>
+                        <p><strong>Phản hồi của Sale Staff: </strong></p>
                             {feedback.response ? (
                                 <p>{feedback.response}</p>
                             ) : (
