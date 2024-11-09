@@ -389,7 +389,7 @@ const OrderForm = () => {
             if (!orderData.wardS) orderData.wardS = "Phú Minh";
           }
 
-          if (japan === "Trong nước") {
+          if (japan === "Nhật Bản") {
             // If 'Trong nước', adjust origin with specific values
             orderData.origin = `${values.origin}`;
             orderData.cityS = "Hà Nội";
