@@ -88,6 +88,15 @@ public class OrderService {
 
         setServicePrices(orderDTO, order);
 
+        if ("Narita".equalsIgnoreCase(order.getOrigin()) ||
+                "Haneda".equalsIgnoreCase(order.getOrigin()) ||
+                "Kansai".equalsIgnoreCase(order.getOrigin())) {
+
+            int updatedTotalPrice = order.getTotalPrice() + ADDITIONAL_FEE;
+            order.setTotalPrice(updatedTotalPrice);
+            logger.info("Additional fee of {} applied due to origin. Updated total price: {}", ADDITIONAL_FEE, updatedTotalPrice);
+        }
+
         int totalQuantity = 0;
         float totalWeight = 0;
 
@@ -113,14 +122,6 @@ public class OrderService {
             logger.info("Applied discount code '10PKL'. New total price: {}", order.getTotalPrice());
         }
 
-        if ("Narita".equalsIgnoreCase(order.getOrigin()) ||
-                "Haneda".equalsIgnoreCase(order.getOrigin()) ||
-                "Kansai".equalsIgnoreCase(order.getOrigin())) {
-
-            int updatedTotalPrice = order.getTotalPrice() + ADDITIONAL_FEE;
-            order.setTotalPrice(updatedTotalPrice);
-            logger.info("Additional fee of {} applied due to origin. Updated total price: {}", ADDITIONAL_FEE, updatedTotalPrice);
-        }
 
         logger.info("Creating Order with Account ID: {}", order.getAccount().getAccountId());
 
