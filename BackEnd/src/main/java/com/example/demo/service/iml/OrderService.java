@@ -108,16 +108,16 @@ public class OrderService {
         }
 
         order.setOrderDetails(orderDetails);
-        order.setTotalQuantity(totalQuantity);
-        order.setTotalWeight(totalWeight);
+        orderDTO.setTotalQuantity(totalQuantity);
+        orderDTO.setTotalWeight(totalWeight);
 
-        int amount = (int) (order.getTotalPrice() + order.getTotalQuantity() * 1000 + order.getTotalWeight() * 1000);
+        int amount = (int) (order.getTotalPrice() + orderDTO.getTotalQuantity() * 1000 + orderDTO.getTotalWeight() * 1000);
         order.setTotalPrice(amount);
 
         order.setPaymentStatus(0);
 
         String discountCode = order.getDiscount();
-        if ("10PKL".equals(discountCode) && order.getTotalWeight() >= 5) {
+        if ("10PKL".equals(discountCode) && orderDTO.getTotalWeight() >= 5) {
             double discountAmount = order.getTotalPrice() * 0.10;
             double newTotalPrice = order.getTotalPrice() - discountAmount;
             order.setTotalPrice((int) newTotalPrice);
