@@ -32,12 +32,85 @@ export const createOrder = async (orderData) => {
 };
 
 export const uploadDocument = (orderDetailId, formData) => {
-  return axios.post(`http://koideliverysystem.id.vn:8080/api/documents/${orderDetailId}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  return axios.post(
+    `http://koideliverysystem.id.vn:8080/api/documents/${orderDetailId}`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
 };
 
+export const updateDocument = async (orderDetailId, formData) => {
+  const response = await fetch(
+    `http://koideliverysystem.id.vn:8080/api/documents/update/${orderDetailId}`,
+    {
+      method: "PUT",
+      body: formData,
+    }
+  );
 
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to reupload document: ${errorText}`);
+  }
+
+  try {
+    return await response.json();
+  } catch (error) {
+    console.warn("Response is not in JSON format. Returning raw response.");
+    return response;
+  }
+};
+
+export const updateOrderDetailStatus = async (orderDetailId, newStatus) => {
+  const response = await fetch(
+    `${REST_API_ORDER_DETAIL_URL}/update/${orderDetailId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to update order detail status: ${errorText}`);
+  }
+
+  try {
+    return await response.json();
+  } catch (error) {
+    console.warn("Response is not in JSON format. Returning raw response.");
+    return response;
+  }
+};
+export const updateOrderStatus = async (orderId, newStatus) => {
+  const response = await fetch(
+    `${REST_API_ORDER_URL}/update/${orderId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to update order status: ${errorText}`);
+  }
+
+  try {
+    return await response.json();
+  } catch (error) {
+    console.warn("Response is not in JSON format. Returning raw response.");
+    return response;
+  }
+};
 
 export const createOrderDetail = async (orderDetailData) => {
   try {
@@ -54,7 +127,10 @@ export const createOrderDetail = async (orderDetailData) => {
     console.log("Order detail created successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error creating order detail:", error.response || error.message);
+    console.error(
+      "Error creating order detail:",
+      error.response || error.message
+    );
     throw error;
   }
 };
@@ -112,12 +188,14 @@ export const cancelOrder = async (orderId) => {
 
 export const getOrderPDF = async (orderDetailId) => {
   try {
-    const response = await fetch(`${REST_API_DOCUMENT_URL}/download/order/${orderDetailId}`);
-    
+    const response = await fetch(
+      `${REST_API_DOCUMENT_URL}/download/order/${orderDetailId}`
+    );
+
     if (!response.ok) {
       throw new Error("Failed to fetch PDF");
     }
-    
+
     return await response.blob(); // Return blob for use as PDF in the UI
   } catch (error) {
     console.error("Error fetching PDF:", error);
@@ -228,10 +306,9 @@ export const getDeliveryStatusByOrderId = async (orderId) => {
   }
 };
 
-
 export const fetchServices = async () => {
   try {
-    const response = await fetch(`${REST_API_SERVICES_URL}`); 
+    const response = await fetch(`${REST_API_SERVICES_URL}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

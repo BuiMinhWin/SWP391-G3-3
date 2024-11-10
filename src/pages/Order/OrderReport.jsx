@@ -24,8 +24,7 @@ const OrderReport = () => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  //Sort order theo status
-  const statusOrder = [1, 0, 2, 3, 4, 5];
+  const statusOrder = [1, 9000, 0, 2, 3, 4, 5, 7];
 
   // Lấy order rồi filter
   useEffect(() => {
@@ -36,22 +35,23 @@ const OrderReport = () => {
         );
         const accountId = localStorage.getItem("accountId");
 
-        // Ko có hàm lấy full order nên phải filter :(( siêu tốn tài nguyên
+        // Lấy order theo accountID
         const filteredOrders = response.data.filter(
           (order) => order.accountId === accountId
         );
 
-        // Sort order theo status
+        // Sort lại thứ tự order
         const sortedOrders = filteredOrders.sort((a, b) => {
-          // Kiểm tra paymentStatus = 1 and status = 5
-          const aPriority = a.paymentStatus === 1 && a.status === 5 ? -1 : 0;
-          const bPriority = b.paymentStatus === 1 && b.status === 5 ? -1 : 0;
-          if (aPriority === bPriority) {
-            return (
-              statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)
-            );
-          }
-          return aPriority - bPriority;
+          // Status 6 có priority cao nhất
+          if (a.status === 6) return -1;
+          if (b.status === 6) return 1;
+
+          // Tiếp là 5 với paymentStatus = 0
+          if (a.status === 5 && a.paymentStatus === 0) return -1;
+          if (b.status === 5 && b.paymentStatus === 0) return 1;
+
+          // Sort còn lại thì giữ nguyên
+          return statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
         });
 
         setOrders(sortedOrders);
@@ -76,20 +76,27 @@ const OrderReport = () => {
   const getButtonProps = (status, paymentStatus) => {
     switch (status) {
       case 0:
-        return { text: "Pending", color: "warning" };
+        return { text: "Đang Duyệt", color: "warning" };
       case 1:
-        return { text: "Verified", color: "success" };
+        return { text: "Đã Duyệt", color: "success" };
       case 2:
-      case 4:
-        return { text: "Shipping", color: "info" };
+        return { text: "Đang Lấy Hàng", color: "info" };
       case 3:
-        return { text: "Tracking", color: "transparent" };
+        return { text: "Theo Dõi", color: "transparent" };
+      case 4:
+        return { text: "Đang Vận Chuyển", color: "info" };
       case 5:
-        return paymentStatus
-          ? { text: "View", color: "primary" }
-          : { text: "Checkout Now", color: "error" };
+        return paymentStatus === 1
+          ? { text: "Xem Đơn Hàng", color: "primary" }
+          : { text: "Thanh Toán", color: "error" };
+      case 6:
+        return { text: "Đơn Hàng Cần Chú Ý", color: "error" };
+      case 7:
+        return { text: "Đã nhận hàng", color: "transparent" };
+      case 9000:
+        return { text: "Lỗi tài liệu", color: "error" };
       default:
-        return { text: "Unknown", color: "default" };
+        return { text: "Không Xác Định", color: "default" };
     }
   };
 
@@ -126,23 +133,36 @@ const OrderReport = () => {
                 </Typography>
                 <Typography variant="body1">
                   Tình trạng đơn hàng:{" "}
-                  {order.status === 0
-                    ? "Đang chờ xét duyệt"
-                    : order.status === 1
-                    ? "Đã duyệt - Đơn hàng của bạn đang được chuẩn bị cho bắt đầu vận chuyển"
-                    : order.status === 2
-                    ? "Tài xế đã nhận đơn"
-                    : [3, 4].includes(order.status)
-                    ? `Đơn hàng đang được giao đến địa điểm chỉ định sau ${
-                        order.freight === "Dịch vụ tiêu chuẩn"
-                          ? "5-7 ngày"
-                          : order.freight === "Dịch vụ hỏa tốc"
-                          ? "3-4 ngày"
-                          : "Thời gian không xác định"
-                      } kể từ ngày duyệt đơn`
-                    : order.status === 5
-                    ? "Đơn hàng đã được giao đến"
-                    : "Trạng thái không xác định"}
+                  {order.status === 0 ? (
+                    "Đang chờ xét duyệt"
+                  ) : order.status === 1 ? (
+                    "Đã duyệt - Đơn hàng của bạn đang được chuẩn bị cho bắt đầu vận chuyển"
+                  ) : order.status === 2 ? (
+                    "Tài xế đã nhận đơn"
+                  ) : [3, 4].includes(order.status) ? (
+                    `Đơn hàng đang được giao đến địa điểm chỉ định sau ${
+                      order.freight === "Dịch vụ tiêu chuẩn"
+                        ? "5-7 ngày"
+                        : order.freight === "Dịch vụ hỏa tốc"
+                        ? "3-4 ngày"
+                        : order.freight === "Vận chuyển nước ngoài"
+                        ? "7-14 ngày"
+                        : "Thời gian không xác định"
+                    } kể từ ngày duyệt đơn`
+                  ) : order.status === 5 ? (
+                    "Đơn hàng đã được giao đến"
+                  ) : order.status === 6 ? (
+                    "Đơn hàng cần được chú ý"
+                  ) : order.status === 7 ? (
+                    "Đã nhận hàng"
+                  ) : order.status === 9000 ? (
+                    <span style={{ color: "red", fontWeight: "bold" }}>
+                      {" "}
+                      PDF bị từ chối - Vui lòng cập nhật lại tài liệu
+                    </span>
+                  ) : (
+                    "Trạng thái không xác định"
+                  )}
                 </Typography>
                 <Typography variant="body1">
                   Tổng tiền: {`${formatCurrency(order.totalPrice)}`} VND -{" "}
@@ -158,6 +178,10 @@ const OrderReport = () => {
                   sx={{
                     ...(order.status === 3 && {
                       backgroundColor: "#171B36",
+                      color: "white",
+                    }),
+                    ...(order.status === 7 && {
+                      backgroundColor: "#CC00CC",
                       color: "white",
                     }),
                     padding: "4px 10px",

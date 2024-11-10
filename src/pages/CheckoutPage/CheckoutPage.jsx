@@ -17,6 +17,7 @@ import {
   Card,
   CardContent,
   CardActions,
+  styled,
 } from "@mui/material";
 import {
   order,
@@ -31,6 +32,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import DeliveryStatusPopup from "../../components/DeliveryTracking";
 import PDFPreview from "../../components/PDFPreview";
+import { getService } from '../../services/EmployeeService';
 
 const buttonStyles = {
   backgroundColor: "#3e404e",
@@ -44,9 +46,27 @@ const buttonStyles = {
   alignItems: "center",
   justifyContent: "center",
 };
+const pdfButtonStyles = {
+  backgroundColor: "#3e404e",
+  color: "white",
+  "&:hover": { backgroundColor: "#727376" },
+  padding: "8px 16px",
+  borderRadius: "8px",
+  justifyContent: "center",
+};
+
+const RedStepLabel = styled(StepLabel)(({ theme }) => ({
+  color: theme.palette.error.main,
+  "& .MuiStepIcon-root": {
+    color: theme.palette.error.main, //Icon đỏ
+  },
+  "& .MuiStepIcon-text": {
+    fill: theme.palette.common.white, // chữ "X" bla bla bla
+  },
+}));
 
 const REST_API_BANK_URL =
-  "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
+ "/api/v1/payment/vn-pay";
 
 const formatCurrency = (value) => {
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -62,18 +82,20 @@ const CheckoutPage = () => {
 
   const [orderData, setOrderData] = useState(null);
   const [orderDetailData, setOrderDetailData] = useState([]);
-  // const [serviceStatusData, setServiceStatusData] = useState([]);
+  // const servicesData = useState([]);
   const [error, setError] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [selectedOrderDetailId, setSelectedOrderDetailId] = useState(null);
+
 
   const { enqueueSnackbar } = useSnackbar();
 
   const confirmCancelOrder = () => {
-    setOpenDialog(true); // Open the confirmation dialog
+    setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
-    setOpenDialog(false); // Close the dialog without canceling the order
+    setOpenDialog(false);
   };
 
   useEffect(() => {
@@ -81,6 +103,7 @@ const CheckoutPage = () => {
       try {
         const fetchedOrder = await order(orderId);
         setOrderData(fetchedOrder);
+        console.log(fetchedOrder);
 
         const fetchedOrderDetails = await orderDetail(orderId);
         setOrderDetailData(
@@ -95,7 +118,31 @@ const CheckoutPage = () => {
     if (orderId) {
       fetchOrderData();
     }
+  getAllServices();
+    
+
   }, [orderId]);
+  const [serviceIdToName, setServiceIdToName] = useState({}); 
+  const [services, setServices] = useState([]); 
+  const getAllServices = () => {
+    getService()
+      .then((response) => {
+        const serviceList = Array.isArray(response.data) ? response.data : [];
+        console.log("Fetched services:", serviceList); 
+  
+        setServices(serviceList);
+  
+        const mapping = serviceList.reduce((acc, service) => {
+          acc[service.servicesId] = service.servicesName; 
+          return acc;
+        }, {});
+  
+        setServiceIdToName(mapping); 
+        console.log("Service ID to Name Mapping:", mapping); 
+      })
+      .catch((error) => console.error("Error fetching services: ", error));
+  };
+  
 
   const fetchPDF = async (orderDetailId) => {
     try {
@@ -119,15 +166,23 @@ const CheckoutPage = () => {
     try {
       await cancelOrder(orderId);
       alert("Order canceled successfully.");
-      navigate("/customer");
+      navigate("/order-report");
     } catch (error) {
       console.error("Error canceling order:", error);
     }
   };
   const handleConfirmCancel = async () => {
-    await handleCancelOrder(); // Execute cancel order logic after confirmation
-    enqueueSnackbar("Đơn của bạn đã được hủy", { variant: "success" }); // Show success notification
-    setOpenDialog(false); // Close the dialog
+    try {
+      await handleCancelOrder();
+      enqueueSnackbar("Đơn của bạn đã được hủy", { variant: "success" });
+    } catch (error) {
+      console.error("Error during order cancellation:", error);
+      enqueueSnackbar("Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.", {
+        variant: "error",
+      });
+    } finally {
+      setOpenDialog(false);
+    }
   };
 
   const handleProceedToPayment = async () => {
@@ -137,7 +192,7 @@ const CheckoutPage = () => {
       const response = await axios.post(REST_API_BANK_URL, {
         orderId,
         bankCode: "NCB",
-        returnUrl: "http://localhost:3000/payment-outcome",
+        returnUrl: "https://koi-delivery-system.vercel.app/payment-outcome",
       });
 
       console.log("Payment API Response:", response.data);
@@ -175,31 +230,46 @@ const CheckoutPage = () => {
 
   // Define steps based on orderData
   const steps = [
-    "Xử Lí", // Step 1
-    "Duyệt đơn", // Step 2
-    "Tài xế lấy hàng",
+    "Xử Lí",
+    "Duyệt đơn",
     "Tài xế nhận đơn",
-    "Đơn đang được vận chuyển", //step 5
-    orderData.paymentStatus === 1 ? "Hoàn thành" : "Vui Lòng Thanh Toán", // Step 6
-  ];
+    "Tài xế lấy hàng",
+    "Đơn đang được vận chuyển",
+    orderData.paymentStatus === 2 && "Vui lòng thanh toán",
+    orderData.paymentStatus === 1 && "Hoàn thành"
+  ].filter(Boolean);
+  
+
 
   const getActiveStep = (status, paymentStatus) => {
-    if (status === 0) return 1; // "Đang xử lí"
-    if (status === 1) return 2; // "Đã duyệt"
-    if (status === 2) return 3; // "Tài xế nhận đơn"
-    if (status === 3) return 4; // "Đã lấy hàng"
-    if (status === 4) return 5; //"Đang giao"
-    if (status === 5) return paymentStatus === 0 ? 5 : 6;
+    if (status === 0) return 0; // "Đang xử lí"
+    if (status === 1) return 1; // "Đã duyệt"
+    if (status === 2) return 2; // "Tài xế nhận đơn"
+    if (status === 3) return 3; // "Đã lấy hàng"
+    if (status === 4) return 4; //"Đang giao"
+    if (status === 5) return paymentStatus === 2 ? 4 : 5;
     return 0; // Default case
   };
 
-  const serviceIdToName = {
-    1: "Bảo vệ cá",
-    2: "Chăm sóc cá",
-    3: "Người nhận trả tiền",
+  const handleUpdateOrderStatus = async () => {
+    try {
+      const newStatus = 7;
+      const updatedOrder = await updateOrderStatus(orderData.id, newStatus);
+      console.log("Order Id being updated to finish is:", orderData.id);
+      message;
+      console.log("Order status updated:", updatedOrder);
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
   };
 
-  const activeStep = getActiveStep(orderData.status, orderData.paymentStatus);
+  const activeStep = getActiveStep(orderData?.status, orderData?.paymentStatus);
+  const hasError = orderData?.status === 6;
+
+  // const serviceIdToName = servicesData.reduce((acc, service) => {
+  //   acc[service.servicesId] = service.servicesName;
+  //   return acc;
+  // }, {});
 
   return (
     <Box
@@ -222,16 +292,35 @@ const CheckoutPage = () => {
         >
           Thông Tin Đơn Hàng
         </Typography>
+        {orderData && orderData.status !== 7 ? (
+          <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
+            {steps.map((label, index) => (
+              <Step key={index} completed={hasError || activeStep >= index}>
+                {hasError ? (
+                  <RedStepLabel icon={<HighlightOffIcon />} error>
+                    {label}
+                  </RedStepLabel>
+                ) : (
+                  <StepLabel>{label}</StepLabel>
+                )}
+              </Step>
+            ))}
+          </Stepper>
+        ) : (
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", mt: 4, mb: 4, color: "green" }}
+          >
+            Thank you for choosing our service!
+          </Typography>
+        )}
 
-        {/* Stepper for Order Status */}
-        <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
-          {steps.map((label, index) => (
-            <Step key={index}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-
+        {hasError && (
+          <Typography color="error" variant="body2" align="center">
+            Đã có vấn đề xảy ra khi xử lí đơn của bạn. Vui lòng liên hệ đội ngũ
+            hỗ trợ để được hỗ trợ.
+          </Typography>
+        )}
         {/* Order Information */}
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -308,8 +397,20 @@ const CheckoutPage = () => {
                     : "Không có ghi chú nào cho đơn hàng này"}
                 </Typography>
               </Paper>
-              <Typography sx={{ fontWeight: "bold" }}>
-                Tình trạng đơn hàng: {steps[orderData.status]}
+              <Typography>
+                Dịch vụ áp dụng:{" "}
+                {orderData.serviceIds && orderData.serviceIds.length > 0 ? (
+                orderData.serviceIds
+                  .sort((a, b) => a - b)
+                  .map((id, index) => (
+                    <span key={index}>
+                      {serviceIdToName[id] || `Dịch vụ không xác định (${id})`}
+                      {index < orderData.serviceIds.length - 1 && ", "}
+                    </span>
+                  ))
+              ) : (
+                <span>Không có dịch vụ</span>
+              )}
               </Typography>
               <Typography variant="h6">
                 Tổng giá:
@@ -353,35 +454,29 @@ const CheckoutPage = () => {
                           <Typography>Số lượng: {detail.quantity}</Typography>
                           <Typography>Cân nặng: {detail.weight} kg</Typography>
                           <Typography>
-                            Mã giảm giá:{" "}
-                            {detail.discount && detail.discount.trim() !== ""
-                              ? detail.discount
-                              : "Không có mã giảm giá nào được áp dụng cho đơn hàng này"}
-                          </Typography>
-                          <Typography>
-                            Tình trạng cá:{" "}
-                            {detail.status === 0 ? "Bất thường" : "Khỏe mạnh"}
-                          </Typography>
-                          <Typography>
-                            Dịch vụ áp dụng:{" "}
-                            {detail.serviceIds && detail.serviceIds.length > 0
-                              ? detail.serviceIds
-                                  .sort((a, b) => a - b) // Sort the IDs in ascending order
-                                  .map((id, index) => (
-                                    <span key={index}>
-                                      {serviceIdToName[id] ||
-                                        `Dịch vụ không xác định (${id})`}
-                                      {index < detail.serviceIds.length - 1 &&
-                                        ", "}
-                                    </span>
-                                  ))
-                              : "Không có dịch vụ nào được áp dụng"}
+                            Trạng thái PDF:
+                            {detail.status === 0 ? (
+                              <span
+                                style={{ color: "red", fontWeight: "bold" }}
+                              >
+                                {" "}
+                                Bị từ chối - Vui lòng cập nhật lại tài liệu
+                              </span>
+                            ) : (
+                              <span> Bình thường</span>
+                            )}
                           </Typography>
                         </CardContent>
                         <CardActions>
                           <Button
+                            sx={{ ...pdfButtonStyles }}
                             size="small"
-                            onClick={() => handlePDFClick(detail.orderDetailId)}
+                            onClick={() =>
+                              handlePDFClick(
+                                detail.orderDetailId,
+                                detail.status
+                              )
+                            }
                           >
                             PDF
                           </Button>
@@ -391,6 +486,8 @@ const CheckoutPage = () => {
                         open={openPDF}
                         onClose={() => setOpenPDF(false)}
                         pdfUrl={pdfUrl}
+                        orderDetailStatus={detail.status}
+                        orderDetailId={detail.orderDetailId}
                       />
                     </Grid>
                   ))}
@@ -402,7 +499,18 @@ const CheckoutPage = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Grid item xs={12}>
-              {orderData.status === 5 && <FeedbackForm orderId={orderId} />}
+              {orderData.status === 7 && <FeedbackForm orderId={orderId} />}
+            </Grid>
+            <Grid item xs={12}>
+              {orderData.status === 5 && orderData.payment === 1 && (
+                <Button
+                  variant="contained"
+                  onClick={handleUpdateOrderStatus}
+                  sx={{ mt: 2, ...buttonStyles }}
+                >
+                  Xác nhận nhận hàng
+                </Button>
+              )}
             </Grid>
           </Grid>
           {(orderData.status === 0 || orderData.status === 1) &&
@@ -418,18 +526,17 @@ const CheckoutPage = () => {
               </Button>
             )}
 
-          {[1, 2, 3, 4, 5].includes(orderData.status) &&
-            !orderData.paymentStatus && (
-              <Button
-                startIcon={<PaymentIcon />}
-                sx={{ mt: 5, mx: 80 }}
-                variant="contained"
-                color="primary"
-                onClick={handleProceedToPayment}
-              >
-                Thanh toán
-              </Button>
-            )}
+          {[1, 2, 3, 4, 5].includes(orderData.status) && orderData.paymentStatus === 2 && (
+            <Button
+              startIcon={<PaymentIcon />}
+              sx={{ mt: 5, mx: 80 }}
+              variant="contained"
+              color="primary"
+              onClick={handleProceedToPayment}
+            >
+              Thanh toán
+            </Button>
+          )}
         </Grid>
         <DeliveryStatusPopup
           open={isPopupOpen}

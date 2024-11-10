@@ -2,28 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { getAllFeedbackByOrderId, respondToFeedback } from '../../services/ResponseFeedback';
 import { useParams } from 'react-router-dom';
 import './ResponseFeedback.css';
+import { colors } from '@mui/material';
 
 const FeedbackResponse = () => {
     const { orderId } = useParams();
     const [feedbacks, setFeedbacks] = useState([]);
-    const [responses, setResponses] = useState({}); // Manage responses by feedbackId
+    const [responses, setResponses] = useState({}); 
 
     useEffect(() => {
-        if (orderId) {
-            getAllFeedbackByOrderId(orderId)
-                .then((response) => {
-                    if (Array.isArray(response)) {
-                        setFeedbacks(response);
-                    } else {
-                        console.error("Unexpected response format:", response);
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching feedbacks:", error);
-                });
-        } else {
-            console.log("Order ID not found");
-        }
+        const fetchFeedbacks = async () => {
+            try {
+                const data = await getAllFeedbackByOrderId(orderId);
+                console.log("Fetched Feedbacks:", data);
+                setFeedbacks(data); 
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
+    
+        fetchFeedbacks();
     }, [orderId]);
 
     const handleInputChange = (feedbackId, value) => {
@@ -42,9 +39,14 @@ const FeedbackResponse = () => {
             };
     
             await respondToFeedback(feedbackId, payload);
+            setFeedbacks(prevFeedbacks =>
+                prevFeedbacks.map(fb =>
+                    fb.feedbackId === feedbackId ? { ...fb, response: responses[feedbackId] } : fb
+                )
+            );
             setResponses(prevResponses => ({
                 ...prevResponses,
-                [feedbackId]: "" // Clear the specific response text after submission
+                [feedbackId]: "" 
             }));
             alert("Phản hồi đã được gửi thành công!");
         } catch (error) {
@@ -54,7 +56,7 @@ const FeedbackResponse = () => {
     };
 
     return (
-        <div className="feedback-response-container">
+        <div className="feedback-response-container" >
             <h2>Feedback của khách hàng</h2>
             {feedbacks.length > 0 ? (
                 feedbacks.map(feedback => (
@@ -62,17 +64,23 @@ const FeedbackResponse = () => {
                         <p><strong>Xếp hạng:</strong> {feedback.rating}</p>
                         <p><strong>Bình luận:</strong> {feedback.comment}</p>
                         <div>
-                            <label>Phản hồi của Sale:</label>
-                            <input
-                                type="text"
-                                value={responses[feedback.feedbackId] || ""}
-                                onChange={(e) => handleInputChange(feedback.feedbackId, e.target.value)}
-                                placeholder="Điền phản hồi của bạn..."
-                            />
-                            <button onClick={() => handleResponseSubmit(feedback.feedbackId)}>
-                                Gửi Phản Hồi
-                            </button>
-                        </div>
+                        <p><strong>Phản hồi của Sale Staff: </strong></p>
+                        {feedback.responses ? (
+                            <p>{feedback.responses.comment}</p>
+                        ) : (
+                            <>
+                                <input
+                                    type="text"
+                                    value={responses[feedback.feedbackId] || ""}
+                                    onChange={(e) => handleInputChange(feedback.feedbackId, e.target.value)}
+                                    placeholder="Điền phản hồi của bạn..."
+                                />
+                                <button onClick={() => handleResponseSubmit(feedback.feedbackId)}>
+                                    Gửi Phản Hồi
+                                </button>
+                            </>
+                        )}
+                    </div>
                     </div>
                 ))
             ) : (

@@ -43,7 +43,6 @@ const buttonStyles = {
   justifyContent: "center",
 };
 
-
 const FeedbackForm = ({ orderId }) => {
   const [existingFeedback, setExistingFeedback] = useState(null);
   const [accountId, setAccountId] = useState("");
@@ -53,8 +52,10 @@ const FeedbackForm = ({ orderId }) => {
     const fetchExistingFeedback = async () => {
       try {
         const feedback = await getFeedbackByOrderId(orderId);
+        console.log(feedback);
         if (feedback && feedback.length > 0) {
           setExistingFeedback(feedback[0]);
+          
         } else {
           setExistingFeedback(null);
         }
@@ -78,10 +79,12 @@ const FeedbackForm = ({ orderId }) => {
     },
     validationSchema: Yup.object({
       rating: Yup.number()
-        .required("Please provide a rating.")
-        .min(1, "Minimum rating is 1.")
+        .required("Vui lòng để lại đánh giá của bạn.")
+        .min(1, "Đánh giá thấp nhất là 1.")
         .max(5, "Maximum rating is 5."),
-      comment: Yup.string().required("Comment is required."),
+      comment: Yup.string()
+        .nullable()
+        .max(500, "Mỗi feedback chỉ được tối đa 500 kí tự"),
     }),
     onSubmit: async (values) => {
       try {
@@ -92,12 +95,12 @@ const FeedbackForm = ({ orderId }) => {
           accountId: accountId,
         });
         enqueueSnackbar("Feedback được gửi thành công", { variant: "success" });
-        // After submission, fetch existing feedback again to update state
+     
         const feedback = await getFeedbackByOrderId(orderId);
         if (feedback && feedback.length > 0) {
-          setExistingFeedback(feedback[0]); // Update with the new feedback
+          setExistingFeedback(feedback[0]); 
         } else {
-          setExistingFeedback(null); // No feedback available
+          setExistingFeedback(null); 
         }
         formik.resetForm();
       } catch (error) {
@@ -107,7 +110,7 @@ const FeedbackForm = ({ orderId }) => {
     },
   });
 
-  // Render existing feedback if available
+
   if (existingFeedback) {
     return (
       <Box
@@ -118,27 +121,27 @@ const FeedbackForm = ({ orderId }) => {
           backgroundColor: "#fff",
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{ textDecoration: "underline" }}
-          gutterBottom
-        >
+        <Typography variant="h6" sx={{ textDecoration: "underline" }} gutterBottom>
           Feedback của bạn:
         </Typography>
         <StyledRating value={existingFeedback.rating} readOnly />
-        <Typography>Comment: {existingFeedback.comment}</Typography>
+        <Typography>Bình luận: {existingFeedback.comment}</Typography>
+        
         {/* Display responses if available */}
-        {existingFeedback.responses &&
-          existingFeedback.responses.length > 0 && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle1">Responses:</Typography>
-              {existingFeedback.responses.map((response) => (
-                <Paper key={response.feedbackId} sx={{ p: 2, mb: 1 }}>
-                  <Typography>Response: {response.comment}</Typography>
-                </Paper>
-              ))}
-            </Box>
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="subtitle1">Phản hồi:</Typography>
+          
+          {/* Ensure that responses exists before accessing its comment */}
+          {existingFeedback.responses && existingFeedback.responses.comment ? (
+            <Paper sx={{ p: 2, mb: 1 }}>
+              <Typography>{existingFeedback.responses.comment}</Typography>
+            </Paper>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Chưa có phản hồi.
+            </Typography>
           )}
+        </Box>
       </Box>
     );
   }
@@ -187,7 +190,7 @@ const FeedbackForm = ({ orderId }) => {
       {formik.touched.comment && formik.errors.comment && (
         <Typography color="error">{formik.errors.comment}</Typography>
       )}
-      <Button sx={{...buttonStyles}} variant="contained" type="submit">
+      <Button sx={{ ...buttonStyles }} variant="contained" type="submit">
         Gửi Feedback
       </Button>
     </Box>
