@@ -1,8 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.request.FeedbackDTO;
-import com.example.demo.entity.Feedback;
-import com.example.demo.mapper.FeedbackMapper;
 import com.example.demo.repository.FeedbackRepository;
 import com.example.demo.service.iml.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;

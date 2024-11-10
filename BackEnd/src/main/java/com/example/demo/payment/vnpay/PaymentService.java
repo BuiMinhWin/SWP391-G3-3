@@ -2,7 +2,6 @@ package com.example.demo.payment.vnpay;
 
 import com.example.demo.config.VNPAYConfig;
 import com.example.demo.dto.request.OrderDTO;
-import com.example.demo.entity.OrderDetail;
 import com.example.demo.exception.OrderNotFoundException;
 import com.example.demo.service.iml.OrderService;
 import com.example.demo.service.iml.TransactionService;
@@ -11,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 

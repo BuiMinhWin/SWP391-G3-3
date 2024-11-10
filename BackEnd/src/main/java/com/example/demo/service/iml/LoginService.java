@@ -22,24 +22,16 @@ public class LoginService {
     public ResponseEntity<LoginMessage> loginUser(LoginDTO loginDTO) {
         Account account = accountRepository.findByUserName(loginDTO.getUserName());
 
-        if (account == null && loginDTO.getEmail() != null) {
-            account = accountRepository.findByEmail(loginDTO.getEmail());
-        }
-
-        if (account == null && loginDTO.getPhone() != null) {
-            account = accountRepository.findByPhone(loginDTO.getPhone());
-        }
-
         if (account == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new LoginMessage("User Name or Email or Phone not exists", false, null, null));
+                    .body(new LoginMessage("User Name not exists", false, null, null));
         }
 
         if (account.getStatus() == 0) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginMessage("Login Failed: Account is inactive.", false, null, null));
         }
-        
+
         String inputPassword = loginDTO.getPassword();
         String encodedPassword = account.getPassword();
 
