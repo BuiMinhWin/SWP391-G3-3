@@ -53,18 +53,15 @@ public class DocumentService {
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order detail not found with id: " + orderDetailId));
 
-        // Tìm kiếm Document hiện tại hoặc tạo mới nếu không tồn tại
         Document existingDocument = documentRepository.findByOrderDetailOrderDetailId(orderDetailId)
                 .orElse(Document.builder()
                         .orderDetail(orderDetail)
                         .build());
 
-        // Cập nhật thông tin Document
         existingDocument.setFileName(file.getOriginalFilename());
         existingDocument.setFileType(file.getContentType());
         existingDocument.setImageData(ImageUtils.compressImage(file.getBytes()));
 
-        // Lưu Document
         documentRepository.save(existingDocument);
 
         return existingDocument.getFileName();

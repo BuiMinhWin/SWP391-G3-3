@@ -31,17 +31,9 @@ public class FeedbackController {
 
     @GetMapping("/getAllFeedbackByOrderId/{orderId}")
     public ResponseEntity<List<FeedbackDTO>> getFeedbacksByOrderId(@PathVariable String orderId) {
-        List<Feedback> feedbacks = feedbackRepository.findByOrder_OrderId(orderId);
-
-        List<FeedbackDTO> parentFeedbackDTOs = feedbacks.stream()
-                .filter(feedback -> feedback.getParentFeedback() == null)
-                .map(FeedbackMapper::maptoFeedbackDTO)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(parentFeedbackDTOs);
+        List<FeedbackDTO> feedbackDTOs = feedbackService.getFeedbacksByOrderId(orderId);
+        return ResponseEntity.ok(feedbackDTOs);
     }
-
-
 
     @PostMapping("/respond/{feedbackId}")
     public ResponseEntity<FeedbackDTO> respondToCustomerFeedback(

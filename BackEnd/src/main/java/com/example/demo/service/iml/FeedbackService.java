@@ -65,7 +65,9 @@ public class FeedbackService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
 
         List<Feedback> feedbacks = feedbackRepository.findByOrder(order);
+
         return feedbacks.stream()
+                .filter(feedback -> feedback.getParentFeedback() == null)
                 .map(FeedbackMapper::maptoFeedbackDTO)
                 .collect(Collectors.toList());
     }
