@@ -251,6 +251,18 @@ const CheckoutPage = () => {
     return 0; // Default case
   };
 
+  const handleUpdateOrderStatus = async () => {
+    try {
+      const newStatus = 7;
+      const updatedOrder = await updateOrderStatus(orderData.id, newStatus);
+      console.log("Order Id being updated to finish is:", orderData.id);
+      message;
+      console.log("Order status updated:", updatedOrder);
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
   const activeStep = getActiveStep(orderData?.status, orderData?.paymentStatus);
   const hasError = orderData?.status === 6;
 
@@ -280,21 +292,28 @@ const CheckoutPage = () => {
         >
           Thông Tin Đơn Hàng
         </Typography>
-
-        {/* Stepper for Order Status */}
-        <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
-          {steps.map((label, index) => (
-            <Step key={index} completed={hasError || activeStep >= index}>
-              {hasError ? (
-                <RedStepLabel icon={<HighlightOffIcon />} error>
-                  {label}
-                </RedStepLabel>
-              ) : (
-                <StepLabel>{label}</StepLabel>
-              )}
-            </Step>
-          ))}
-        </Stepper>
+        {orderData && orderData.status !== 7 ? (
+          <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
+            {steps.map((label, index) => (
+              <Step key={index} completed={hasError || activeStep >= index}>
+                {hasError ? (
+                  <RedStepLabel icon={<HighlightOffIcon />} error>
+                    {label}
+                  </RedStepLabel>
+                ) : (
+                  <StepLabel>{label}</StepLabel>
+                )}
+              </Step>
+            ))}
+          </Stepper>
+        ) : (
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", mt: 4, mb: 4, color: "green" }}
+          >
+            Thank you for choosing our service!
+          </Typography>
+        )}
 
         {hasError && (
           <Typography color="error" variant="body2" align="center">
@@ -480,7 +499,18 @@ const CheckoutPage = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Grid item xs={12}>
-              {orderData.status === 5 && orderData.paymentStatus === 1 && <FeedbackForm orderId={orderId} />}
+              {orderData.status === 7 && <FeedbackForm orderId={orderId} />}
+            </Grid>
+            <Grid item xs={12}>
+              {orderData.status === 5 && orderData.payment === 1 && (
+                <Button
+                  variant="contained"
+                  onClick={handleUpdateOrderStatus}
+                  sx={{ mt: 2, ...buttonStyles }}
+                >
+                  Xác nhận nhận hàng
+                </Button>
+              )}
             </Grid>
           </Grid>
           {(orderData.status === 0 || orderData.status === 1) &&
