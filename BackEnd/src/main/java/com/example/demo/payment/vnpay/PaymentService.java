@@ -90,7 +90,7 @@ public class PaymentService {
                 orderService.updatePaymentStatus(orderDTO.getOrderId(), 1);
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 1);
                 transactionService.createTransaction(orderDTO.getOrderId(), orderDTO.getTotalPrice());
-                return new PaymentDTO.VNPayResponse("00", "Success", "http://localhost:3000/payment-outcome");
+                return new PaymentDTO.VNPayResponse("00", "Success", "https://koi-delivery-system.vercel.app/payment-outcome");
             } else {
                 orderService.updateOrderStatus(orderDTO.getOrderId(), 0);
                 return new PaymentDTO.VNPayResponse("01", "Failed", null);

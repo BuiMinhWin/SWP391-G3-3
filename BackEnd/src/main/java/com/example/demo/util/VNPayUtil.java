@@ -7,6 +7,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class VNPayUtil {
@@ -43,6 +44,16 @@ public class VNPayUtil {
             ipAdress = "Invalid IP:" + e.getMessage();
         }
         return ipAdress;
+    }
+
+    public static String getRandomNumber(int len) {
+        Random rnd = new Random();
+        String chars = "0123456789";
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 
     public static String getPaymentURL(Map<String, String> paramsMap, boolean encodeKey) {
