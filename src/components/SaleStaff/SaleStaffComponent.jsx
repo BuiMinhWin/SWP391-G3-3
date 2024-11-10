@@ -138,15 +138,15 @@ import './SaleStaff.css';
           <ul className="list-unstyled">
             
               <li>
-                <a href="/confirm"><i className="bi bi-speedometer2 me-2"> <HiOutlineClipboardDocumentList /> </i>  Order awaiting confirmation</a>
+                <a href="/confirm"><i className="bi bi-speedometer2 me-2"> <HiOutlineClipboardDocumentList /> </i>  Duyệt đơn</a>
             </li>
 
             <li>
-              <a href="/salestaff/listsaleorder"><i className="bi bi-chat-dots me-2"> <HiOutlineClipboardDocumentList/> </i>  View Order</a>
+              <a href="/salestaff/listsaleorder"><i className="bi bi-chat-dots me-2"> <HiOutlineClipboardDocumentList/> </i>  Xem đơn</a>
             </li>
 
           <li>
-            <a href="/salestaff/test"><i className="bi bi-chat-dots me-2"> <HiOutlineClipboardDocumentList/> </i> Driver Booking</a>
+            <a href="/salestaff/test"><i className="bi bi-chat-dots me-2"> <HiOutlineClipboardDocumentList/> </i> Chọn tài</a>
           </li>
 
           {/* <li>
@@ -173,7 +173,7 @@ import './SaleStaff.css';
           <main className="dashboard-sale">
           <header className="d-flex justify-content-between align-items-center mb-4 pb-4">
           
-                <h4 className="title">Dashboard</h4>
+                <h4 className="title">Danh sách</h4>
                 <header className="d-flex justify-content-between align-items-center mb-4 ">
                 <div className="header-content" style={{ width: '%' }} > 
                   
