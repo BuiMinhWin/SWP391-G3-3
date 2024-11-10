@@ -1,0 +1,29 @@
+
+.table thead th {
+  background-color: #343a40;
+  color: #fff;
+  padding: 12px;
+  text-align: center;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.table tbody td {
+  padding: 12px;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid #dee2e6;
+}
+.add-btn {
+  padding:0px;
+  padding-top: 6px;
+  padding-left: 6px;
+  padding-bottom: 6px;
+  padding-right: 6px;
+  border: -1px;
+  border-radius: 10px;
+
+}
+
+
+
