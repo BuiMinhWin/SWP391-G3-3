@@ -54,6 +54,7 @@ const FeedbackForm = ({ orderId }) => {
         const feedback = await getFeedbackByOrderId(orderId);
         if (feedback && feedback.length > 0) {
           setExistingFeedback(feedback[0]);
+          console.log("Feedback data get: ", existingFeedback);
         } else {
           setExistingFeedback(null);
         }
@@ -110,6 +111,7 @@ const FeedbackForm = ({ orderId }) => {
 
   // Render existing feedback if available
   if (existingFeedback) {
+    console.log(existingFeedback.responses.comment);
     return (
       <Box
         sx={{
@@ -127,19 +129,18 @@ const FeedbackForm = ({ orderId }) => {
           Feedback của bạn:
         </Typography>
         <StyledRating value={existingFeedback.rating} readOnly />
-        <Typography>Comment: {existingFeedback.comment}</Typography>
+        <Typography>Bình luận: {existingFeedback.comment}</Typography>
         {/* Display responses if available */}
-        {existingFeedback.responses &&
-          existingFeedback.responses.length > 0 && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle1">Responses:</Typography>
-              {existingFeedback.responses.map((response) => (
-                <Paper key={response.feedbackId} sx={{ p: 2, mb: 1 }}>
-                  <Typography>Response: {response.comment}</Typography>
-                </Paper>
-              ))}
-            </Box>
-          )}
+
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="subtitle1">Phản hồi:</Typography>
+
+          <Paper sx={{ p: 2, mb: 1 }}>
+            <Typography>
+              {existingFeedback.responses.comment}
+            </Typography>
+          </Paper>
+        </Box>
       </Box>
     );
   }
