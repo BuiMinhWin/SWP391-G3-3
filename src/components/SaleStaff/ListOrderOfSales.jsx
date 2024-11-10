@@ -92,7 +92,7 @@ const ListOrderOfSales = () => {
                 <td style={{ color: order.freight === "Dịch vụ hỏa tốc" ? "red" : "green"}}>
                   {order.freight}</td>
                 <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                <td>{new Date (order.shippedDate).toLocaleDateString()}</td>
+                <td>{order.shippedDate ? new Date(order.shippedDate).toLocaleDateString() : 'Chưa giao hàng'}</td>
                 <td>{formatCurrency(order.totalPrice)}</td>   
                 <td>{order.sale}</td>
                 <td>{order.deliver}</td>
