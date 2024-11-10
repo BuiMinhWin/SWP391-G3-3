@@ -52,7 +52,7 @@ const FeedbackForm = ({ orderId }) => {
     const fetchExistingFeedback = async () => {
       try {
         const feedback = await getFeedbackByOrderId(orderId);
-       
+        console.log(feedback);
         if (feedback && feedback.length > 0) {
           setExistingFeedback(feedback[0]);
           
@@ -95,12 +95,12 @@ const FeedbackForm = ({ orderId }) => {
           accountId: accountId,
         });
         enqueueSnackbar("Feedback được gửi thành công", { variant: "success" });
-        // After submission, fetch existing feedback again to update state
+     
         const feedback = await getFeedbackByOrderId(orderId);
         if (feedback && feedback.length > 0) {
-          setExistingFeedback(feedback[0]); // Update with the new feedback
+          setExistingFeedback(feedback[0]); 
         } else {
-          setExistingFeedback(null); // No feedback available
+          setExistingFeedback(null); 
         }
         formik.resetForm();
       } catch (error) {
@@ -110,9 +110,8 @@ const FeedbackForm = ({ orderId }) => {
     },
   });
 
-  // Render existing feedback if available
+
   if (existingFeedback) {
-    console.log(existingFeedback.responses.comment);
     return (
       <Box
         sx={{
@@ -122,25 +121,26 @@ const FeedbackForm = ({ orderId }) => {
           backgroundColor: "#fff",
         }}
       >
-      <Typography
-          variant="h6"
-          sx={{ textDecoration: "underline" }}
-          gutterBottom
-        >
+        <Typography variant="h6" sx={{ textDecoration: "underline" }} gutterBottom>
           Feedback của bạn:
         </Typography>
         <StyledRating value={existingFeedback.rating} readOnly />
         <Typography>Bình luận: {existingFeedback.comment}</Typography>
+        
         {/* Display responses if available */}
-
         <Box sx={{ mt: 2 }}>
           <Typography variant="subtitle1">Phản hồi:</Typography>
-
-          <Paper sx={{ p: 2, mb: 1 }}>
-            <Typography>
-              {existingFeedback.responses.comment}
+          
+          {/* Ensure that responses exists before accessing its comment */}
+          {existingFeedback.responses && existingFeedback.responses.comment ? (
+            <Paper sx={{ p: 2, mb: 1 }}>
+              <Typography>{existingFeedback.responses.comment}</Typography>
+            </Paper>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Chưa có phản hồi.
             </Typography>
-          </Paper>
+          )}
         </Box>
       </Box>
     );
