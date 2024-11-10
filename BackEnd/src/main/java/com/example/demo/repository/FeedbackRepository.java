@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface FeedbackRepository extends JpaRepository<Feedback, String> {
     List<Feedback> findByOrder(Order order);
-    List<Feedback> findByOrder_OrderId(String orderId);
 }

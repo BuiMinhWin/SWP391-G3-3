@@ -39,18 +39,18 @@ public class MailService {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
             helper.setTo(email);
-            helper.setSubject("Password Reset Verification Code");
+            helper.setSubject("Mã xác minh để đặt lại mật khẩu");
 
             String htmlContent = "<div style='text-align: center; font-family: Arial, sans-serif;'>"
-                    + "<h2 style='font-size: 24px; color: #333;'>Your verification code is:</h2>"
+                    + "<h2 style='font-size: 24px; color: #333;'>Mã xác minh của bạn là:</h2>"
                     + "<p style='font-size: 30px; font-weight: bold; color: #171B36;'>" + verificationCode + "</p>"
-                    + "<h3>Please do not share this code with anyone. "
-                    + "<h3>The verification code is valid for</h3>"
-                    + "<span style='font-size: 24px; font-weight: bold; color: #171B36;'>5 minutes</span>.</h3>"
+                    + "<h3>Vui lòng không chia sẻ mã xác minh này với bất kỳ ai.</h3>"
+                    + "<h3>Mã xác minh này có giá trị trong</h3>"
+                    + "<span style='font-size: 24px; font-weight: bold; color: #171B36;'>5 phút</span>.</h3>"
                     + "</div>";
 
 
-            helper.setText(htmlContent, true); // Enable HTML content
+            helper.setText(htmlContent, true);
 
             mailSender.send(mimeMessage);
             return true;

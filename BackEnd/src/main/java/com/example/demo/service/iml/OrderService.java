@@ -459,11 +459,4 @@ public class OrderService {
 
         return orderDTOs;
     }
-
-    public List<OrderDetail> getOrderDetailsByOrderId(String orderId) {
-        if (orderId == null || orderId.trim().isEmpty()) {
-            throw new IllegalArgumentException("orderId cannot be null or empty");
-        }
-        return orderDetailRepository.findByOrder_OrderId(orderId);
-    }
 }
