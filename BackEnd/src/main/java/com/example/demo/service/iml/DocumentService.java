@@ -6,6 +6,7 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.DocumentRepository;
 import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.util.ImageUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +45,26 @@ public class DocumentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found for order with id: " + orderDetailId));
 
         return ImageUtils.decompressImage(document.getImageData());
+    }
+
+    @Transactional
+    public String updateImage(MultipartFile file, String orderDetailId) throws IOException {
+        OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order detail not found with id: " + orderDetailId));
+
+        Document updatedDocument = documentRepository.save(
+                Document.builder()
+                        .fileName(file.getOriginalFilename())
+                        .fileType(file.getContentType())
+                        .imageData(ImageUtils.compressImage(file.getBytes()))
+                        .orderDetail(orderDetail)
+                        .build()
+        );
+
+        if (updatedDocument != null) {
+            return file.getOriginalFilename();
+        }
+        return null;
     }
 
 }

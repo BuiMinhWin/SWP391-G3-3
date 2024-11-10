@@ -40,5 +40,23 @@ public class DocumentController {
                 .body(new ByteArrayResource(imageData));
     }
 
+    @PatchMapping(value = "/update/{orderDetailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateImage(
+            @Parameter(description = "File to upload", required = true)
+            @RequestPart("document_file") MultipartFile file,
+            @PathVariable String orderDetailId) {
+
+        try {
+            String fileName = documentService.updateImage(file, orderDetailId);
+            if (fileName != null) {
+                return ResponseEntity.status(HttpStatus.OK).body("Update success: " + fileName);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update failed.");
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
+    }
+
 
 }

@@ -31,4 +31,13 @@ public class OrderDetailController {
         List<OrderDetailDTO> orderDetails = orderDetailService.getOrderDetailsByOrderId(orderId);
         return new ResponseEntity<>(orderDetails, HttpStatus.OK);
     }
+
+    @PatchMapping("/update/{orderDetailId}")
+    public ResponseEntity<OrderDetailDTO> updateOrderDetail(
+            @PathVariable String orderDetailId,
+            @RequestBody OrderDetailDTO orderDetailDTO) {
+
+        OrderDetailDTO updatedOrderDetail = orderDetailService.updateOrderDetail(orderDetailId, orderDetailDTO);
+        return ResponseEntity.ok(updatedOrderDetail);
+    }
 }
