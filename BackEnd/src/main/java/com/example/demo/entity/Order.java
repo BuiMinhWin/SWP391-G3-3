@@ -99,16 +99,13 @@ public class Order {
     @Column(name = "sale")
     private String sale;
 
-    public OrderDetail getOrderDetail() {
-        if (orderDetails != null && !orderDetails.isEmpty()) {
-            return orderDetails.iterator().next();
-        }
-        return null;
-    }
 
     @Column(name = "service_ids")
     private String serviceIds;
 
+    private int totalQuantity;
+
+    private float totalWeight;
 
     @Column(name = "discount")
     private String discount;
