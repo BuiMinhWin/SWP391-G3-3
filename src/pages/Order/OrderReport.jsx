@@ -24,7 +24,7 @@ const OrderReport = () => {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  const statusOrder = [1, 0, 2, 3, 4, 5];
+  const statusOrder = [1, 9000, 0, 2, 3, 4, 5];
 
   // Lấy order rồi filter
   useEffect(() => {
@@ -91,6 +91,8 @@ const OrderReport = () => {
           : { text: "Thanh Toán", color: "error" };
       case 6:
         return { text: "Đơn Hàng Cần Chú Ý", color: "error" };
+        case 9000:
+          return {text: "Lỗi tài liệu", color: "error"}
       default:
         return { text: "Không Xác Định", color: "default" };
     }

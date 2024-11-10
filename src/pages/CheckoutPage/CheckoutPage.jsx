@@ -435,21 +435,29 @@ const CheckoutPage = () => {
                           <Typography>Số lượng: {detail.quantity}</Typography>
                           <Typography>Cân nặng: {detail.weight} kg</Typography>
                           <Typography>
-                            Mã giảm giá:{" "}
-                            {detail.discount && detail.discount.trim() !== ""
-                              ? detail.discount
-                              : "Không có mã giảm giá nào được áp dụng cho đơn hàng này"}
-                          </Typography>
-                          <Typography>
-                            Tình trạng cá:{" "}
-                            {detail.status === 0 ? "Bất thường" : "Khỏe mạnh"}
+                            Trạng thái PDF:
+                            {detail.status === 0 ? (
+                              <span
+                                style={{ color: "red", fontWeight: "bold" }}
+                              >
+                                {" "}
+                                Bị từ chối - Vui lòng cập nhật lại tài liệu
+                              </span>
+                            ) : (
+                              <span> Bình thường</span>
+                            )}
                           </Typography>
                         </CardContent>
                         <CardActions>
                           <Button
                             sx={{ ...pdfButtonStyles }}
                             size="small"
-                            onClick={() => handlePDFClick(detail.orderDetailId)}
+                            onClick={() =>
+                              handlePDFClick(
+                                detail.orderDetailId,
+                                detail.status
+                              )
+                            }
                           >
                             PDF
                           </Button>
@@ -459,6 +467,8 @@ const CheckoutPage = () => {
                         open={openPDF}
                         onClose={() => setOpenPDF(false)}
                         pdfUrl={pdfUrl}
+                        orderDetailStatus={detail.status}
+                        orderDetailId={detail.orderDetailId}
                       />
                     </Grid>
                   ))}
