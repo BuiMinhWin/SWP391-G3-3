@@ -55,6 +55,7 @@ const FeedbackForm = ({ orderId }) => {
         console.log(feedback);
         if (feedback && feedback.length > 0) {
           setExistingFeedback(feedback[0]);
+          
         } else {
           setExistingFeedback(null);
         }
@@ -94,12 +95,12 @@ const FeedbackForm = ({ orderId }) => {
           accountId: accountId,
         });
         enqueueSnackbar("Feedback được gửi thành công", { variant: "success" });
-
+     
         const feedback = await getFeedbackByOrderId(orderId);
         if (feedback && feedback.length > 0) {
-          setExistingFeedback(feedback[0]);
+          setExistingFeedback(feedback[0]); 
         } else {
-          setExistingFeedback(null);
+          setExistingFeedback(null); 
         }
         formik.resetForm();
       } catch (error) {
@@ -108,6 +109,7 @@ const FeedbackForm = ({ orderId }) => {
       }
     },
   });
+
 
   if (existingFeedback) {
     return (
@@ -119,20 +121,16 @@ const FeedbackForm = ({ orderId }) => {
           backgroundColor: "#fff",
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{ textDecoration: "underline" }}
-          gutterBottom
-        >
+        <Typography variant="h6" sx={{ textDecoration: "underline" }} gutterBottom>
           Feedback của bạn:
         </Typography>
         <StyledRating value={existingFeedback.rating} readOnly />
         <Typography>Bình luận: {existingFeedback.comment}</Typography>
-
+        
         {/* Display responses if available */}
         <Box sx={{ mt: 2 }}>
           <Typography variant="subtitle1">Phản hồi:</Typography>
-
+          
           {/* Ensure that responses exists before accessing its comment */}
           {existingFeedback.responses && existingFeedback.responses.comment ? (
             <Paper sx={{ p: 2, mb: 1 }}>

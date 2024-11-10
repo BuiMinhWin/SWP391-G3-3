@@ -24,7 +24,6 @@ import {
   orderDetail,
   cancelOrder,
   getOrderPDF,
-  fetchServices,
 } from "../../services/CustomerService";
 import axios from "axios";
 import FeedbackForm from "../../components/FeedbackForm";
@@ -33,6 +32,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import DeliveryStatusPopup from "../../components/DeliveryTracking";
 import PDFPreview from "../../components/PDFPreview";
+import { getService } from '../../services/EmployeeService';
 
 const buttonStyles = {
   backgroundColor: "#3e404e",
@@ -66,7 +66,7 @@ const RedStepLabel = styled(StepLabel)(({ theme }) => ({
 }));
 
 const REST_API_BANK_URL =
-  "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
+ "/api/v1/payment/vn-pay";
 
 const formatCurrency = (value) => {
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -82,23 +82,11 @@ const CheckoutPage = () => {
 
   const [orderData, setOrderData] = useState(null);
   const [orderDetailData, setOrderDetailData] = useState([]);
-
+  // const servicesData = useState([]);
   const [error, setError] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [selectedOrderDetailId, setSelectedOrderDetailId] = useState(null);
 
-  const [servicesData, setServicesData] = useState([]);
-  useEffect(() => {
-    const getServicesData = async () => {
-      const data = await fetchServices();
-      setServicesData(data);
-    };
-    getServicesData();
-  }, []);
-  const serviceIdToName = servicesData.reduce((acc, service) => {
-    acc[service.servicesId] = service.servicesName;
-    return acc;
-  }, {});
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -115,6 +103,7 @@ const CheckoutPage = () => {
       try {
         const fetchedOrder = await order(orderId);
         setOrderData(fetchedOrder);
+        console.log(fetchedOrder);
 
         const fetchedOrderDetails = await orderDetail(orderId);
         setOrderDetailData(
@@ -129,7 +118,31 @@ const CheckoutPage = () => {
     if (orderId) {
       fetchOrderData();
     }
+  getAllServices();
+    
+
   }, [orderId]);
+  const [serviceIdToName, setServiceIdToName] = useState({}); 
+  const [services, setServices] = useState([]); 
+  const getAllServices = () => {
+    getService()
+      .then((response) => {
+        const serviceList = Array.isArray(response.data) ? response.data : [];
+        console.log("Fetched services:", serviceList); 
+  
+        setServices(serviceList);
+  
+        const mapping = serviceList.reduce((acc, service) => {
+          acc[service.servicesId] = service.servicesName; 
+          return acc;
+        }, {});
+  
+        setServiceIdToName(mapping); 
+        console.log("Service ID to Name Mapping:", mapping); 
+      })
+      .catch((error) => console.error("Error fetching services: ", error));
+  };
+  
 
   const fetchPDF = async (orderDetailId) => {
     try {
@@ -179,7 +192,7 @@ const CheckoutPage = () => {
       const response = await axios.post(REST_API_BANK_URL, {
         orderId,
         bankCode: "NCB",
-        returnUrl: "http://localhost:3000/payment-outcome",
+        returnUrl: "https://koi-delivery-system.vercel.app/payment-outcome",
       });
 
       console.log("Payment API Response:", response.data);
@@ -223,8 +236,10 @@ const CheckoutPage = () => {
     "Tài xế lấy hàng",
     "Đơn đang được vận chuyển",
     orderData.paymentStatus === 2 && "Vui lòng thanh toán",
-    orderData.paymentStatus === 1 && "Hoàn thành",
+    orderData.paymentStatus === 1 && "Hoàn thành"
   ].filter(Boolean);
+  
+
 
   const getActiveStep = (status, paymentStatus) => {
     if (status === 0) return 0; // "Đang xử lí"
@@ -250,6 +265,11 @@ const CheckoutPage = () => {
 
   const activeStep = getActiveStep(orderData?.status, orderData?.paymentStatus);
   const hasError = orderData?.status === 6;
+
+  // const serviceIdToName = servicesData.reduce((acc, service) => {
+  //   acc[service.servicesId] = service.servicesName;
+  //   return acc;
+  // }, {});
 
   return (
     <Box
@@ -379,23 +399,18 @@ const CheckoutPage = () => {
               </Paper>
               <Typography>
                 Dịch vụ áp dụng:{" "}
-                {orderData.serviceIds && orderData.serviceIds.length > 0
-                  ? orderData.serviceIds
-                      .sort((a, b) => a - b) // Sort IDs in ascending order
-                      .map((id, index) => (
-                        <span key={index}>
-                          {serviceIdToName[id] ||
-                            `Dịch vụ không xác định (${id})`}
-                          {index < orderData.serviceIds.length - 1 && ", "}
-                        </span>
-                      ))
-                  : "Không có dịch vụ nào được áp dụng"}
-              </Typography>
-              <Typography>
-                Mã giảm giá:{" "}
-                {orderData.discount && orderData.discount.trim() !== ""
-                  ? orderData.discount
-                  : "Không có mã giảm giá nào được áp dụng cho đơn hàng này"}
+                {orderData.serviceIds && orderData.serviceIds.length > 0 ? (
+                orderData.serviceIds
+                  .sort((a, b) => a - b)
+                  .map((id, index) => (
+                    <span key={index}>
+                      {serviceIdToName[id] || `Dịch vụ không xác định (${id})`}
+                      {index < orderData.serviceIds.length - 1 && ", "}
+                    </span>
+                  ))
+              ) : (
+                <span>Không có dịch vụ</span>
+              )}
               </Typography>
               <Typography variant="h6">
                 Tổng giá:
@@ -511,18 +526,17 @@ const CheckoutPage = () => {
               </Button>
             )}
 
-          {[1, 2, 3, 4, 5].includes(orderData.status) &&
-            !orderData.paymentStatus && (
-              <Button
-                startIcon={<PaymentIcon />}
-                sx={{ mt: 5, mx: 80 }}
-                variant="contained"
-                color="primary"
-                onClick={handleProceedToPayment}
-              >
-                Thanh toán
-              </Button>
-            )}
+          {[1, 2, 3, 4, 5].includes(orderData.status) && orderData.paymentStatus === 2 && (
+            <Button
+              startIcon={<PaymentIcon />}
+              sx={{ mt: 5, mx: 80 }}
+              variant="contained"
+              color="primary"
+              onClick={handleProceedToPayment}
+            >
+              Thanh toán
+            </Button>
+          )}
         </Grid>
         <DeliveryStatusPopup
           open={isPopupOpen}

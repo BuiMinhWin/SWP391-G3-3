@@ -32,8 +32,9 @@ const Booking = () => {
   const getAllOrders = () => {
     listOrder()
       .then((response) => {
+        console.log(response.data); 
         if (Array.isArray(response.data)) {
-          const filteredOrders = response.data.filter(order => order.sale === accountId);
+          const filteredOrders = response.data.filter(order => order.sale === accountId && order.paymentStatus === 1);
           const sortedOrders = filteredOrders.sort((a, b) => {
             if (a.freight === "Dịch vụ hỏa tốc" && b.freight !== "Dịch vụ hỏa tốc") return -1;
             if (a.freight !== "Dịch vụ hỏa tốc" && b.freight === "Dịch vụ hỏa tốc") return 1;
@@ -96,8 +97,8 @@ const Booking = () => {
                 <td>{order.destination}</td>
                 <td style={{ color: order.freight === "Dịch vụ hỏa tốc" ? "red" : "green"}}>
                   {order.freight}</td>
-                <td>{order.orderDate}</td>
-                <td>{order.shippedDate}</td>
+                <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                <td>{new Date(order.shippedDate).toLocaleDateString()}</td>
                 <td>{formatCurrency(order.totalPrice)}</td>
                 <td>{order.deliver}</td>
                 <td>{statusLabels[order.status]}</td>

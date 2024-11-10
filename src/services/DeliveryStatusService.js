@@ -7,7 +7,6 @@ export const getAllDeliveryStatusByOrderId = (orderId) => {
 };
 
 export const trackingOrderState = (trackingData) => {
-  console.log(trackingData);
   return axios.post(`${API_BASE_URL}/create`, trackingData, {
     headers: {
       'Content-Type': 'application/json',
