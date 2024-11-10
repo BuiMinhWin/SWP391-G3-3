@@ -961,7 +961,7 @@ const OrderForm = () => {
                   <Divider
                     sx={{ backgroundColor: "black", margin: "20px 50px" }}
                   />
-                  <Grid xs={12}>
+                  <Grid item xs={12}>
                     <CheckboxWrapper
                       name="termsOfService"
                       legend="Terms Of Service"
