@@ -72,10 +72,6 @@ public class OrderDetailService {
                 .orElseThrow(() -> new ResourceNotFoundException("OrderDetail not found with id " + orderDetailId));
 
         existingOrderDetail.setStatus(orderDetailDTO.getStatus());
-        existingOrderDetail.setQuantity(orderDetailDTO.getQuantity());
-        if (orderDetailDTO.getCreatedAt() == null) {
-            orderDetailDTO.setCreatedAt(LocalDateTime.now());
-        }
 
         OrderDetail updatedOrderDetail = orderDetailRepository.save(existingOrderDetail);
 

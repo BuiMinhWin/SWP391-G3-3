@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.service.iml.DocumentService;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,21 +41,16 @@ public class DocumentController {
                 .body(new ByteArrayResource(imageData));
     }
 
-    @PatchMapping(value = "/update/{orderDetailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateImage(
-            @Parameter(description = "File to upload", required = true)
-            @RequestPart("document_file") MultipartFile file,
-            @PathVariable String orderDetailId) {
-
+    @PutMapping(value = "/update/{orderDetailId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateImage(@RequestParam("document_file") MultipartFile file,
+                                              @PathVariable String orderDetailId) {
         try {
             String fileName = documentService.updateImage(file, orderDetailId);
-            if (fileName != null) {
-                return ResponseEntity.status(HttpStatus.OK).body("Update success: " + fileName);
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update failed.");
-            }
+            return new ResponseEntity<>("Image updated successfully: " + fileName, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+            return new ResponseEntity<>("Failed to update image", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

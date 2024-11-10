@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,19 +53,24 @@ public class DocumentService {
         OrderDetail orderDetail = orderDetailRepository.findById(orderDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order detail not found with id: " + orderDetailId));
 
-        Document updatedDocument = documentRepository.save(
-                Document.builder()
-                        .fileName(file.getOriginalFilename())
-                        .fileType(file.getContentType())
-                        .imageData(ImageUtils.compressImage(file.getBytes()))
+        // Tìm kiếm Document hiện tại hoặc tạo mới nếu không tồn tại
+        Document existingDocument = documentRepository.findByOrderDetailOrderDetailId(orderDetailId)
+                .orElse(Document.builder()
                         .orderDetail(orderDetail)
-                        .build()
-        );
+                        .build());
 
-        if (updatedDocument != null) {
-            return file.getOriginalFilename();
-        }
-        return null;
+        // Cập nhật thông tin Document
+        existingDocument.setFileName(file.getOriginalFilename());
+        existingDocument.setFileType(file.getContentType());
+        existingDocument.setImageData(ImageUtils.compressImage(file.getBytes()));
+
+        // Lưu Document
+        documentRepository.save(existingDocument);
+
+        return existingDocument.getFileName();
     }
+
+
+
 
 }
