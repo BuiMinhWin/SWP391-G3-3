@@ -6,7 +6,6 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.OrderDetailMapper;
 import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.repository.OrderRepository;
-import com.example.demo.repository.ServicesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +20,12 @@ public class OrderDetailService {
 
     private final OrderDetailRepository orderDetailRepository;
     private final OrderRepository orderRepository;
-    private final ServicesRepository servicesRepository;
 
     @Autowired
     public OrderDetailService(OrderDetailRepository orderDetailRepository,
-                              OrderRepository orderRepository,
-                              ServicesRepository servicesRepository) {
+                              OrderRepository orderRepository) {
         this.orderDetailRepository = orderDetailRepository;
         this.orderRepository = orderRepository;
-        this.servicesRepository = servicesRepository; // Khởi tạo biến
     }
 
     public List<OrderDetailDTO> createOrderDetail(List<OrderDetailDTO> orderDetailDTOs) {
@@ -70,5 +66,21 @@ public class OrderDetailService {
                 .map(OrderDetailMapper::mapToOrderDetailDTO)
                 .collect(Collectors.toList());
     }
+
+    public OrderDetailDTO updateOrderDetail(String orderDetailId, OrderDetailDTO orderDetailDTO) {
+        OrderDetail existingOrderDetail = orderDetailRepository.findById(orderDetailId)
+                .orElseThrow(() -> new ResourceNotFoundException("OrderDetail not found with id " + orderDetailId));
+
+        existingOrderDetail.setStatus(orderDetailDTO.getStatus());
+        existingOrderDetail.setQuantity(orderDetailDTO.getQuantity());
+        if (orderDetailDTO.getCreatedAt() == null) {
+            orderDetailDTO.setCreatedAt(LocalDateTime.now());
+        }
+
+        OrderDetail updatedOrderDetail = orderDetailRepository.save(existingOrderDetail);
+
+        return OrderDetailMapper.mapToOrderDetailDTO(updatedOrderDetail);
+    }
+
 
 }

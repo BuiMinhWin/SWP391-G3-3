@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -40,10 +41,11 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final AccountRepository accountRepository;
     private final OrderDetailRepository orderDetailRepository;
-    private final TransactionRepository transactionRepository;
-    private final DeliveryStatusRepository deliveryStatusRepository;
     private final OrderMapper orderMapper;
     private final ServicesRepository servicesRepository;
+
+    @Value("${manager.email}")
+    private String managerEmail;
 
     private static final int STATUS_CANCELLED = 9000;
     private static final int STATUS_WAITING_APPROVAL = 0;
@@ -188,7 +190,11 @@ public class OrderService {
         }
         if (order.getStatus() == 2) {
             logger.info("Updating 'deliver' information for Processing Order with ID: {}", orderId);
-            Optional.ofNullable(orderDTO.getDeliver()).ifPresent(order::setDeliver);
+            Optional.ofNullable(orderDTO.getDeliver()).ifPresent(deliver -> {
+                order.setDeliver(deliver);
+
+                sendEmailToDelivery(deliver, order);
+            });
         }
 
         updateOrderFields(order, orderDTO);
@@ -304,7 +310,7 @@ public class OrderService {
                 break;
             case STATUS_APPROVED:
                 logger.info("Order status updated to Pending.");
-                sendEmailNotification(order);
+                sendEmailToCustomer(order, status);
                 break;
             case STATUS_ASSIGNED_TO_CARRIER:
                 logger.info("Order status updated to Processing.");
@@ -320,6 +326,8 @@ public class OrderService {
                 break;
             case STATUS_OTHER:
                 logger.info("There was a problem with the order.");
+                sendEmailToCustomer(order, status);
+                sendEmailToManager(order);
             default:
                 logger.warn("Order status updated to an unrecognized status: {}", status);
                 break;
@@ -345,12 +353,6 @@ public class OrderService {
         return orderRepository.findById(vnpTxnRef)
                 .map(order -> orderMapper.convertToDTO(order))
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + vnpTxnRef));
-    }
-
-
-    public Optional<String> getVnpTxnRefByOrderId(String orderId) {
-        return orderRepository.findById(orderId)
-                .map(Order::getVnpTxnRef);
     }
 
     public void updateVnpTxnRef(String orderId, String vnpTxnRef) {
@@ -379,13 +381,47 @@ public class OrderService {
                 .orElseThrow(() -> new OrderNotFoundException("Order not found for orderId: " + orderId));
     }
 
-    private void sendEmailNotification(Order order) {
+    private void sendEmailToCustomer(Order order, int status) {
         Account account = order.getAccount();
         String recipientEmail = account.getEmail();
-        String subject = "Your Order is Now Processing!";
-        String message = String.format("Dear %s,\n\nYour order with ID %s has been approved. Please check your order for details.\n\nThank you for shopping with us!",
-                account.getUserName(), order.getOrderId());
+        String subject = "Thông báo về đơn hàng của bạn";
+        String message;
 
+        if (status == STATUS_OTHER) {
+            message = String.format(
+                    "Kính gửi %s,\n\nĐơn hàng với mã %s của bạn hiện đang gặp vấn đề. Xin vui lòng kiểm tra đơn hàng để biết thêm chi tiết.\n\nCảm ơn bạn đã sử dụng dịch vụ của chúng tôi!",
+                    account.getUserName(), order.getOrderId());
+        } else {
+            message = String.format(
+                    "Kính gửi %s,\n\nĐơn hàng với mã %s của bạn đã được phê duyệt. Xin vui lòng kiểm tra đơn hàng để biết thêm chi tiết.\n\nCảm ơn bạn đã sử dụng dịch vụ của chúng tôi!",
+                    account.getUserName(), order.getOrderId());
+        }
+
+        sendEmail(recipientEmail, subject, message, "Thông báo Cho Khách Hàng");
+    }
+
+    private void sendEmailToDelivery(String deliver, Order order) {
+        Account deliveryAccount = accountRepository.findById(deliver)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài khoản giao hàng với ID: " + deliver));
+
+        String subject = "Đơn hàng mới được giao cho bạn";
+        String body = String.format("Kính gửi %s,\n\nBạn đã được giao một đơn hàng mới.\nMã đơn hàng: %s\nNgười nhận: %s\nĐịa chỉ giao hàng: %s\n\nTrân trọng,\nNhóm phát triển",
+                deliveryAccount.getUserName(), order.getOrderId(), order.getReceiverName(), order.getDestination());
+
+        sendEmail(deliveryAccount.getEmail(), subject, body, "Thông Báo Cho Tài Xế");
+    }
+
+
+    private void sendEmailToManager(Order order) {
+        String subject = "Thông Báo Vấn Đề Đơn Hàng";
+        String message = String.format(
+                "Kính gửi Quản lý,\n\nĐã xảy ra vấn đề với đơn hàng có mã: %s. Vui lòng kiểm tra chi tiết đơn hàng và thực hiện các hành động cần thiết.\n\nXin cảm ơn.",
+                order.getOrderId());
+
+        sendEmail(managerEmail, subject, message, "Thông Báo Cho Quản Lý");
+    }
+
+    private void sendEmail(String recipientEmail, String subject, String message, String logContext) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(recipientEmail);
         mailMessage.setSubject(subject);
@@ -393,9 +429,9 @@ public class OrderService {
 
         try {
             mailSender.send(mailMessage);
-            logger.info("Email sent to {} for Order ID: {}", recipientEmail, order.getOrderId());
+            logger.info("Email sent to {}: {}", recipientEmail, logContext);
         } catch (Exception e) {
-            logger.error("Failed to send email to {} for Order ID: {}: {}", recipientEmail, order.getOrderId(), e.getMessage());
+            logger.error("Failed to send email to {}: {}: {}", recipientEmail, logContext, e.getMessage());
         }
     }
 
