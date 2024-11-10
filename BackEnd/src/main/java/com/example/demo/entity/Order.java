@@ -103,8 +103,10 @@ public class Order {
     @Column(name = "service_ids")
     private String serviceIds;
 
+    @Transient
     private int totalQuantity;
 
+    @Transient
     private float totalWeight;
 
     @Column(name = "discount")
