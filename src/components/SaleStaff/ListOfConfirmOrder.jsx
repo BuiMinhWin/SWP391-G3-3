@@ -47,6 +47,7 @@ const ListOrderComponent = () => {
     }
   };
 
+
   const handleViewOrder = (orderId) => navigate(`/confirmDetail/${orderId}`);
 
   return (
@@ -67,7 +68,9 @@ const ListOrderComponent = () => {
             <th>Sale</th>
             <th>Trạng thái</th>
             <th>Cập nhật trạng thái</th>
-            <th>Chi tiết đơn hàng</th>
+            <th>Chi tiết</th>
+
+           
           </tr>
         </thead>
         <tbody>
@@ -102,12 +105,22 @@ const ListOrderComponent = () => {
           )}
         </td>
         <td>
-          <button
+          {order.status == 9000 ? (
+            <button
             className="btn btn-primary"
             onClick={() => handleViewOrder(order.orderId)}
           >
-            Chi tiết
+              Đơn đang chờ duyệt lại
           </button>
+          ) : (
+            <button
+            className="btn btn-primary"
+            onClick={() => handleViewOrder(order.orderId)}
+          >
+                Chi tiết
+          </button>
+          )}
+          
         </td>
       </tr>
     ))
