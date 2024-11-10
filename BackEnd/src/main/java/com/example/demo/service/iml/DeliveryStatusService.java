@@ -45,8 +45,8 @@ public class DeliveryStatusService {
         }
 
         int status = deliveryStatusDTO.getStatus();
-        if (status < 0 || status > 6) {
-            throw new IllegalArgumentException("Status must be between 0 and 6.");
+        if (status < 0 || status > 7) {
+            throw new IllegalArgumentException("Status must be between 0 and 7.");
         }
         deliveryStatus.setStatus(status);
 

@@ -55,6 +55,7 @@ public class OrderService {
     private static final int STATUS_IN_TRANSIT = 4;
     private static final int STATUS_DELIVERED = 5;
     private static final int STATUS_OTHER = 6;
+    private static final int STATUS_SUCCESS = 7;
 
     private static final int ADDITIONAL_FEE = 500000;
 
@@ -299,7 +300,7 @@ public class OrderService {
     }
 
     private int validateStatus(int newStatus) {
-        if (newStatus < STATUS_WAITING_APPROVAL || newStatus > STATUS_OTHER) {
+        if (newStatus < STATUS_WAITING_APPROVAL || newStatus > STATUS_SUCCESS) {
             logger.info("Invalid status provided. Defaulting to Processing.");
             return STATUS_ASSIGNED_TO_CARRIER;
         }
@@ -331,6 +332,9 @@ public class OrderService {
                 logger.info("There was a problem with the order.");
                 sendEmailToCustomer(order, status);
                 sendEmailToManager(order);
+            case STATUS_SUCCESS:
+                logger.info("Order success.");
+                break;
             default:
                 logger.warn("Order status updated to an unrecognized status: {}", status);
                 break;
