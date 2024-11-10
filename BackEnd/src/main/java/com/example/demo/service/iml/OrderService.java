@@ -81,6 +81,8 @@ public class OrderService {
             logger.debug("Order status was invalid, set to: {}", STATUS_WAITING_APPROVAL);
         }
 
+        order.setPaymentStatus(0);
+
         if (orderDTO.getServiceIds() != null && !orderDTO.getServiceIds().isEmpty()) {
             String serviceIdsString = orderDTO.getServiceIds().stream()
                     .map(String::valueOf)
@@ -116,8 +118,6 @@ public class OrderService {
         int amount = (int) (order.getTotalPrice() + order.getTotalQuantity() * 1000 + order.getTotalWeight() * 1000);
         order.setTotalPrice(amount);
 
-        order.setPaymentStatus(0);
-
         String discountCode = order.getDiscount();
         if ("10PKL".equals(discountCode) && order.getTotalWeight() >= 5) {
             double discountAmount = order.getTotalPrice() * 0.10;
@@ -149,6 +149,9 @@ public class OrderService {
 
             servicesSet.add(service);
             totalServicePrice += service.getPrice();
+        }
+        if(order.getServiceIds().contains("3")){
+            order.setPaymentStatus(2);
         }
 
         order.setServices(servicesSet);
