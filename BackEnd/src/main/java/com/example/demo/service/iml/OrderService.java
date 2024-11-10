@@ -300,7 +300,7 @@ public class OrderService {
     }
 
     private int validateStatus(int newStatus) {
-        if (newStatus == 9000 || (newStatus >= STATUS_WAITING_APPROVAL && newStatus <= STATUS_SUCCESS)) {
+        if (newStatus == STATUS_CANCELLED || (newStatus >= STATUS_WAITING_APPROVAL && newStatus <= STATUS_SUCCESS)) {
             return newStatus;
         } else {
             logger.info("Invalid status provided. Defaulting to Processing.");
