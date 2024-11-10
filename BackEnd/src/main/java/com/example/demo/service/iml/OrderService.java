@@ -300,11 +300,12 @@ public class OrderService {
     }
 
     private int validateStatus(int newStatus) {
-        if (newStatus < STATUS_WAITING_APPROVAL || newStatus > STATUS_SUCCESS ) {
+        if (newStatus == 9000 || (newStatus >= STATUS_WAITING_APPROVAL && newStatus <= STATUS_SUCCESS)) {
+            return newStatus;
+        } else {
             logger.info("Invalid status provided. Defaulting to Processing.");
             return STATUS_WAITING_APPROVAL;
         }
-        return newStatus;
     }
 
     private void handleStatusSpecificLogic(Order order, int status) {
