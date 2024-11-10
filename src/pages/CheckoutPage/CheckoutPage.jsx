@@ -66,7 +66,7 @@ const RedStepLabel = styled(StepLabel)(({ theme }) => ({
 }));
 
 const REST_API_BANK_URL =
- "http://koideliverysystem.id.vn:8080/api/v1/payment/vn-pay";
+ "/api/v1/payment/vn-pay";
 
 const formatCurrency = (value) => {
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -192,7 +192,7 @@ const CheckoutPage = () => {
       const response = await axios.post(REST_API_BANK_URL, {
         orderId,
         bankCode: "NCB",
-        returnUrl: "http://localhost:3000/payment-outcome",
+        returnUrl: "https://koi-delivery-system.vercel.app/payment-outcome",
       });
 
       console.log("Payment API Response:", response.data);
@@ -235,8 +235,11 @@ const CheckoutPage = () => {
     "Tài xế nhận đơn",
     "Tài xế lấy hàng",
     "Đơn đang được vận chuyển",
-    orderData.paymentStatus === 1 ? "Hoàn thành" : "Vui Lòng Thanh Toán",
-  ];
+    orderData.paymentStatus === 2 && "Vui lòng thanh toán",
+    orderData.paymentStatus === 1 && "Hoàn thành"
+  ].filter(Boolean);
+  
+
 
   const getActiveStep = (status, paymentStatus) => {
     if (status === 0) return 0; // "Đang xử lí"
@@ -244,7 +247,7 @@ const CheckoutPage = () => {
     if (status === 2) return 2; // "Tài xế nhận đơn"
     if (status === 3) return 3; // "Đã lấy hàng"
     if (status === 4) return 4; //"Đang giao"
-    if (status === 5) return paymentStatus === 0 ? 5 : 6;
+    if (status === 5) return paymentStatus === 2 ? 4 : 5;
     return 0; // Default case
   };
 
@@ -467,7 +470,7 @@ const CheckoutPage = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Grid item xs={12}>
-              {orderData.status === 5 && <FeedbackForm orderId={orderId} />}
+              {orderData.status === 5 && orderData.paymentStatus === 1 && <FeedbackForm orderId={orderId} />}
             </Grid>
           </Grid>
           {(orderData.status === 0 || orderData.status === 1) &&
@@ -483,18 +486,17 @@ const CheckoutPage = () => {
               </Button>
             )}
 
-          {[1, 2, 3, 4, 5].includes(orderData.status) &&
-            !orderData.paymentStatus && (
-              <Button
-                startIcon={<PaymentIcon />}
-                sx={{ mt: 5, mx: 80 }}
-                variant="contained"
-                color="primary"
-                onClick={handleProceedToPayment}
-              >
-                Thanh toán
-              </Button>
-            )}
+          {[1, 2, 3, 4, 5].includes(orderData.status) && orderData.paymentStatus === 2 && (
+            <Button
+              startIcon={<PaymentIcon />}
+              sx={{ mt: 5, mx: 80 }}
+              variant="contained"
+              color="primary"
+              onClick={handleProceedToPayment}
+            >
+              Thanh toán
+            </Button>
+          )}
         </Grid>
         <DeliveryStatusPopup
           open={isPopupOpen}
