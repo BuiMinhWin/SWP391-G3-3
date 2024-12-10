@@ -105,7 +105,7 @@ const FORM_VALIDATION = Yup.object().shape({
   senderNote: Yup.string()
     .nullable()
     .max(500, "Ghi chú cần phải dưới 500 kí tự"),
-  discount: Yup.string().nullable(),
+  discount: Yup.string().nullable().oneOf([null,"10PKL","Mã giảm giá không hợp lệ "]),
   // cityS: Yup.string().required("Vui lòng chọn thành phố"),
   // cityR: Yup.string().required("Vui lòng chọn thành phố"),
   freight: Yup.string().required("Vui lòng chọn phương thức vận chuyển"),
@@ -389,7 +389,7 @@ const OrderForm = () => {
             if (!orderData.wardS) orderData.wardS = "Phú Minh";
           }
 
-          if (japan === "Nhật Bản") {
+          if (japan === "Trong nước") {
             // If 'Trong nước', adjust origin with specific values
             orderData.origin = `${values.origin}`;
             orderData.cityS = "Hà Nội";
@@ -961,7 +961,7 @@ const OrderForm = () => {
                   <Divider
                     sx={{ backgroundColor: "black", margin: "20px 50px" }}
                   />
-                  <Grid item xs={12}>
+                  <Grid xs={12}>
                     <CheckboxWrapper
                       name="termsOfService"
                       legend="Terms Of Service"

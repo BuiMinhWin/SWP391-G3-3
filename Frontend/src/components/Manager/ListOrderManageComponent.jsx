@@ -241,37 +241,32 @@ const toggleDropdown = () => {
         
         <h6>List</h6>
         <li>
-          <a href="/manager"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i>Dashboard</a>
+          <a href="/manager"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i>Dashboard</a> 
         </li>
 
         <li>
-          <a  href="/listcustomers"><i className="bi bi-people me-2"><FiUsers /></i> Customers</a>
+          <a  href="/listcustomers"><i className="bi bi-people me-2"><FiUsers /></i>Danh sách khách hàng</a>
         </li>
 
         <li>
-          <a href="/accounts"><i className="bi bi-person-badge me-2"><FiUsers /></i> Employees</a>
+          <a href="/accounts"><i className="bi bi-person-badge me-2"><FiUsers /></i>Dach sách nhân viên</a>
         </li>
 
-         <li>
-            <a href="/service"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Services</a>
-          </li>
+
         
-        <h6>General</h6>
-        <li>
-          <a href="#"><i className="bi bi-chat-dots me-2"><FaRegCalendarAlt /></i> Calendar</a>
-         </li>
+         <li>
+            <a href="/service"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Danh sách dịch vụ</a>
+          </li>
 
-        <li>
-          <a href="#"><i className="bi bi-life-preserver me-2"><MdSupportAgent /></i> Help & Support</a>
+          <li>
+          <a href="employee-page"><i className="bi bi-person-badge me-2"><CgProfile /></i>Thông tin tài khoản</a>
         </li>
 
         <li>
-          <a href="#"><i className="bi bi-chat-dots me-2"> <FaRegMessage/> </i>  Messages</a>
+          <a onClick={handleLogout}><i className="bi bi-person-badge me-2"><CiLogout /></i>Đăng xuất</a>
         </li>
 
-        <li>
-          <a href="#"><i className="bi bi-gear me-2"><IoSettingsOutline /></i> Settings</a>
-         </li>
+        
        
       </ul>
       </nav>
@@ -281,7 +276,7 @@ const toggleDropdown = () => {
         <main className="dashboard col-10 ">
         <header className="d-flex justify-content-between align-items-center mb-4 ">
         <h4 className="title">Dashboard</h4>
-            <header className="d-flex justify-content-between align-items-center mb-4 ">
+        <header className="d-flex justify-content-between align-items-center mb-4" style={{ marginRight: '50px' }}>
             <div className="header-content" style={{ width: '%' }}> 
             <div className="d-flex align-items-center justify-content-center search-container">
             <input
@@ -321,37 +316,38 @@ const toggleDropdown = () => {
 
               <div className="filter-bar d-flex mb-3">
                 <select className="form-select me-2" value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)}>
-                  <option value="">All Months</option>
-                  <option value="1">January</option>
-                  <option value="2">February</option>
-                  <option value="3">March</option>
-                  <option value="4">April</option>
-                  <option value="5">May</option>
-                  <option value="6">June</option>
-                  <option value="7">July</option>
-                  <option value="8">August</option>
-                  <option value="9">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
+                  <option value="">Tháng</option>
+                  <option value="1">Tháng 1</option>
+                  <option value="2">Tháng 2</option>
+                  <option value="3">Tháng 3</option>
+                  <option value="4">Tháng 4</option>
+                  <option value="5">Tháng 5</option>
+                  <option value="6">Tháng 6</option>
+                  <option value="7">Tháng 7</option>
+                  <option value="8">Tháng 8</option>
+                  <option value="9">Tháng 9</option>
+                  <option value="10">Tháng 10</option>
+                  <option value="11">Tháng 11</option>
+                  <option value="12">Tháng 12</option>
                 </select>
               
                 <select className="form-select me-2" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                  <option value="">All Statuses</option>
-                  <option value="1">Paying</option>
-                  <option value="2">Approving</option>
-                  <option value="3">Waiting for get order</option>
-                  <option value="4">Delivering</option>
-                  <option value="5">Delivered</option>
-                  <option value="6">Special</option>
+                  <option value="">Trạng thái</option>
+                  <option value="0">Chờ Duyệt</option>
+                  <option value="1">Đã duyệt</option>
+                  <option value="2">Chờ thanh toán</option>
+                  <option value="3">Đang lấy hàng</option>
+                  <option value="4">Đang giao</option>
+                  <option value="5">Đã giao</option>
+                  <option value="6">Đơn sự cố</option>
                   
                  
                 </select>
                 <select className="form-select me-2" value={transportationFilter} onChange={(e) => setTransportationFilter(e.target.value)}>
              
-                  <option value= "">Method Transport</option>
-                  <option value= "Giao hàng khẩn cấp">Express Delivery</option>
-                  <option value= "Giao hàng tiêu chuẩn">Regular Delivery</option>
+                  <option value= "">Phương thức vận chuyển</option>
+                  <option value= "Giao hàng khẩn cấp">Giao hàng khẩn cấp</option>
+                  <option value= "Giao hàng tiêu chuẩn">Giao hàng tiêu chuẩn</option>
                 </select>
 
                 
@@ -369,12 +365,12 @@ const toggleDropdown = () => {
                 <thead>
                   <tr>
                   <th>OrderId</th>
-                  <th>Origin</th>
-                  <th>OrderDate</th>
-                  <th>Destination</th>
-                  <th>ShippedDate</th>
-                  <th>Freight</th>
-                  <th>Status</th>
+                  <th>Điểm đi</th>
+                  <th>Ngày đặt</th>
+                  <th>Điểm đến</th>
+                  <th>Ngày giao</th>
+                  <th>Phương thức vận chuyển</th>
+                  <th>Trạng thái</th>
                   <th> </th>
                   </tr>
                 </thead>
@@ -399,11 +395,12 @@ const toggleDropdown = () => {
                         {order.status === 4 && "Đang giao"}
                         {order.status === 5 && "Đã hoàn thành"}  
                         {order.status === 6 ? (
-                            <button onClick={() => updateOrderStatus(order.orderId)}>Solve</button>
-                          ) : null} 
+                            <button onClick={() => updateOrderStatus(order.orderId)}>Xử lí</button>
+                          ) : null}
+                        {order.status === 7 && "Đã hoàn thành"} 
                       </td>
                       <td>
-                        <button onClick={() => handleViewOrder(order.orderId)}>View</button>
+                        <button onClick={() => handleViewOrder(order.orderId)}>Xem</button>
                       </td>
                     </tr>
                   ))

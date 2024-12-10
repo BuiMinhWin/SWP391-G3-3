@@ -34,7 +34,7 @@ const Booking = () => {
       .then((response) => {
         console.log(response.data); 
         if (Array.isArray(response.data)) {
-          const filteredOrders = response.data.filter(order => order.sale === accountId && order.paymentStatus === 1);
+          const filteredOrders = response.data.filter(order => order.sale === accountId && order.paymentStatus === 1 || order.paymentStatus === 2);
           const sortedOrders = filteredOrders.sort((a, b) => {
             if (a.freight === "Dịch vụ hỏa tốc" && b.freight !== "Dịch vụ hỏa tốc") return -1;
             if (a.freight !== "Dịch vụ hỏa tốc" && b.freight === "Dịch vụ hỏa tốc") return 1;
@@ -98,12 +98,12 @@ const Booking = () => {
                 <td style={{ color: order.freight === "Dịch vụ hỏa tốc" ? "red" : "green"}}>
                   {order.freight}</td>
                 <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                <td> {order.shippedDate ? new Date(order.shippedDate).toLocaleDateString() : 'Chưa giao hàng'}</td>
+                <td>{new Date(order.shippedDate).toLocaleDateString()}</td>
                 <td>{formatCurrency(order.totalPrice)}</td>
                 <td>{order.deliver}</td>
                 <td>{statusLabels[order.status]}</td>
                 <td>
-                  {order.status === 1 ? (
+                  {order.status === 1 && order.sale != accountId ? (
                     <button
                       className="btn btn-info"
                       onClick={() => openAssignDriverModal(order.orderId)}

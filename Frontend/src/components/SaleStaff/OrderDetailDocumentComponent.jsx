@@ -23,6 +23,7 @@ const OrderDetailDocumentComponent = () => {
     }
   }, [orderId]);
 
+
   useEffect(() => {
     getOrder(orderId)
       .then(response => {
@@ -32,14 +33,6 @@ const OrderDetailDocumentComponent = () => {
         console.error("Error fetching orders: ", error);
       });
   }, []);
-
-  const handleCancelOrder = (orderId) => {
-    replyOrder(orderId)
-      .then(() => {
-        console.log(orderId.status);
-      })
-      .catch((error) => console.error("Error updating order: ", error));
-  };
 
   const handleViewPDF = async (orderDetailId) => {
     if (pdfUrls[orderDetailId]) {
@@ -60,60 +53,68 @@ const OrderDetailDocumentComponent = () => {
     }
   };
 
-  const handleUpdateOrderIdDetail = (orderDetailId) => {
-    updateOrderDetailStatus(orderDetailId, 1) // Update to 1 (Báo lỗi)
-      .then(() => {
-        console.log(`Updated OrderDetailId ${orderDetailId} to status 1`);
-        // Refresh the order details after update
-        getOrderDetail(orderId).then(response => setOrderDetail(response.data));
-      })
-      .catch(error => console.error("Error updating order detail status:", error));
+ 
+  
+  const handleUpdateForDetail = async (orderDetailId, newStatus) => {
+    try {
+      console.log(newStatus)
+      const response = await  updateOrderDetailStatus(orderDetailId, newStatus)
+      
+      console.log("Response handle update for detail", response.data)
+ 
+    }catch{
+      
+
+    }
+
+  }
+  
+  const handleUpdateOrderIdDetailto9000 = async (orderDetailId, newStatus, orderId) => {
+    try {
+      // First, update the order detail status
+      const response = await updateOrderDetailStatus(orderDetailId, newStatus);
+      console.log("Response handle update for detail:", response.data);
+  
+      // After that, update the order status to 9000
+      const data = await updateStatus(orderId, 9000);
+      console.log("Order ID being sent for status update:", orderId);
+      console.log("Response from order status update:", data);
+    } catch (error) {
+      // Catch any errors from the two asynchronous operations
+      console.error("Error occurred while updating order details or order status:", error);
+    }
   };
   
-  const handleUpdateOrderIdDetail1 = (orderDetailId) => {
-    updateOrderDetailStatus(orderDetailId, 2) // Send request to update status to 2 (Duyệt lại)
-      .then(() => {
-        console.log(`Successfully updated OrderDetailId ${orderDetailId} to status 2`);
-        // Re-fetch the order details to reflect the updated status
-        return getOrderDetail(orderId);
-      })
-      .then(response => {
-        setOrderDetail(response.data); // Update state with the refreshed data from backend
-      })
-      .catch(error => console.error("Error updating order detail status:", error));
-  };
-  
-  const handleUpdateStatus = (orderId) => {
-    // Log the orderId and currentStatus
-    console.log("Updating OrderId:", orderId, "Current Status:");
-    const newStatus = 1; // Set new status to 1 (Duyệt)
-    console.log("Setting new status to:", newStatus);
-  
+
+const handleUpdateStatus = (orderId) => {
+    console.log("Updating OrderId:", orderId);
+
+    const newStatus = 1; // C?p nh?t tr?ng thái don hàng
+
     updateStatus(orderId, newStatus)
-      .then(() => {
-        console.log("Successfully updated OrderId:", orderId, "to status 1 (Duyệt)");
-        updateSale(orderId, accountId); // Update sale info if needed
-        console.log("Sale information updated for OrderId:", orderId, "with AccountId:", accountId);
-      })
-      .catch((error) => console.error("Error updating order:", error));
-  // Refresh the page
-  };
+        .then(() => {
+            console.log("Successfully updated OrderId:", orderId, "to status 1 (Duy?t)");
+            updateSale(orderId, accountId); // C?p nh?t sale info n?u c?n
+        })
+        .catch((error) => console.error("Error updating order:", error));
+};
   
   const handleUpdateStatus9000 = (orderId) => {
     // Log the orderId and currentStatus
     console.log("Updating OrderId:", orderId, "Current Status:");
   
-    const newStatus = 0; // Set new status to 0 (Chờ phản hồi)
+    const newStatus = 0; // Set new status to 0 (Ch? ph?n h?i)
     console.log("Setting new status to:", newStatus);
   
-    updateStatus(orderId, newStatus)
+    updateStatus(orderId, 0)
       .then(() => {
-        console.log("Successfully updated OrderId:", orderId, "to status 0 (Chờ phản hồi)");
+        console.log("Successfully updated OrderId:", orderId, "to status 0 (Ch? ph?n h?i)");
       })
       .catch((error) => console.error("Error updating order:", error));
   
 
   };
+
  
   console.log("Test button:", orders)
   // Check if the conditions for the "Update Order Status" button are met
@@ -122,7 +123,7 @@ console.log("orderDetail",orderDetail)
 return (
   <div className="order-detail-document">
     <h2>Chi tiết đơn hàng cho OrderID: {orderId}</h2>
-    {(orders.status <= 0   || orders.status === 9000) ? (
+    {(orders.status === 0 || orders.status === 9000) ? (
       orderDetail.length > 0 ? (
         <>
           <table className="table-document table-striped-document">
@@ -130,7 +131,7 @@ return (
               <tr>
                 <th>Ngày tạo</th>
                 <th>Tên cá</th>
-                <th>Loại cá</th>
+                <th>Loài cá</th>
                 <th>Số lượng</th>
                 <th>Cân nặng</th>
                 <th>Trạng thái</th>
@@ -147,27 +148,25 @@ return (
                     <td>{order.quantity || "N/A"}</td>
                     <td>{order.weight || "N/A"}</td>
                     <td>
-                    {(orders.status < 1 || orders.status === 9000) && (
-                    <>
+                    
                       {order.status === 1 ? (
                         <button
                           className="btn btn-danger"
-                          onClick={() => handleUpdateOrderIdDetail(order.orderDetailId)}
+                          onClick={() => handleUpdateOrderIdDetailto9000(order.orderDetailId, 0, orderId)}
                         >
                           Báo lỗi
                         </button>
                       ) : order.status === 2 ? (
                         <button
                           className="btn btn-warning"
-                          onClick={() => handleUpdateOrderIdDetail1(order.orderDetailId)}
+                          onClick={() => handleUpdateForDetail(order.orderDetailId, 1)}
                         >
                           Duyệt lại
                         </button>
-                      ) : order.status === 0 ? (
-                        <span>Đang chờ khách hàng phản hồi</span>
-                      ) : null}
-                    </>
-                  )}
+                      ) : order.status === 0
+                      ? <p>Khách hàng duyệt đơn</p> : null}
+                  
+                  
                     </td>
                     <td>
                       <button
@@ -203,7 +202,7 @@ return (
               className="btn btn-success"
               onClick={() => handleUpdateStatus9000(orderId)}
             >
-              Đưa về trạng thái 0
+              Ðưa về trạng thái 0
             </button>
           ) : orderId && orders.status === 0 ? (
             <button
@@ -232,7 +231,7 @@ return (
               <tr>
                 <th>Ngày tạo</th>
                 <th>Tên cá</th>
-                <th>Loại cá</th>
+                <th>Loài cá</th>
                 <th>Số lượng</th>
                 <th>Cân nặng</th>
                 <th>Trạng thái</th>
@@ -283,7 +282,7 @@ return (
               className="btn btn-success"
               onClick={() => handleUpdateStatus9000(orderId)}
             >
-              Đưa về trạng thái 0
+              Ðưa về trạng thái 0
             </button>
           ) : orderId && orders.status === 0 ? (
             <button

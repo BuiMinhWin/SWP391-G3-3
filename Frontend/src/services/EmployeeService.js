@@ -1,38 +1,31 @@
 import axios from "axios";
 
-const REST_API_BASE_URL = "http://koideliverysystem.id.vn:8080/api/accounts";
-const REST_API_BASE_URL2 = "http://koideliverysystem.id.vn:8080/api/Google/loginGG";
-const REST_API_PASSWORD_URL = "http://koideliverysystem.id.vn:8080/api/auth";
-const REST_API_SERVICE_URL = "http://koideliverysystem.id.vn:8080/api/services";
+
+const REST_API_BASE_URL = "/api/accounts";
+const REST_API_BASE_URL2 = "/api/Google/loginGG";
+const REST_API_PASSWORD_URL = "/api/auth";
+const REST_API_SERVICE_URL = "/api/services";
 
 export const listAccount = () => {
   return axios.get(REST_API_BASE_URL);
 };
 
 export const createAccount = (account) => {
-  return axios.post(REST_API_BASE_URL +'/register',account);
+  return axios.post(REST_API_BASE_URL + '/register', account);
 };
-
 
 export const getAccount = (accountId) => {
   return axios.get(REST_API_BASE_URL + '/' + accountId);
 };
 
-
 export const updateAccount = (accountId, account) => {
-  return axios.patch(REST_API_BASE_URL + '/update/'+accountId, account);
+  return axios.put(REST_API_BASE_URL + '/' + accountId, account);
 };
-
 
 export const deleteAccount = (accountId) => {
-  console.log(accountId);
+
   return axios.patch(`${REST_API_BASE_URL}/deActive/${accountId}`, { isDeleted: true });
 };
-
-// export const updateAvatar = (accountId, avatar) => {
-//   return axios.post(`${REST_API_BASE_URL}/${accountId}`, { avatar });
-// };
-
 
 export const loginAccount = (loginData) => {
   return axios.post(REST_API_BASE_URL + '/login', loginData, {
@@ -40,7 +33,6 @@ export const loginAccount = (loginData) => {
     withCredentials: true,
   });
 };
-
 
 export const googleLogin = (account) => {
   console.log('URL:', REST_API_BASE_URL2);
@@ -67,8 +59,8 @@ export const forgotPassword = (email) => {
   return axios.post(REST_API_PASSWORD_URL + `/forgot?email=${email}`);
 };
 
-export const verifyPassword = (email,code,newPassword,confirmPassword) => {
-  return axios.post(REST_API_PASSWORD_URL +`/verify?email=${email}&code=${code}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`);
+export const verifyPassword = (email, code, newPassword, confirmPassword) => {
+  return axios.post(REST_API_PASSWORD_URL + `/verify?email=${email}&code=${code}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`);
 };
 
 export const getService = () =>{
@@ -83,7 +75,7 @@ export const updatePrice = (servicesId, newPrice) => {
       console.error("Error updating service price:", error);
       throw error;
     });
-};
+}
 export const createService = (service) => {
   console.log(service);
   return axios.post(`${REST_API_SERVICE_URL}/create`,service);

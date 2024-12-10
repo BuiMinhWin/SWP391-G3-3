@@ -115,6 +115,7 @@ const Homepage = () => {
   const autoComplete = async (inputValue, setSuggestions) => {
     if (inputValue.length > 2) {
       try {
+        
         const response = await axios.get('https://rsapi.goong.io/Place/AutoComplete', {
           params: {
             api_key: API_KEY,
@@ -125,6 +126,7 @@ const Homepage = () => {
         console.log(response.data)
         setSuggestions(response.data.predictions || []);
       } catch (error) {
+        
         console.error('Error fetching suggestions:', error);
       }
     } else {

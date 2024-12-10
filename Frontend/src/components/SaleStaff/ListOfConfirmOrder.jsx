@@ -47,7 +47,6 @@ const ListOrderComponent = () => {
     }
   };
 
-
   const handleViewOrder = (orderId) => navigate(`/confirmDetail/${orderId}`);
 
   return (
@@ -68,9 +67,7 @@ const ListOrderComponent = () => {
             <th>Sale</th>
             <th>Trạng thái</th>
             <th>Cập nhật trạng thái</th>
-            <th>Chi tiết</th>
-
-           
+            <th>Chi tiết đơn hàng</th>
           </tr>
         </thead>
         <tbody>
@@ -84,7 +81,7 @@ const ListOrderComponent = () => {
           {order.freight}
         </td>
         <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-        <td>{order.shippedDate ? new Date(order.shippedDate).toLocaleDateString() : 'Chưa giao hàng'}</td>
+        <td>{new Date (order.shippedDate).toLocaleDateString()}</td>
         <td>{formatCurrency(order.totalPrice)}</td>
         <td>{order.sale}</td>
         <td style={{ color: order.status === 0 ? 'red' : 'green' }}>
@@ -105,22 +102,12 @@ const ListOrderComponent = () => {
           )}
         </td>
         <td>
-          {order.status == 9000 ? (
-            <button
+          <button
             className="btn btn-primary"
             onClick={() => handleViewOrder(order.orderId)}
           >
-              Đơn đang chờ duyệt lại
+            Chi tiết
           </button>
-          ) : (
-            <button
-            className="btn btn-primary"
-            onClick={() => handleViewOrder(order.orderId)}
-          >
-                Chi tiết
-          </button>
-          )}
-          
         </td>
       </tr>
     ))

@@ -31,7 +31,7 @@ const OrderReport = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          "http://koideliverysystem.id.vn:8080/api/orders"
+          "/api/orders"
         );
         const accountId = localStorage.getItem("accountId");
 
@@ -166,7 +166,7 @@ const OrderReport = () => {
                 </Typography>
                 <Typography variant="body1">
                   Tổng tiền: {`${formatCurrency(order.totalPrice)}`} VND -{" "}
-                  {order.paymentStatus ? "Đã thanh toán" : "Chưa thanh toán"}
+                  {order.paymentStatus ===2 ? "Trả sau" : order.paymentStatus ===0 ? "Chưa thanh toán" : order.paymentStatus ===1? "Đã thanh toán":undefined}
                 </Typography>
               </Box>
 

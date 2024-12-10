@@ -2,18 +2,17 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './DeliveryStaff.css';
 import { useNavigate } from 'react-router-dom';
-import { listOrder,  updateStatus } from '../../services/DeliveryService';
+import { listOrder, getOrderDetail, updateStatus } from '../../services/DeliveryService';
 import { logout } from '../Member/auth'; 
-import { FaRegCalendarAlt,FaDirections,FaEye } from "react-icons/fa";
+import { FaRegCalendarAlt,FaDirections } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
-import { MdSupportAgent,MdOutlineReportProblem} from "react-icons/md";
+import { MdSupportAgent,MdOutlineReportProblem,MdRemoveRedEye} from "react-icons/md";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { CgProfile } from "react-icons/cg";
 import { CiLogout } from "react-icons/ci";
 import { FiAlertTriangle,FiHome  } from "react-icons/fi";
 import { FaRegRectangleList,FaBoxesStacked,FaRegMessage,FaTruckFast  } from "react-icons/fa6";
-import { MdRemoveRedEye } from "react-icons/md";
 import {  getAvatar} from "../../services/CustomerService";
 import { trackingOrderState } from '../../services/DeliveryStatusService';
 import { useSnackbar } from 'notistack';
@@ -118,6 +117,25 @@ const toggleDropdown = () => {
  
     if (accountId) fetchAccount();
 
+    // const getAllOrders = () => {
+    //   listOrder()
+    //     .then((response) => {
+    //       if (Array.isArray(response.data)) {
+    //         setOrders(response.data);
+    //         const filteredOrders = response.data.filter(order => order.deliver === accountId);
+    //         localStorage.setItem("orders", JSON.stringify(filteredOrders));
+    //         console.log("Orders from localStorage:", JSON.parse(localStorage.getItem("orders")));
+    //       } else {
+    //         console.error("API response is not an array", response.data);
+    //         setOrders([]);
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error fetching : ", error);
+    //     });
+    // };
+    
+
     fetchProvinces();
     getAllOrders();
   }, []);
@@ -139,7 +157,41 @@ const toggleDropdown = () => {
         console.error("Error fetching : ", error);
       });
   };
-   
+  
+
+  useEffect(() => {
+    const storedOrders1 = JSON.parse(localStorage.getItem("orders")) || [];
+    const accountId = localStorage.getItem("accountId");
+  
+    const checkForNewOrders = async () => {
+      try {
+        const response = await listOrder(); 
+        const newOrders = response.data || [];
+  
+ 
+        const filteredNewOrders = newOrders.filter(order => order.deliver === accountId);
+        
+     
+        const newOrderCount = filteredNewOrders.length;
+        const storedOrderCount = storedOrders1.length;
+  
+        // if (newOrderCount > storedOrderCount) {
+        //   enqueueSnackbar(`Có ${newOrderCount - storedOrderCount} đơn hàng mới!`, { variant: "info" });
+        // }
+  
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+  
+    const intervalId = setInterval(checkForNewOrders, 5000);
+
+    
+    return () => clearInterval(intervalId);
+  }, []);
+
+
+ 
 
 
   const handleSearch = async (event) => {
@@ -313,24 +365,18 @@ const toggleDropdown = () => {
         </li>
         
         <li>
-          <a href="/orders"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Ordered</a>
+          <a href="/orders"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i>Lịch sử đơn hàng</a>
         </li>
 
         <li>
-          <a href="#"><i className="bi bi-chat-dots me-2"><FaRegCalendarAlt /></i> Calendar</a>
-         </li>
-
-        <li>
-          <a href="#"><i className="bi bi-life-preserver me-2"><MdSupportAgent /></i> Help & Support</a>
+          <a href="employee-page"><i className="bi bi-person-badge me-2"><CgProfile /></i>Thông tin tài khoản</a>
         </li>
 
         <li>
-          <a href="#"><i className="bi bi-chat-dots me-2"> <FaRegMessage/> </i>  Messages</a>
+          <a onClick={handleLogout}><i className="bi bi-person-badge me-2"><CiLogout /></i>Đăng xuất</a>
         </li>
 
-        <li>
-          <a href="#"><i className="bi bi-gear me-2"><IoSettingsOutline /></i> Settings</a>
-         </li>
+  
        
       </ul>
       </nav>
@@ -403,38 +449,42 @@ const toggleDropdown = () => {
           </section>
 
           <section className="delivery-ongoing-delivery mt-4 d-flex border-top pt-3">
-          <div className="delivery-list col-12">
-            <div className="filter-bar d-flex mb-3 w-100 justify-content-between ">
-              <select className="form-select me-2" value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)}>
-                <option value="">Tháng</option>
-                <option value="1">Tháng 1</option>
-                <option value="2">Tháng 2</option>
-                <option value="3">Tháng 3</option>
-                <option value="4">Tháng 4</option>
-                <option value="5">Tháng 5</option>
-                <option value="6">Tháng 6</option>
-                <option value="7">Tháng 7</option>
-                <option value="8">Tháng 8</option>
-                <option value="9">Tháng 9</option>
-                <option value="10">Tháng 10</option>
-                <option value="11">Tháng 11</option>
-                <option value="12">Tháng 12</option>
-              </select>
+          <div className="delivery-list col-12 " >
+              <div className="filter-bar d-flex mb-3">
+                <select className="form-select me-2" value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)}>
+                  <option value="">Tháng</option>
+                  <option value="1">Tháng 1</option>
+                  <option value="2">Tháng 2</option>
+                  <option value="3">Tháng 3</option>
+                  <option value="4">Tháng 4</option>
+                  <option value="5">Tháng 5</option>
+                  <option value="6">Tháng 6</option>
+                  <option value="7">Tháng 7</option>
+                  <option value="8">Tháng 8</option>
+                  <option value="9">Tháng 9</option>
+                  <option value="10">Tháng 10</option>
+                  <option value="11">Tháng 11</option>
+                  <option value="12">Tháng 11</option>
+                </select>
+              
+                <select className="form-select me-2" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                  <option value="">Trạng thái</option>
+                  <option value="2">Chờ lấy hàng</option>
+                  <option value="3">Đã lấy hàng</option>
+                  <option value="4">Đang giao</option>
+                  
+                 
+                </select>
+                <select className="form-select me-2" value={transportationFilter} onChange={(e) => setTransportationFilter(e.target.value)}>
+            
+                  <option value= "">Phương thức vận chuyển</option>
+                  <option value= "Giao hàng khẩn cấp">Giao hàng khẩn cấp</option>
+                  <option value= "Giao hàng tiêu chuẩn">Giao hàng tiêu chuẩn</option>
+                </select>
 
-              <select className="form-select me-2" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                <option value="">Trạng thái</option>
-                <option value="2">Chờ lấy hàng</option>
-                <option value="3">Đã lấy hàng</option>
-                <option value="4">Đang giao</option>
-              </select>
-
-              <select className="form-select me-2" value={transportationFilter} onChange={(e) => setTransportationFilter(e.target.value)}>
-                <option value="">Phương thức vận chuyển</option>
-                <option value="Giao hàng khẩn cấp">Giao hàng khẩn cấp</option>
-                <option value="Giao hàng tiêu chuẩn">Giao hàng tiêu chuẩn</option>
-              </select>
-
-              <select className="form-select me-2" value={provinceFilter} onChange={(e) => setProvinceFilter(e.target.value)}>
+                
+                
+                <select className="form-select me-2" value={provinceFilter} onChange={(e) => setProvinceFilter(e.target.value)}>
                 <option value="">Tỉnh thành</option>
                 {provinces?.map((province) => (
                   <option key={province.ProvinceID} value={province.ProvinceName}>
@@ -442,65 +492,70 @@ const toggleDropdown = () => {
                   </option>
                 ))}
               </select>
-            </div>
-
-            <table className="table table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>OrderId</th>
-                <th>Điểm đi</th>
-                <th>Điểm đến</th>
-                <th>Dịch vụ</th>
-                <th>Cập nhật</th>
-                <th>Tác vụ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.length > 0 ? (
-                filteredOrders
-                  .filter((order) => order.deliver === accountId && order.status > 1 && order.status < 5)
-                  .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
-                  .map((order) => (
-                    <tr key={order.orderId}>
-                      <td>{order.orderId}</td>
-                      <td>{order.origin}</td>
-                      <td>{order.destination}</td>
-                      <td>{order.freight}</td>
-                      <td>
-                        <button className="btn btn-info" onClick={() => handleClick(order.orderId)} disabled={isDisabled}>
-                          {order.status === 2 && "Đang lấy hàng"}
-                          {order.status === 3 && "Đã lấy hàng"}
-                          {order.status === 4 && "Đang giao"}
-                          {order.status === 5 && "Đã hoàn thành"}
-                          {order.status === 6 && "Đơn sự cố"}
-                        </button>
-                      </td>
-                      <td>
-                        <button className="btn btn-primary me-2" onClick={() => handleViewOrder(order.orderId)}>
-                          <MdRemoveRedEye />
-                        </button>
-
-                        <button className="btn btn-primary me-2" onClick={() => handleDirection(order.destination)}>
-                          <FaDirections />
-                        </button>
-
-                        <button className="btn btn-primary" onClick={() => updateOrderSpecial(order.orderId)}>
-                          <MdOutlineReportProblem />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-              ) : (
+              </div>
+              
+              <table className="table table-striped table-bordered">
+              <thead>
                 <tr>
-                  <td colSpan="6" className="text-center">Chưa có đơn nào</td>
+                  <th>OrderId</th>
+                  <th>Điểm đi</th>
+                  <th>Điểm đến</th>
+                  <th>Dịch vụ</th>
+                  <th>Cập nhật</th>
+                  <th>Tác vụ</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredOrders.length > 0 ? (
+                  filteredOrders
+                    .filter((order) => order.deliver === accountId && order.status > 1 && order.status < 5)
+                    .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
+                    .map((order) => (
+                      <tr key={order.orderId}>
+                        <td>{order.orderId}</td>
+                        <td>{order.origin}</td>
+                        <td>{order.destination}</td>
+                        <td>{order.freight}</td>
+                        <td>
+                          <button className="btn btn-info" onClick={() => handleClick(order.orderId)} disabled={isDisabled}>
+                            {order.status === 2 && "Đang lấy hàng"}
+                            {order.status === 3 && "Đã lấy hàng"}
+                            {order.status === 4 && "Đang giao"}
+                            {order.status === 5 && "Đã hoàn thành"}
+                            {order.status === 6 && "Đơn sự cố"}
+                          </button>
+                        </td>
+                        <td>
+                          <button className="btn btn-primary me-2" onClick={() => handleViewOrder(order.orderId)}>
+                            <MdRemoveRedEye />
+                          </button>
 
-            {showMap && <Map origin={selectedOrigin} destination={selectedDestination} />}
-          </div>
-        </section>
+                          <button className="btn btn-primary me-2" onClick={() => handleDirection(order.destination)}>
+                            <FaDirections />
+                          </button>
+
+                          <button className="btn btn-primary" onClick={() => updateOrderSpecial(order.orderId)}>
+                            <MdOutlineReportProblem />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center">Chưa có đơn nào</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            {showMap && (
+              <Map origin={selectedOrigin} destination={selectedDestination} />
+            )}
+
+
+         
+            </div>
+          
+          </section>
         </main>
       </div>
     </div>

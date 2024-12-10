@@ -116,26 +116,6 @@ const toggleDropdown = () => {
     setSearchQuery(event.target.value.toLowerCase());
   };
 
-  const API_KEY =import.meta.env.VITE_GOONG_API_KEY; // Thay bằng API Key của bạn
-
-  const reverseGeocodeAddress = async (lat, long) => {
-    try {
-      const response = await axios.get(
-        `https://rsapi.goong.io/Geocode?latlng=${lat},${long}&api_key=${API_KEY}`
-      );
-      const data = response.data;
-      if (data.results && data.results.length > 0) {
-        const address = data.results[0].formatted_address; // Get the formatted address
-        return address; // Return the full address
-      } else {
-        throw new Error('No results found for the address.');
-      }
-    } catch (error) {
-      console.error('Error fetching geocode:', error);
-      throw new Error('Failed to fetch geocode.');
-    }
-  };
- 
   const filteredOrders = orders.filter(order => {
     const orderMonth = new Date(order.orderDate).getMonth() + 1;
     const matchesMonth = monthFilter ? orderMonth === parseInt(monthFilter) : true;
@@ -186,21 +166,7 @@ const toggleDropdown = () => {
           <a href="/delivery"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Ordering</a>
         </li>
 
-        <li>
-          <a href="#"><i className="bi bi-chat-dots me-2"><FaRegCalendarAlt /></i> Calendar</a>
-         </li>
-
-        <li>
-          <a href="#"><i className="bi bi-life-preserver me-2"><MdSupportAgent /></i> Help & Support</a>
-        </li>
-
-        <li>
-          <a href="#"><i className="bi bi-chat-dots me-2"> <FaRegMessage/> </i>  Messages</a>
-        </li>
-
-        <li>
-          <a href="#"><i className="bi bi-gear me-2"><IoSettingsOutline /></i> Settings</a>
-         </li>
+       
        
       </ul>
       </nav>
@@ -209,27 +175,27 @@ const toggleDropdown = () => {
 
         <main className="dashboard col-10 ">
         <header className="d-flex justify-content-between align-items-center mb-4 ">
-            <h4 className="title">Delivery History</h4> 
-            {/* <h6>Delivery Orders</h6>          */}
-            <header className="d-flex justify-content-between align-items-center mb-4 ">
-            <div className="header-content" style={{ width: '%' }}> 
-            <div className="d-flex align-items-center justify-content-center search-container">
-            <input
-              className="search-bar"
-              type="text"
-              value={searchQuery}
-              onChange={handleSearch}
-              placeholder="Search Order"
-            />
-           </div>
+        <h4 className="title">Lịch sử đơn hàng</h4> 
+           
+           <header className="d-flex justify-content-between align-items-center mb-4" style={{ marginRight: '50px' }}>
+           <div className="header-content" style={{ width: '%' }}> 
+           <div className="d-flex align-items-center justify-content-center search-container">
+           <input
+               className="search-bar"
+               type="text"
+               value={searchQuery}
+               onChange={handleSearch}
+               placeholder="Search Order"
+           />
+          </div>
 
-              <div className="navbar-cus-right">
+          <div className="navbar-cus-right">
                 <div className="dropdown" onClick={toggleDropdown}>
                 <img src={avatar || '/default-avatar.png'} alt="Avatar" className="avatar" />
                   {isDropdownOpen && ( 
                     <div className="dropdown-content">
-                      <a  href="user-page"><CgProfile /> View Profile</a>
-                      <a  onClick={handleLogout}><CiLogout /> Logout</a>
+                      <a  href="employee-page"><CgProfile /> Thông tin tài khoản</a>
+                      <a  onClick={handleLogout}><CiLogout /> Đăng xuất</a>
                     </div>
                   )}
                 </div>
@@ -249,60 +215,60 @@ const toggleDropdown = () => {
           <section className="delivery-ongoing-delivery mt-4 d-flex border-top pt-3">
           <div className="delivery-list col-12 " >
 
-              <div className="filter-bar d-flex mb-3">
-                <select className="form-select me-2" value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)}>
-                  <option value="">All Months</option>
-                  <option value="1">January</option>
-                  <option value="2">February</option>
-                  <option value="3">March</option>
-                  <option value="4">April</option>
-                  <option value="5">May</option>
-                  <option value="6">June</option>
-                  <option value="7">July</option>
-                  <option value="8">August</option>
-                  <option value="9">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
-                </select>
-              
-                <select className="form-select me-2" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                  <option value="">All Statuses</option>
-                  <option value="3">Waiting for get order</option>
-                  <option value="4">Deliverin</option>
-                  <option value="5">Delivered</option>
-                  
-                 
-                </select>
-                <select className="form-select me-2" value={transportationFilter} onChange={(e) => setTransportationFilter(e.target.value)}>
-             
-                  <option value= "">Method Transport</option>
-                  <option value= "Giao hàng khẩn cấp">Express Delivery</option>
-                  <option value= "Giao hàng tiêu chuẩn">Regular Delivery</option>
-                </select>
+          <div className="filter-bar d-flex mb-3">
+            <select className="form-select me-2" value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)}>
+              <option value="">Tháng</option>
+              <option value="1">Tháng 1</option>
+              <option value="2">Tháng 2</option>
+              <option value="3">Tháng 3</option>
+              <option value="4">Tháng 4</option>
+              <option value="5">Tháng 5</option>
+              <option value="6">Tháng 6</option>
+              <option value="7">Tháng 7</option>
+              <option value="8">Tháng 8</option>
+              <option value="9">Tháng 9</option>
+              <option value="10">Tháng 10</option>
+              <option value="11">Tháng 11</option>
+              <option value="12">Tháng 12</option>
+            </select>
 
-                
-                <select className="form-select me-2" value={provinceFilter} onChange={(e) => setProvinceFilter(e.target.value)}>
-                <option value="">All Provinces</option>
-                {provinces?.map((province) => (
-                  <option key={province.ProvinceID} value={province.ProvinceName}>
-                    {province.ProvinceName}
-                  </option>
-                ))}
-              </select>
-              </div>
+            <select className="form-select me-2" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                   <option value="">Trạng thái</option>
+                  <option value="2">Chờ lấy hàng</option>
+                  <option value="3">Đã lấy hàng</option>
+                  <option value="4">Đang giao</option>
+              
+            
+            </select>
+            <select className="form-select me-2" value={transportationFilter} onChange={(e) => setTransportationFilter(e.target.value)}>
+
+              <option value= "">Phương thức vận chuyển</option>
+              <option value= "Giao hàng khẩn cấp">Giao hàng khẩn cấp</option>
+              <option value= "Giao hàng tiêu chuẩn">Giao hàng tiêu chuẩn</option>
+            </select>
+
+            
+            <select className="form-select me-2" value={provinceFilter} onChange={(e) => setProvinceFilter(e.target.value)}>
+            <option value="">Tỉnh thành</option>
+            {provinces?.map((province) => (
+              <option key={province.ProvinceID} value={province.ProvinceName}>
+                {province.ProvinceName}
+              </option>
+            ))}
+          </select>
+          </div>
               
               <table className="table table-striped table-bordered ">
                 <thead>
                   <tr>
                   <th>OrderId</th>
-                  <th>Origin</th>
-                  <th>OrderDate</th>
-                  <th>Destination</th>
-                  <th>ShippedDate</th>
-                  <th>Freight</th>
-                  <th>Status</th>
-                  <th>Details</th>
+                  <th>Điểm đi</th>
+                  <th>Ngày tạo đơn</th>
+                  <th>Điểm đến</th>
+                  <th>Ngày giao</th>
+                  <th>Phương thức</th>
+                  <th>Trạng thái</th>
+                  <th>Xem</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -325,15 +291,17 @@ const toggleDropdown = () => {
                         {order.status === 3 && "Đã lấy hàng"}
                         {order.status === 4 && "Đang giao"}
                         {order.status === 5 && "Đã hoàn thành"}  
+                        {order.status === 6 && "Đơn khẩn cấp"} 
+                        {order.status === 7 && "Đã hoàn thành"} 
                       </td>
                       <td>
-                        <button onClick={() => handleViewOrder(order.orderId)}>View</button>
+                        <button onClick={() => handleViewOrder(order.orderId)}>Xem</button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="12" className="text-center">No Orders Found</td>
+                    <td colSpan="12" className="text-center">Chưa có đơn nào</td>
                   </tr>
                 )}
               </tbody>

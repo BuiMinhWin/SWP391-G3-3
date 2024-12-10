@@ -1,6 +1,7 @@
-import axios from "axios";
+import axios from 'axios';
 
-const API_BASE_URL = "http://koideliverysystem.id.vn:8080/api/feedbacks";
+const API_BASE_URL = "/api/feedbacks";
+
 
 export const createFeedback = async (feedbackData) => {
   const response = await axios.post(`${API_BASE_URL}/create`, feedbackData);
@@ -19,8 +20,7 @@ export const respondToFeedback = (feedbackId, comment, accountId) => {
   return axios.post(`${API_BASE_URL}/respond/${feedbackId}`, {
     feedbackId,
     comment,
+    createdAt: new Date().toISOString(),
     accountId,
   });
 };
-
-
