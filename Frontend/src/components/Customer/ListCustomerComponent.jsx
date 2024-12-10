@@ -135,73 +135,53 @@ const ListEmployeeComponent = () => {
         </li>
 
         
-        <h6>List</h6>
+        <h6>Quản lí</h6>
         <li>
           <a href="/manager"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i>Dashboard</a> 
         </li>
 
         
         <li onClick={toggleAccountDropdown} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-             < a href="#"><i className="bi bi-person-badge me-2"><FiUsers /></i> Customers</a>
+             < a href="#"><i className="bi bi-person-badge me-2"><FiUsers /></i> Quản lí khách hàng</a>
             </li>
             {isAccountDropdownOpen && (
               <ul className="list-unstyled ms-3">
-                 <li>
-                 
-                 <a href="#" onClick={addNewAccount}>
-                   <i className="bi bi-person-badge me-2"> <IoMdAddCircle  /> </i> New Accounts
-                 </a>
-                </li>
-             
                <li>
               
                  <a href="#" onClick={handleOpenActiveModal}>
-                   <i className="bi bi-person-badge me-2"> <IoMdAddCircle  /> </i> Deactive
+                   <i className="bi bi-person-badge me-2"> <IoMdAddCircle  /> </i> Vô hiệu hóa
                  </a>
                </li>
              
               </ul>
             )}
         <li>
-          <a href="/accounts"><i className="bi bi-person-badge me-2"><FiUsers /></i> Employees</a>
+          <a href="/accounts"><i className="bi bi-person-badge me-2"><FiUsers /></i>Dach sách nhân viên</a>
         </li>
 
 
         
          <li>
-            <a href="/service"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Services</a>
+            <a href="/service"><i className="bi bi-person-badge me-2"><HiOutlineClipboardDocumentList /></i> Danh sách dịch vụ</a>
           </li>
 
-          
-      
-        
-        <h6>General</h6>
-        <li>
-          <a href="#"><i className="bi bi-chat-dots me-2"><FaRegCalendarAlt /></i> Calendar</a>
-         </li>
-
-        <li>
-          <a href="#"><i className="bi bi-life-preserver me-2"><MdSupportAgent /></i> Help & Support</a>
+          <li>
+          <a href="employee-page"><i className="bi bi-person-badge me-2"><CgProfile /></i>Thông tin tài khoản</a>
         </li>
 
         <li>
-          <a href="#"><i className="bi bi-chat-dots me-2"> <FaRegMessage/> </i>  Messages</a>
+          <a onClick={handleLogout}><i className="bi bi-person-badge me-2"><CiLogout /></i>Đăng xuất</a>
         </li>
 
-        <li>
-          <a href="#"><i className="bi bi-gear me-2"><IoSettingsOutline /></i> Settings</a>
-         </li>
 
-      
-       
       </ul>
       </nav>
       </div>
       </aside>
       <main className="dashboard col-10 ">
       <header className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2 ">
-        <h4 className="title">Employees</h4>
-            <header className="d-flex justify-content-between align-items-center mb-4 ">
+        <h4 className="title">Danh sách khách hàng</h4>
+        <header className="d-flex justify-content-between align-items-center mb-4" style={{ marginRight: '50px' }}>
            
             <div className="search-bar ml-auto">
               <input
@@ -218,15 +198,12 @@ const ListEmployeeComponent = () => {
                 <img src={avatar || '/default-avatar.png'} alt="Avatar" className="avatar" />
                   {isDropdownOpen && ( 
                     <div className="dropdown-content">
-                      <a  href="user-page"><CgProfile /> View Profile</a>
-                      <a  onClick={handleLogout}><CiLogout /> Logout</a>
+                      <a  href="user-page"><CgProfile /> Thông tin tài khoản</a>
+                      <a  onClick={handleLogout}><CiLogout /> Đăng xuất</a>
                     </div>
                   )}
                 </div>
               </div>
-            
-
-            
 
             <div className="notification-icon m-4">
                 <IoIosNotificationsOutline />
@@ -243,7 +220,7 @@ const ListEmployeeComponent = () => {
         <div className="delivery-list col-12">
           <div className="filter-bar d-flex mb-4 col-10 align-items-center">
             <select className="form-select me-2 col-4" value={roleIdFilter} onChange={(e) => setRoleIdFilter(e.target.value)}>
-              <option value="">All Employees</option>
+              <option value="">Nhân Viên</option>
               <option value="Sales">Sales</option>
               <option value="Delivery">Delivery</option>
             </select>
@@ -271,7 +248,7 @@ const ListEmployeeComponent = () => {
                   <td>{account.lastName}</td>
                   <td>{account.email}</td>
                   <td>
-                    <button className="btn btn-info" onClick={() => updateAccount(account.accountId)}>Update</button>
+                    <button className="btn btn-info" onClick={() => updateAccount(account.accountId)}>Cập nhật</button>
                   </td>
                 </tr>
               ))
@@ -290,7 +267,7 @@ const ListEmployeeComponent = () => {
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">Active Accounts</h5>
+              <h5 className="modal-title">Tài Khoản</h5>
               <button 
                 type="button" 
                 className="close" 
@@ -323,14 +300,14 @@ const ListEmployeeComponent = () => {
                             className="btn btn-danger btn-sm"
                             onClick={() => handleDeactivateService(account.accountId)}
                           >
-                            Deactivate
+                            Vô hiệu hóa
                           </button>
                         ) : ( 
                           <button
                             className="btn btn-secondary btn-sm" 
                             disabled 
                           >
-                            Deactivate
+                            Vô hiệu hóa
                           </button>
                         )}
                       </td>
@@ -339,9 +316,7 @@ const ListEmployeeComponent = () => {
                 </tbody>
               </table>
             </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={handleCloseActiveModal}>Close</button>
-            </div>
+          
           </div>
         </div>
       </div>
